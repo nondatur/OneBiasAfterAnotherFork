@@ -154,8 +154,11 @@ def main() -> None:
 
     print(f"Loading model: {args.model}")
     tokenizer = AutoTokenizer.from_pretrained(args.model)
-    model = AutoModelForSequenceClassification.from_pretrained(args.model, torch_dtype=dtype)
-    model.to(device)
+    device_map = "auto" if args.device in ("auto", "cuda") else str(device)
+    model = AutoModelForSequenceClassification.from_pretrained(
+        args.model, torch_dtype=dtype, device_map=device_map
+    )
+    # .to() intentionally omitted: device_map handles placement.
     model.eval()
 
     # Prepare (question, answer) pairs for chosen/rejected

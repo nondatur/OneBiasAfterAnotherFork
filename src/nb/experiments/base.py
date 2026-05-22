@@ -275,12 +275,21 @@ class BiasExperiment(ABC):
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
         
+        # "cuda" / "auto" → let HF shard the model across all visible GPUs.
+        # An explicit single-device string (e.g. "cuda:0", "cpu") is passed
+        # through unchanged so the caller retains control.
+        device_map = (
+            "auto"
+            if self.config.device in ("cuda", "auto")
+            else self.config.device
+        )
         self.model = AutoModelForSequenceClassification.from_pretrained(
             self.config.model_path,
             trust_remote_code=self.config.trust_remote_code,
             torch_dtype=torch.bfloat16,
+            device_map=device_map,
         )
-        self.model = self.model.to(self.config.device)
+        # .to() intentionally omitted: device_map handles placement.
         
         if self.model.config.pad_token_id is None:
             self.model.config.pad_token_id = self.tokenizer.pad_token_id

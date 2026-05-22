@@ -384,17 +384,23 @@ def get_embeddings(
                 max_length=max_length,
                 return_tensors="pt",
             )
-            inputs = {k: v.to(device) for k, v in inputs.items()}
-            
+            # With device_map="auto" the first layer may not be on `device`;
+            # always send inputs to wherever the first layer actually lives.
+            input_device = next(base_model.parameters()).device
+            inputs = {k: v.to(input_device) for k, v in inputs.items()}
+
             outputs = base_model(**inputs, output_hidden_states=True)
             hidden_states = outputs.hidden_states[-1]  # [batch, seq_len, hidden_dim]
-            
-            # Get last non-padding token for each example
+
+            # Get last non-padding token for each example.
+            # hidden_states may be on a different GPU than inputs (device_map="auto"),
+            # so derive the indexing device from the tensor itself.
             attention_mask = inputs["attention_mask"]
             last_token_indices = attention_mask.sum(dim=1) - 1
+            hs_device = hidden_states.device
             batch_embeddings = hidden_states[
-                torch.arange(hidden_states.size(0), device=device),
-                last_token_indices,
+                torch.arange(hidden_states.size(0), device=hs_device),
+                last_token_indices.to(hs_device),
             ]
             all_embeddings.append(batch_embeddings.float().cpu())
     
@@ -541,26 +547,34 @@ def get_rewards_with_nulling(
                 max_length=max_length,
                 return_tensors="pt",
             )
-            inputs = {k: v.to(device) for k, v in inputs.items()}
-            
+            input_device = next(base_model.parameters()).device
+            inputs = {k: v.to(input_device) for k, v in inputs.items()}
+
             if do_nulling:
                 # Get hidden states and null out probe direction
                 outputs = base_model(**inputs, output_hidden_states=True)
                 hidden_states = outputs.hidden_states[-1]
-                
-                # Get last token hidden states
+
+                # Get last token hidden states.
+                # With device_map="auto", hidden_states may be on a different
+                # GPU than inputs, so index on hidden_states' own device.
                 attention_mask = inputs["attention_mask"]
                 last_token_indices = attention_mask.sum(dim=1) - 1
+                hs_device = hidden_states.device
                 last_hidden = hidden_states[
-                    torch.arange(hidden_states.size(0), device=device),
-                    last_token_indices,
+                    torch.arange(hidden_states.size(0), device=hs_device),
+                    last_token_indices.to(hs_device),
                 ].float()
-                
+
                 # Null out probe subspace
                 nulled_hidden = project_to_null_space(last_hidden, probe)
-                
-                # Get score from nulled hidden state
-                scores = score_head(nulled_hidden.to(hidden_states.dtype)).squeeze(-1)
+
+                # score_head may be on a different GPU (device_map="auto"),
+                # so move the hidden state to match it.
+                score_device = score_head.weight.device
+                scores = score_head(
+                    nulled_hidden.to(score_device).to(hidden_states.dtype)
+                ).squeeze(-1)
             else:
                 # Standard forward pass
                 outputs = model(**inputs)
@@ -631,28 +645,39 @@ def get_rewards_both(
                 max_length=max_length,
                 return_tensors="pt",
             )
-            inputs = {k: v.to(device) for k, v in inputs.items()}
-            
+            input_device = next(base_model.parameters()).device
+            inputs = {k: v.to(input_device) for k, v in inputs.items()}
+
             # Always get hidden states so we can compute both scores
             outputs = base_model(**inputs, output_hidden_states=True)
             hidden_states = outputs.hidden_states[-1]
-            
-            # Get last token hidden states
+
+            # Get last token hidden states.
+            # With device_map="auto", hidden_states may be on a different
+            # GPU than inputs, so index on hidden_states' own device.
             attention_mask = inputs["attention_mask"]
             last_token_indices = attention_mask.sum(dim=1) - 1
+            hs_device = hidden_states.device
             last_hidden = hidden_states[
-                torch.arange(hidden_states.size(0), device=device),
-                last_token_indices,
+                torch.arange(hidden_states.size(0), device=hs_device),
+                last_token_indices.to(hs_device),
             ].float()
-            
+
+            # score_head may be on a different GPU (device_map="auto")
+            score_device = score_head.weight.device
+
             # Baseline score (no nulling)
-            baseline_scores = score_head(last_hidden.to(hidden_states.dtype)).squeeze(-1)
+            baseline_scores = score_head(
+                last_hidden.to(score_device).to(hidden_states.dtype)
+            ).squeeze(-1)
             all_baseline_scores.append(baseline_scores.cpu())
-            
+
             # Nulled score
             if do_nulling:
                 nulled_hidden = project_to_null_space(last_hidden, probe)
-                nulled_scores = score_head(nulled_hidden.to(hidden_states.dtype)).squeeze(-1)
+                nulled_scores = score_head(
+                    nulled_hidden.to(score_device).to(hidden_states.dtype)
+                ).squeeze(-1)
             else:
                 nulled_scores = baseline_scores
             all_nulled_scores.append(nulled_scores.cpu())
