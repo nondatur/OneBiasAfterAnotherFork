@@ -530,10 +530,10 @@ def main():
     if not all_probes:
         logger.error("No probes found in %s", args.probes_dir)
         logger.error("Run bias experiments first to generate probes:")
-        logger.error("  python experiments/run_experiment.py --config experiments/configs/length_skywork.yaml")
-        logger.error("  python experiments/run_experiment.py --config experiments/configs/position_skywork_gsm8k.yaml")
-        logger.error("  python experiments/run_experiment.py --config experiments/configs/sycophancy_skywork_gsm8k_mc.yaml")
-        logger.error("  python experiments/run_experiment.py --config experiments/configs/uncertainty_skywork_gsm8k_mc.yaml")
+        logger.error("  python experiments/run_experiment.py --config configs/length_skywork.yaml")
+        logger.error("  python experiments/run_experiment.py --config configs/position_skywork_gsm8k.yaml")
+        logger.error("  python experiments/run_experiment.py --config configs/sycophancy_skywork_gsm8k_mc.yaml")
+        logger.error("  python experiments/run_experiment.py --config configs/uncertainty_skywork_gsm8k_mc.yaml")
         sys.exit(1)
     
     # Filter probes by model name if specified

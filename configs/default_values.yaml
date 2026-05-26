@@ -1,0 +1,41 @@
+# Default configuration values for all notebooks.
+# Each section corresponds to one notebook.
+# Individual experiment YAML files override these defaults;
+# keyword arguments passed at call-time override everything.
+
+run_experiment:
+  artifacts_dir: artifacts
+  plots_dir: plots
+  device: cuda
+  null_alpha: 1.0
+  probe_size: 500
+  split_seed: 42
+  batch_size: 8
+  max_length: 2048
+  trust_remote_code: true
+
+run_all:
+  device: cuda
+  cross: false
+  dry_run: false
+
+rewardbench_multiprobe:
+  model: Skywork/Skywork-Reward-V2-Llama-3.1-8B
+  probes_dir: artifacts/probes
+  output: artifacts/results/rewardbench2_multiprobe.json
+  plots_dir: plots/rewardbench
+  batch_size: 8
+  max_length: 2048
+  device: cuda
+  null_alpha: 1.0
+  split: test
+
+eval_perplexity:
+  nll_norm: bytes       # token | bytes | chars
+  corr_kind: spearman   # pearson | spearman
+  do_family_split: false
+  panel_func: median    # mean | median
+
+eval_rb2_data:
+  # Relative to project root
+  filepath: rb2_data/rewardbench2_multiprobe_combined.json

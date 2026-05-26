@@ -4,7 +4,7 @@ Run bias evaluation experiments.
 
 Usage:
     # From config file:
-    python experiments/run_experiment.py --config experiments/configs/length_skywork.yaml
+    python experiments/run_experiment.py --config configs/length_skywork.yaml
     
     # From command line args:
     python experiments/run_experiment.py \\

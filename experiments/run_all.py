@@ -29,7 +29,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-MODELS_CONFIG = PROJECT_ROOT / "experiments" / "models.yaml"
+MODELS_CONFIG = PROJECT_ROOT / "configs" / "models.yaml"
 
 
 def load_registry() -> Dict[str, Any]:
