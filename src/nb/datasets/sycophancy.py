@@ -231,7 +231,7 @@ class SycophancyMCQDataset(ProbeDataset):
     def _parse_mcq_examples(self, dataset: Any, max_examples: Optional[int] = None) -> List[Dict[str, Any]]:
         """Parse MCQ dataset into sycophancy format."""
         examples = []
-        random.seed(self.split_seed)
+        rng = random.Random(self.split_seed)  # local RNG — does not touch global state
         
         for idx, row in enumerate(dataset):
             # Handle different field names
@@ -260,7 +260,7 @@ class SycophancyMCQDataset(ProbeDataset):
             incorrect_indices = [i for i in range(4) if i != correct_idx and choices[i]]
             if not incorrect_indices:
                 continue
-            incorrect_idx = random.choice(incorrect_indices)
+            incorrect_idx = rng.choice(incorrect_indices)
             incorrect_answer = choices[incorrect_idx]
             
             examples.append({

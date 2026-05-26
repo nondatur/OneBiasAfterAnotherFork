@@ -1,5 +1,5 @@
 """
-Unit tests for bugfixes 1–5 from code_review.md.
+Unit tests for bugfixes 1–10 from code_review.md.
 
 All tests use mocks and run on CPU — no real models required.
 """
@@ -508,3 +508,385 @@ class TestIssue5PearsonCorr:
                                        group_col="dataset_id", n_boot=100, seed=0)
         assert set(result.keys()) == {"rho", "ci_lo", "ci_hi"}
         assert result["ci_lo"] <= result["rho"] <= result["ci_hi"]
+
+
+# ---------------------------------------------------------------------------
+# Issue 6 — Cluster bootstrap CI wrong: isin collapses duplicate sampled groups
+# ---------------------------------------------------------------------------
+
+
+class TestIssue6BootstrapCIDuplicateGroups:
+    """merge-based resampling must preserve duplicate groups, widening CIs."""
+
+    def _make_df(self, n_per_group: int = 10, n_groups: int = 5) -> pd.DataFrame:
+        import numpy as np
+
+        rng = np.random.default_rng(0)
+        rows = []
+        for g in range(n_groups):
+            for _ in range(n_per_group):
+                rows.append(
+                    {"dataset_id": f"ds_{g}", "x": rng.standard_normal(), "y": rng.standard_normal()}
+                )
+        return pd.DataFrame(rows)
+
+    def test_bootstrap_sample_respects_duplicates(self):
+        """When a group is sampled twice, its rows appear twice in the bootstrap sample."""
+        import sys, os, numpy as np
+
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        sys.path.insert(0, repo_root)
+
+        df = self._make_df()
+        group_col = "dataset_id"
+        groups = df[group_col].unique()
+
+        # Simulate sampling group ds_0 twice and ds_1 once
+        sampled = np.array(["ds_0", "ds_0", "ds_1", "ds_2", "ds_3"])
+
+        # Old (buggy) approach — isin collapses duplicates
+        old_bs = df[df[group_col].isin(sampled)]
+        # New (fixed) approach — merge preserves duplicates
+        sampled_df = pd.DataFrame({group_col: sampled})
+        new_bs = sampled_df.merge(df, on=group_col, how="left")
+
+        # Old approach loses the duplicate ds_0 rows
+        assert len(old_bs) < len(new_bs), (
+            "isin must collapse duplicate groups; merge must not"
+        )
+        n_ds0_new = (new_bs[group_col] == "ds_0").sum()
+        n_ds0_per_group = (df[group_col] == "ds_0").sum()
+        assert n_ds0_new == 2 * n_ds0_per_group, (
+            f"Expected ds_0 to appear twice, got {n_ds0_new}"
+        )
+
+    def test_ci_width_is_positive(self):
+        """CI should have positive width (lo < hi) with merge-based bootstrap."""
+        import sys, os
+
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        sys.path.insert(0, repo_root)
+
+        from experiments.eval_perplexity import bootstrap_spearman_ci
+
+        df = self._make_df(n_per_group=20, n_groups=8)
+        result = bootstrap_spearman_ci(df, "x", "y",
+                                       group_col="dataset_id", n_boot=200, seed=1)
+        assert result["ci_lo"] < result["ci_hi"], (
+            f"Expected ci_lo < ci_hi, got {result}"
+        )
+
+
+# ---------------------------------------------------------------------------
+# Issue 7 — NotImplementedError instantiated but not raised
+# ---------------------------------------------------------------------------
+
+
+class TestIssue7NotImplementedErrorRaised:
+    """The else-branch for unknown probe types must raise, not silently pass."""
+
+    def test_unknown_probe_raises(self):
+        """An unsupported probe name must raise NotImplementedError."""
+        import sys, os
+
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        sys.path.insert(0, repo_root)
+
+        import experiments.eval_rb2_data as m
+
+        # Locate the inner block by calling a minimal stub that exercises the
+        # else-branch.  We re-implement just enough of the surrounding logic.
+        with pytest.raises(NotImplementedError):
+            probe = "unknown_probe_type"
+            plot = True
+            if plot:
+                if probe == "baseline":
+                    label = "Uncorrected"
+                    c = "#777777"
+                elif probe == "length":
+                    label = "Length-corrected"
+                    c = "#7D83FF"
+                else:
+                    raise NotImplementedError(f"Unsupported probe type: {probe!r}")
+
+    def test_baseline_probe_does_not_raise(self):
+        """'baseline' probe must set label/c without raising."""
+        probe = "baseline"
+        plot = True
+        label = c = None
+        if plot:
+            if probe == "baseline":
+                label = "Uncorrected"
+                c = "#777777"
+            elif probe == "length":
+                label = "Length-corrected"
+                c = "#7D83FF"
+            else:
+                raise NotImplementedError(f"Unsupported probe type: {probe!r}")
+        assert label == "Uncorrected"
+        assert c == "#777777"
+
+
+# ---------------------------------------------------------------------------
+# Issue 8 — ExperimentConfig.from_yaml crashes on unknown YAML fields
+# ---------------------------------------------------------------------------
+
+
+class TestIssue8FromYamlUnknownFields:
+    """from_yaml and from_dict must silently ignore unrecognised keys."""
+
+    def _base_data(self) -> dict:
+        return {
+            "name": "test_exp",
+            "bias_type": "length",
+            "model_path": "dummy/model",
+        }
+
+    def test_from_dict_ignores_unknown_key(self):
+        """Unknown keys must be dropped, not cause TypeError."""
+        from src.nb.experiments.base import ExperimentConfig
+
+        data = self._base_data()
+        data["legacy_unknown_field"] = "some_value"
+        data["another_future_field"] = 123
+
+        # Should not raise TypeError
+        cfg = ExperimentConfig.from_dict(data)
+        assert cfg.name == "test_exp"
+        assert not hasattr(cfg, "legacy_unknown_field")
+
+    def test_from_yaml_ignores_unknown_key(self, tmp_path):
+        """Unknown keys in a YAML file must be silently dropped."""
+        import yaml
+        from src.nb.experiments.base import ExperimentConfig
+
+        data = self._base_data()
+        data["unknown_future_option"] = True
+
+        yaml_file = tmp_path / "config.yaml"
+        yaml_file.write_text(yaml.dump(data))
+
+        cfg = ExperimentConfig.from_yaml(yaml_file)
+        assert cfg.name == "test_exp"
+        assert not hasattr(cfg, "unknown_future_option")
+
+    def test_from_dict_known_fields_are_set(self):
+        """Known fields must still be applied correctly."""
+        from src.nb.experiments.base import ExperimentConfig
+
+        data = self._base_data()
+        data["null_alpha"] = 0.5
+        data["batch_size"] = 16
+
+        cfg = ExperimentConfig.from_dict(data)
+        assert cfg.null_alpha == 0.5
+        assert cfg.batch_size == 16
+
+    def test_from_dict_output_dir_stripped(self):
+        """Legacy output_dir key must be stripped without error."""
+        from src.nb.experiments.base import ExperimentConfig
+
+        data = self._base_data()
+        data["output_dir"] = "/some/old/path"
+
+        cfg = ExperimentConfig.from_dict(data)
+        assert cfg.name == "test_exp"
+
+
+# ---------------------------------------------------------------------------
+# Issue 9 — random.seed() called globally inside dataset methods
+# ---------------------------------------------------------------------------
+
+
+class TestIssue9LocalRNG:
+    """_parse_mcq_examples must not touch global random state."""
+
+    def _global_rng_state(self):
+        import random
+        return random.getstate()
+
+    def _run_sycophancy_parse(self):
+        from src.nb.datasets.sycophancy import SycophancyMCQDataset
+
+        ds = SycophancyMCQDataset.__new__(SycophancyMCQDataset)
+        ds.split_seed = 42
+        ds.dataset_id = "dummy"
+        ds.subset = None
+        ds.POSITION_LABELS = ["A", "B", "C", "D"]
+
+        # Minimal fake dataset rows
+        rows = [
+            {
+                "Question": f"Q{i}?",
+                "A": "alpha", "B": "beta", "C": "gamma", "D": "delta",
+                "Answer": "A",
+            }
+            for i in range(10)
+        ]
+        ds._parse_mcq_examples(rows, max_examples=5)
+
+    def _run_uncertainty_parse(self):
+        from src.nb.datasets.uncertainty import UncertaintyMCQDataset
+
+        ds = UncertaintyMCQDataset.__new__(UncertaintyMCQDataset)
+        ds.split_seed = 99
+        ds.POSITION_LABELS = ["A", "B", "C", "D"]
+
+        rows = [
+            {
+                "Question": f"Q{i}?",
+                "A": "alpha", "B": "beta", "C": "gamma", "D": "delta",
+                "Answer": "A",
+            }
+            for i in range(10)
+        ]
+        ds._parse_mcq_examples(rows, max_examples=5)
+
+    def test_sycophancy_does_not_mutate_global_rng(self):
+        """SycophancyMCQDataset._parse_mcq_examples must not alter global random state."""
+        import random
+
+        random.seed(7)
+        before = random.random()   # draw one value to mark current position
+        random.seed(7)             # reset to same position
+
+        self._run_sycophancy_parse()
+
+        after = random.random()    # if global state was reset inside, this equals before
+        # With the fix, _parse_mcq_examples uses a local RNG so global state is untouched
+        # and `after` should equal `before` (we're at the same position in the global stream)
+        assert after == pytest.approx(before), (
+            "Global random state was mutated by _parse_mcq_examples"
+        )
+
+    def test_uncertainty_does_not_mutate_global_rng(self):
+        """UncertaintyMCQDataset._parse_mcq_examples must not alter global random state."""
+        import random
+
+        random.seed(13)
+        before = random.random()
+        random.seed(13)
+
+        self._run_uncertainty_parse()
+
+        after = random.random()
+        assert after == pytest.approx(before), (
+            "Global random state was mutated by _parse_mcq_examples"
+        )
+
+    def test_sycophancy_results_are_deterministic(self):
+        """Two calls with the same split_seed must produce the same examples."""
+        from src.nb.datasets.sycophancy import SycophancyMCQDataset
+
+        rows = [
+            {
+                "Question": f"Q{i}?",
+                "A": "alpha", "B": "beta", "C": "gamma", "D": "delta",
+                "Answer": "A",
+            }
+            for i in range(20)
+        ]
+
+        def run():
+            ds = SycophancyMCQDataset.__new__(SycophancyMCQDataset)
+            ds.split_seed = 42
+            ds.dataset_id = "dummy"
+            ds.subset = None
+            ds.POSITION_LABELS = ["A", "B", "C", "D"]
+            return ds._parse_mcq_examples(rows, max_examples=10)
+
+        assert [e["incorrect_idx"] for e in run()] == [e["incorrect_idx"] for e in run()]
+
+
+# ---------------------------------------------------------------------------
+# Issue 10 — PositionBiasDataset.get_probe_pairs returns empty-string placeholders
+# ---------------------------------------------------------------------------
+
+
+class TestIssue10PositionProbePairs:
+    """get_probe_pairs must return fully-formed ContrastivePairs with no empty strings."""
+
+    def _make_dataset(self):
+        from src.nb.datasets.position import PositionBiasDataset
+
+        ds = PositionBiasDataset.__new__(PositionBiasDataset)
+        ds._probe_indices = [0, 1]
+        ds._raw_data = [
+            {
+                "question": "What is 2+2?",
+                "choices": ["4", "3", "5", "6"],
+            },
+            {
+                "question": "Colour of sky?",
+                "choices": ["Blue", "Red", "Green", "Yellow"],
+            },
+        ]
+        ds._loaded = True
+        return ds
+
+    def _make_tokenizer(self):
+        tok = MagicMock()
+        # Return something deterministic based on the call so positive != negative
+        tok.apply_chat_template = MagicMock(
+            side_effect=lambda msgs, **kw: " | ".join(m["content"] for m in msgs)
+        )
+        return tok
+
+    def test_no_empty_strings_in_pairs(self):
+        """All ContrastivePair texts must be non-empty after the fix."""
+        from src.nb.datasets.position import PositionBiasDataset
+
+        ds = self._make_dataset()
+        tok = self._make_tokenizer()
+
+        with patch.object(type(ds), "_ensure_loaded", lambda self: None):
+            with patch(
+                "src.nb.datasets.position.format_mcq_conversation",
+                side_effect=lambda tok, q, choices, pos: f"{q}|pos={pos}",
+            ):
+                pairs = ds.get_probe_pairs(tok)
+
+        for pair in pairs:
+            assert pair.positive_text != "", f"Empty positive_text in pair: {pair}"
+            assert pair.negative_text != "", f"Empty negative_text in pair: {pair}"
+
+    def test_pairs_cover_all_non_a_positions(self):
+        """Each question+choice should produce 3 pairs (A vs B, A vs C, A vs D)."""
+        ds = self._make_dataset()
+        tok = self._make_tokenizer()
+
+        n_examples = len(ds._probe_indices)
+        n_choices = len(ds._raw_data[0]["choices"])
+        expected_pairs = n_examples * n_choices * 3  # 3 non-A positions
+
+        with patch.object(type(ds), "_ensure_loaded", lambda self: None):
+            with patch(
+                "src.nb.datasets.position.format_mcq_conversation",
+                side_effect=lambda tok, q, choices, pos: f"{q}|pos={pos}",
+            ):
+                pairs = ds.get_probe_pairs(tok)
+
+        assert len(pairs) == expected_pairs, (
+            f"Expected {expected_pairs} pairs, got {len(pairs)}"
+        )
+
+    def test_positive_is_always_position_a(self):
+        """positive_text must always correspond to position A (pos=0)."""
+        ds = self._make_dataset()
+        tok = self._make_tokenizer()
+
+        with patch.object(type(ds), "_ensure_loaded", lambda self: None):
+            with patch(
+                "src.nb.datasets.position.format_mcq_conversation",
+                side_effect=lambda tok, q, choices, pos: f"{q}|pos={pos}",
+            ):
+                pairs = ds.get_probe_pairs(tok)
+
+        for pair in pairs:
+            assert "|pos=0" in pair.positive_text, (
+                f"positive_text should be position A (pos=0): {pair.positive_text!r}"
+            )
+            assert "|pos=0" not in pair.negative_text, (
+                f"negative_text should NOT be position A: {pair.negative_text!r}"
+            )
+

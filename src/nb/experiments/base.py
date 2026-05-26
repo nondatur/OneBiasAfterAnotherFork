@@ -99,17 +99,25 @@ class ExperimentConfig:
     @classmethod
     def from_yaml(cls, path: Path) -> "ExperimentConfig":
         """Load config from YAML file."""
+        import dataclasses
         with open(path) as f:
             data = yaml.safe_load(f)
         # Drop legacy output_dir if present
         data.pop("output_dir", None)
+        # Silently ignore any unrecognised keys for forward/backward compatibility
+        valid_fields = {f.name for f in dataclasses.fields(cls)}
+        data = {k: v for k, v in data.items() if k in valid_fields}
         return cls(**data)
     
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "ExperimentConfig":
         """Create config from dictionary."""
+        import dataclasses
         data = dict(data)
         data.pop("output_dir", None)
+        # Silently ignore any unrecognised keys for forward/backward compatibility
+        valid_fields = {f.name for f in dataclasses.fields(cls)}
+        data = {k: v for k, v in data.items() if k in valid_fields}
         return cls(**data)
     
     def to_dict(self) -> Dict[str, Any]:

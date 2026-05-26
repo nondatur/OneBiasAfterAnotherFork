@@ -103,8 +103,9 @@ def bootstrap_spearman_ci(
     boot = np.empty(n_boot, dtype=np.float64)
     for b in range(n_boot):
         sampled = rng.choice(groups, size=len(groups), replace=True)
-        # keep both chosen/rejected rows for each sampled id
-        bs = df[df[group_col].isin(sampled)]
+        # Merge to preserve groups sampled multiple times (isin would collapse them)
+        sampled_df = pd.DataFrame({group_col: sampled})
+        bs = sampled_df.merge(df, on=group_col, how="left")
         boot[b] = bs[x_col].corr(bs[y_col], method="spearman")
 
     lo = float(np.nanquantile(boot, alpha / 2))

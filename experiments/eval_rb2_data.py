@@ -173,7 +173,7 @@ def analyze_length_correlation(res_length_corr: Dict, plot: bool = True, n_boots
                     label = "Length-corrected"
                     c = "#7D83FF"
                 else:
-                    NotImplementedError()
+                    raise NotImplementedError(f"Unsupported probe type: {probe!r}")
                 ax1.scatter(lengths, rewards, alpha=1.0, label=label, s=10, color=c)
                 # xm, ym = binned_median_line(lengths, rewards, bins=25)
                 # ax1.plot(xm, ym, linewidth=2, label=f'{label} median (ρ={corr:.3f})')
