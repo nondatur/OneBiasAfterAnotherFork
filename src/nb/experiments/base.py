@@ -456,6 +456,7 @@ class BiasExperiment(ABC):
             batch_size=self.config.batch_size,
             device=self.config.device,
             max_length=self.config.max_length,
+            null_alpha=self.config.null_alpha,
         )
         baseline_organized = self._organize_rewards(baseline_rewards, text_meta, n_eval)
         baseline_metrics = self._compute_metrics(baseline_organized, eval_examples)

@@ -109,9 +109,13 @@ class SycophancyBiasDataset(ProbeDataset):
             )
         return None
     
-    def get_probe_pairs(self, tokenizer: Any) -> List[ContrastivePair]:
+    def get_probe_pairs(self, tokenizer: Any, baseline_correct_mask=None) -> List[ContrastivePair]:  # noqa: ARG002
         """Create contrastive pairs: with user opinion vs without.
-        
+
+        ``baseline_correct_mask`` is accepted for API compatibility with MCQ
+        datasets but ignored here — preference-pair datasets do not have a
+        correctness mask concept.
+
         Positive: prompt with user opinion
         Negative: prompt without user opinion (base question + chosen response)
         

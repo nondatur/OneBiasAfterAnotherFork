@@ -281,8 +281,9 @@ def main():
             plt.savefig(out_plot, dpi=300)
 
             corr_df = pd.DataFrame(corr_rows).sort_values(f"{CORR_KIND}_r", ascending=False)
-            corr_df["ci95_minus"] = corr_df["spearman_r"] - corr_df["ci95_lo"]
-            corr_df["ci95_plus"] = corr_df["ci95_hi"] - corr_df["spearman_r"]
+            if CORR_KIND == "spearman":
+                corr_df["ci95_minus"] = corr_df["spearman_r"] - corr_df["ci95_lo"]
+                corr_df["ci95_plus"] = corr_df["ci95_hi"] - corr_df["spearman_r"]
             out_corr = (
                 f"corr_reward_vs_sdelta__{a_pair.reward['model_id'].replace('/','__')}__"
                 f"{a_pair.base_key}__{plot_tag}__{NLL_NORM}__{CORR_KIND}.csv"
@@ -290,7 +291,7 @@ def main():
             corr_df.to_csv(out_corr, index=False)
 
             print(f"\nReward Model {a_pair.reward['model_id']}")
-            mean_abs_corr = corr_df["spearman_r"].abs().mean()
+            mean_abs_corr = corr_df[f"{CORR_KIND}_r"].abs().mean()
             print(f"Mean absolute correlation {mean_abs_corr}")
             print(corr_df)
 
