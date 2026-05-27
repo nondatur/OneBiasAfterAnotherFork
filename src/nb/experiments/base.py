@@ -294,7 +294,7 @@ class BiasExperiment(ABC):
         self.model = AutoModelForSequenceClassification.from_pretrained(
             self.config.model_path,
             trust_remote_code=self.config.trust_remote_code,
-            torch_dtype=torch.bfloat16,
+            dtype=torch.bfloat16,
             device_map=device_map,
         )
         # .to() intentionally omitted: device_map handles placement.

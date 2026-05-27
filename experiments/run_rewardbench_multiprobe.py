@@ -565,7 +565,7 @@ def main():
     model = AutoModelForSequenceClassification.from_pretrained(
         args.model,
         trust_remote_code=True,
-        torch_dtype=torch.bfloat16,
+        dtype=torch.bfloat16,
     )
     model = model.to(args.device)
     
