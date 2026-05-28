@@ -8,9 +8,7 @@ pandas>=2.0.0
 scipy>=1.10.0
 matplotlib>=3.8.0        # plotting
 accelerate>=0.25.0       # device_map sharding for transformers
-
 # optional
 vllm>=0.4.0              # fast GSM8K generation (generate_length_data.py only)
-
 # dev / testing
 pytest>=7.0
