@@ -75,10 +75,7 @@ run(filepath="rb2_data/my_results.json")
 | Notebook | Description |
 |---|---|
 | [`run_experiment.ipynb`](notebooks/run_experiment.ipynb) | Run a single bias experiment end-to-end |
-| [`run_all.ipynb`](notebooks/run_all.ipynb) | Orchestrate a full experiment sweep across all models & datasets |
 | [`run_rewardbench_multiprobe.ipynb`](notebooks/run_rewardbench_multiprobe.ipynb) | Multi-probe RB2 evaluation with combined null-space debiasing |
-| [`eval_perplexity.ipynb`](notebooks/eval_perplexity.ipynb) | Panel-relative log-prob vs reward-model correlation analysis |
-| [`eval_rb2_data.ipynb`](notebooks/eval_rb2_data.ipynb) | RewardBench 2 OOD evaluation with/without probe debiasing |
 
 ## Structure
 
@@ -86,7 +83,7 @@ run(filepath="rb2_data/my_results.json")
 configs/                    # Shared config directory (symlinked from experiments/ and notebooks/)
 ├── default_values.yaml     # Default parameter values for all notebooks
 ├── models.yaml             # Shared model & dataset registry
-├── length_skywork.yaml     # Per-experiment YAML configs
+├── length_*.yaml     # Per-experiment YAML configs
 ├── position_*.yaml
 ├── sycophancy_*.yaml
 ├── uncertainty_*.yaml
@@ -108,10 +105,10 @@ experiments/
 notebooks/
 ├── configs -> ../configs   # Symlink to shared configs/
 ├── run_experiment.ipynb
-├── run_all.ipynb
-├── run_rewardbench_multiprobe.ipynb
-├── eval_perplexity.ipynb
-└── eval_rb2_data.ipynb
+#├── run_all.ipynb
+└── run_rewardbench_multiprobe.ipynb
+#├── eval_perplexity.ipynb
+#└── eval_rb2_data.ipynb
 ```
 
 ## Hardware & Device Support
