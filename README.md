@@ -114,6 +114,39 @@ notebooks/
 └── eval_rb2_data.ipynb
 ```
 
+## Hardware & Device Support
+
+All experiment scripts accept a `--device` flag that controls where models run.
+
+| Value | Behaviour |
+|---|---|
+| `cuda` *(default)* | Multi-GPU — `device_map="auto"` shards the model across all visible GPUs |
+| `cuda:0`, `cuda:1`, … | Single specified GPU |
+| `cpu` | CPU-only inference (slow; useful for small models or debugging) |
+| `auto` | Same as `cuda` for model loading; `perplexity_eval_RM_specialDeberta.py` also uses this as its default and falls back to `cpu` automatically if no GPU is present |
+
+```bash
+# Multi-GPU (default)
+python experiments/run_experiment.py --config configs/position_skywork_gsm8k.yaml
+
+# Single GPU
+python experiments/run_experiment.py --config configs/position_skywork_gsm8k.yaml --device cuda:1
+
+# CPU only
+python experiments/run_experiment.py --config configs/position_skywork_gsm8k.yaml --device cpu
+```
+
+**Multi-GPU behaviour:** when `--device cuda` (or `auto`) is used, HuggingFace `accelerate`'s
+`device_map="auto"` is applied. This distributes model layers evenly across all GPUs visible
+to the process. No manual `CUDA_VISIBLE_DEVICES` filtering is needed; the number of GPUs used
+is determined automatically at runtime.
+
+**CPU behaviour:** all scripts work on CPU. Expect significantly slower throughput.
+`bfloat16` is automatically downgraded to `float32` where needed
+(`perplexity_eval_RM_specialDeberta.py`).
+
+**Not supported:** Apple MPS (Metal). The codebase targets CUDA-capable hardware only.
+
 ## Requirements
 
 ```bash

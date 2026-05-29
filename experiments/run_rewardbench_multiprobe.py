@@ -562,12 +562,14 @@ def main():
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
     
+    device_map = "auto" if args.device in ("cuda", "auto") else args.device
     model = AutoModelForSequenceClassification.from_pretrained(
         args.model,
         trust_remote_code=True,
         dtype=torch.bfloat16,
+        device_map=device_map,
     )
-    model = model.to(args.device)
+    # .to() intentionally omitted: device_map handles placement.
     
     # Get model's hidden dimension
     base_model = get_base_model(model)
