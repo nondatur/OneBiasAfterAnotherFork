@@ -48,7 +48,6 @@ class LengthBiasExperiment(BiasExperiment):
         """Compute length bias metrics."""
         return compute_length_bias_metrics(
             rewards=rewards,
-            n_examples=len(eval_examples),
         )
     
     def _create_plot(

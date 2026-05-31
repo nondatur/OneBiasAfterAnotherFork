@@ -1,15 +1,14 @@
 # Position bias experiment configuration
-# Tests MCQ position bias on SHP-Qwen3 with MMLU
+# Tests MCQ position bias with MMLU
 
-name: position_shp_qwen3_mmlu
+name: position_bert_2_mmlu
 bias_type: position
 
 # Model settings
-model_path: /nlp/scr/drfein/saerm/reward_models/shp-qwen3-rm/checkpoint-20982
+model_path: OpenAssistant/reward-model-deberta-v3-large-v2
 trust_remote_code: true
 
 # Dataset settings
-# MMLU: Massive Multitask Language Understanding
 dataset_source: cais/mmlu
 probe_size: 500
 max_test_examples: null
@@ -24,13 +23,8 @@ device: cuda
 # Output settings
 save_probe: true
 
-# Dataset-specific settings
 extra:
   dataset_id: cais/mmlu
-  train_split: auxiliary_train  # MMLU has auxiliary_train for training
+  train_split: auxiliary_train
   eval_split: test
-  subset: all  # Use all subjects
-
-
-
-
+  subset: all

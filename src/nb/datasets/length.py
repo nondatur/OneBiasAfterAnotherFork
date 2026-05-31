@@ -190,7 +190,7 @@ class LengthBiasDataset(ProbeDataset):
 
 def compute_length_bias_metrics(
     rewards: Dict[str, List[float]],
-    n_examples: int,
+    n_examples: int | None = None,
 ) -> Dict[str, float]:
     """Compute length bias metrics from reward scores.
     
@@ -205,21 +205,31 @@ def compute_length_bias_metrics(
     n = len(correct_rewards)
     
     incorrect_beats_correct = sum(
-        1 for i in range(n) if incorrect_rewards[i] > correct_rewards[i]
+        1 for i in range(n)
+        if correct_rewards[i] is not None
+        and incorrect_rewards[i] is not None
+        and incorrect_rewards[i] > correct_rewards[i]
+    )
+    n_valid = sum(
+        1 for i in range(n)
+        if correct_rewards[i] is not None and incorrect_rewards[i] is not None
     )
     
     metrics = {
-        "incorrect_beats_correct_pct": incorrect_beats_correct / n,
-        "n_examples": n,
+        "incorrect_beats_correct_pct": incorrect_beats_correct / n_valid if n_valid > 0 else 0.0,
+        "n_examples": n_valid,
     }
     
-    if verbose_rewards:
-        n_verbose = len(verbose_rewards)
-        incorrect_beats_verbose = sum(
-            1 for i in range(n_verbose) if incorrect_rewards[i] > verbose_rewards[i]
-        )
-        metrics["incorrect_beats_correct_verbose_pct"] = incorrect_beats_verbose / n_verbose
-        metrics["n_verbose_examples"] = n_verbose
+    # Only compute verbose metric when at least one non-None verbose reward exists
+    valid_verbose_pairs = [
+        (incorrect_rewards[i], verbose_rewards[i])
+        for i in range(len(verbose_rewards))
+        if verbose_rewards[i] is not None and incorrect_rewards[i] is not None
+    ]
+    if valid_verbose_pairs:
+        incorrect_beats_verbose = sum(1 for inc, verb in valid_verbose_pairs if inc > verb)
+        metrics["incorrect_beats_correct_verbose_pct"] = incorrect_beats_verbose / len(valid_verbose_pairs)
+        metrics["n_verbose_examples"] = len(valid_verbose_pairs)
     
     return metrics
 

@@ -1,9 +1,10 @@
-# RewardBench evaluation on Skywork RM
-name: rewardbench_skywork
+# RewardBench evaluation on BERT
+name: rewardbench_deberta
 bias_type: rewardbench
 
 # Model settings
-model_path: Skywork/Skywork-Reward-V2-Llama-3.1-8B
+model: OpenAssistant/reward-model-deberta-v3-large-v2
+model_path: OpenAssistant/reward-model-deberta-v3-large-v2
 trust_remote_code: true
 
 # Dataset settings
@@ -23,5 +24,3 @@ save_probe: true
 
 extra:
   split: test
-
-

@@ -109,9 +109,13 @@ class SycophancyBiasDataset(ProbeDataset):
             )
         return None
     
-    def get_probe_pairs(self, tokenizer: Any) -> List[ContrastivePair]:
+    def get_probe_pairs(self, tokenizer: Any, baseline_correct_mask=None) -> List[ContrastivePair]:  # noqa: ARG002
         """Create contrastive pairs: with user opinion vs without.
-        
+
+        ``baseline_correct_mask`` is accepted for API compatibility with MCQ
+        datasets but ignored here — preference-pair datasets do not have a
+        correctness mask concept.
+
         Positive: prompt with user opinion
         Negative: prompt without user opinion (base question + chosen response)
         
@@ -227,7 +231,7 @@ class SycophancyMCQDataset(ProbeDataset):
     def _parse_mcq_examples(self, dataset: Any, max_examples: Optional[int] = None) -> List[Dict[str, Any]]:
         """Parse MCQ dataset into sycophancy format."""
         examples = []
-        random.seed(self.split_seed)
+        rng = random.Random(self.split_seed)  # local RNG — does not touch global state
         
         for idx, row in enumerate(dataset):
             # Handle different field names
@@ -256,7 +260,7 @@ class SycophancyMCQDataset(ProbeDataset):
             incorrect_indices = [i for i in range(4) if i != correct_idx and choices[i]]
             if not incorrect_indices:
                 continue
-            incorrect_idx = random.choice(incorrect_indices)
+            incorrect_idx = rng.choice(incorrect_indices)
             incorrect_answer = choices[incorrect_idx]
             
             examples.append({

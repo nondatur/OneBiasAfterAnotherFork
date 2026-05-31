@@ -269,8 +269,8 @@ def generate_length_dataset(
     else:
         model = AutoModelForCausalLM.from_pretrained(
             model_path,
-            torch_dtype=torch.bfloat16,
-            device_map=device,
+            dtype=torch.bfloat16,
+            device_map="auto" if device in ("cuda", "auto") else device,
             trust_remote_code=trust_remote_code,
         )
         generator = model

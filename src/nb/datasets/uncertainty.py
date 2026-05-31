@@ -329,7 +329,7 @@ class UncertaintyMCQDataset(ProbeDataset):
     def _parse_mcq_examples(self, dataset: Any, max_examples: Optional[int] = None) -> List[Dict[str, Any]]:
         """Parse MCQ dataset into uncertainty format."""
         import random
-        random.seed(self.split_seed)
+        rng = random.Random(self.split_seed)  # local RNG — does not touch global state
         
         examples = []
         
@@ -362,7 +362,7 @@ class UncertaintyMCQDataset(ProbeDataset):
                 continue
             
             # For MCQ without plausibility, treat as uniform (pick first two)
-            random.shuffle(wrong_answers)
+            rng.shuffle(wrong_answers)
             high_wrong = wrong_answers[0]
             low_wrong = wrong_answers[1] if len(wrong_answers) > 1 else wrong_answers[0]
             

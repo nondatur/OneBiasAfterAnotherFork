@@ -190,16 +190,15 @@ class PositionBiasDataset(ProbeDataset):
     def get_probe_pairs(self, tokenizer: Any) -> List[ContrastivePair]:
         """Create position bias probe pairs.
         
-        For each question and each choice, creates:
+        For each question and each choice, creates proper contrastive pairs:
         - Positive: that choice at position A
-        - Negative: that choice at positions B, C, D (averaged later)
-        
-        This is done by collecting embeddings, not text pairs.
+        - Negative: that choice at position B, C, or D (one pair per non-A position)
+
+        Each pair has fully-formed texts on both sides so the difference-of-means
+        probe is not polluted by empty-string EOS/BOS token embeddings.
         """
         self._ensure_loaded()
         
-        # For position bias, we need to create formatted texts for each
-        # choice at each position. The probe is built differently.
         pairs = []
         
         for idx in self._probe_indices:
@@ -207,12 +206,11 @@ class PositionBiasDataset(ProbeDataset):
             question = example["question"]
             choices = example["choices"]
             
-            # For each choice content, create text at position A vs B/C/D
             for choice_idx, choice_content in enumerate(choices):
-                # Get other choices
                 other_choices = [c for i, c in enumerate(choices) if i != choice_idx]
                 
-                # Create shuffled choice lists with target at each position
+                # Build the text for each target position once
+                texts_by_pos: List[str] = []
                 for target_pos in range(4):
                     shuffled = []
                     other_idx = 0
@@ -222,26 +220,22 @@ class PositionBiasDataset(ProbeDataset):
                         else:
                             shuffled.append(other_choices[other_idx])
                             other_idx += 1
-                    
-                    text = format_mcq_conversation(tokenizer, question, shuffled, target_pos)
-                    
-                    # Position A is positive, others are negative
-                    if target_pos == 0:
-                        pairs.append(ContrastivePair(
-                            positive_text=text,
-                            negative_text="",  # Placeholder
-                            metadata={"position": "A", "choice_idx": choice_idx},
-                        ))
-                    else:
-                        pairs.append(ContrastivePair(
-                            positive_text="",  # Placeholder
-                            negative_text=text,
-                            metadata={"position": POSITION_LABELS[target_pos], "choice_idx": choice_idx},
-                        ))
+                    texts_by_pos.append(
+                        format_mcq_conversation(tokenizer, question, shuffled, target_pos)
+                    )
+                
+                # Pair position A (positive) against each of B, C, D (negative)
+                for neg_pos in range(1, 4):
+                    pairs.append(ContrastivePair(
+                        positive_text=texts_by_pos[0],
+                        negative_text=texts_by_pos[neg_pos],
+                        metadata={
+                            "choice_idx": choice_idx,
+                            "neg_position": POSITION_LABELS[neg_pos],
+                        },
+                    ))
         
-        # Reorganize into proper pairs (A vs average of B,C,D)
-        # For simplicity, we'll just return the texts and handle pairing in probe building
-        logger.info("Created %d position bias probe texts", len(pairs))
+        logger.info("Created %d position bias contrastive pairs", len(pairs))
         return pairs
     
     def get_position_embeddings_texts(self, tokenizer: Any) -> Dict[int, List[str]]:

@@ -122,7 +122,7 @@ def main():
         tokenizer = AutoTokenizer.from_pretrained(MODEL, trust_remote_code=True)
         model = AutoModelForSequenceClassification.from_pretrained(
             MODEL,
-            torch_dtype=torch.bfloat16,
+            dtype=torch.bfloat16,
             device_map="auto",
             trust_remote_code=True,
         )

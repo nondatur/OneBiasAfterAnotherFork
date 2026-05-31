@@ -99,17 +99,25 @@ class ExperimentConfig:
     @classmethod
     def from_yaml(cls, path: Path) -> "ExperimentConfig":
         """Load config from YAML file."""
+        import dataclasses
         with open(path) as f:
             data = yaml.safe_load(f)
         # Drop legacy output_dir if present
         data.pop("output_dir", None)
+        # Silently ignore any unrecognised keys for forward/backward compatibility
+        valid_fields = {f.name for f in dataclasses.fields(cls)}
+        data = {k: v for k, v in data.items() if k in valid_fields}
         return cls(**data)
     
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "ExperimentConfig":
         """Create config from dictionary."""
+        import dataclasses
         data = dict(data)
         data.pop("output_dir", None)
+        # Silently ignore any unrecognised keys for forward/backward compatibility
+        valid_fields = {f.name for f in dataclasses.fields(cls)}
+        data = {k: v for k, v in data.items() if k in valid_fields}
         return cls(**data)
     
     def to_dict(self) -> Dict[str, Any]:
@@ -286,7 +294,7 @@ class BiasExperiment(ABC):
         self.model = AutoModelForSequenceClassification.from_pretrained(
             self.config.model_path,
             trust_remote_code=self.config.trust_remote_code,
-            torch_dtype=torch.bfloat16,
+            dtype=torch.bfloat16,
             device_map=device_map,
         )
         # .to() intentionally omitted: device_map handles placement.
@@ -456,6 +464,7 @@ class BiasExperiment(ABC):
             batch_size=self.config.batch_size,
             device=self.config.device,
             max_length=self.config.max_length,
+            null_alpha=self.config.null_alpha,
         )
         baseline_organized = self._organize_rewards(baseline_rewards, text_meta, n_eval)
         baseline_metrics = self._compute_metrics(baseline_organized, eval_examples)

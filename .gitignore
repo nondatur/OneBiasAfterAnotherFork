@@ -16,3 +16,6 @@ __pycache__/
 *.csv
 *.pdf
 *.png
+
+# Local review notes
+/code_review.md

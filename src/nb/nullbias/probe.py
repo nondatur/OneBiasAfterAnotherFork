@@ -96,14 +96,16 @@ def gram_schmidt(vectors: List[torch.Tensor]) -> torch.Tensor:
     return torch.stack(basis, dim=0)
 
 
-def project_to_null_space(hidden: torch.Tensor, basis: torch.Tensor) -> torch.Tensor:
+def project_to_null_space(hidden: torch.Tensor, basis: torch.Tensor, alpha: float = 1.0) -> torch.Tensor:
     """Project hidden states to the null space of a basis (remove subspace components).
     
-    Uses Gram-Schmidt to orthonormalize the basis, then projects out each direction.
+    Uses Gram-Schmidt to orthonormalize the basis, then projects out each direction
+    scaled by ``alpha`` (1.0 = full removal, 0.0 = no change).
     
     Args:
         hidden: [batch, d] hidden states to project
         basis: [d] single vector OR [k, d] multiple vectors (need not be orthonormal)
+        alpha: Nullification strength in [0, 1].  1.0 = full projection (default).
         
     Returns:
         [batch, d] with the basis subspace removed.
@@ -121,12 +123,12 @@ def project_to_null_space(hidden: torch.Tensor, basis: torch.Tensor) -> torch.Te
     if ortho_basis.shape[0] == 0:
         return hidden
     
-    # Project onto orthonormal span and remove
+    # Project onto orthonormal span and remove (scaled by alpha)
     ortho_basis = ortho_basis.to(hidden.device).float()
     coeffs = hidden.float() @ ortho_basis.T  # [batch, k']
     projection = coeffs @ ortho_basis         # [batch, d]
     
-    return hidden - projection.to(hidden.dtype)
+    return hidden - (alpha * projection).to(hidden.dtype)
 
 
 def get_base_model(model: AutoModelForSequenceClassification):
@@ -496,6 +498,7 @@ def get_rewards_with_nulling(
     device: str = "cuda",
     max_length: int = 2048,
     show_progress: bool = True,
+    null_alpha: float = 1.0,
 ) -> torch.Tensor:
     """Compute reward scores with optional null-space projection.
     
@@ -512,6 +515,7 @@ def get_rewards_with_nulling(
         device: Device to use
         max_length: Maximum sequence length
         show_progress: Whether to show progress bar
+        null_alpha: Nullification strength (0=no change, 1=full projection).
         
     Returns:
         [n_texts] tensor of reward scores
@@ -567,7 +571,7 @@ def get_rewards_with_nulling(
                 ].float()
 
                 # Null out probe subspace
-                nulled_hidden = project_to_null_space(last_hidden, probe)
+                nulled_hidden = project_to_null_space(last_hidden, probe, alpha=null_alpha)
 
                 # score_head may be on a different GPU (device_map="auto"),
                 # so move the hidden state to match it.
@@ -594,6 +598,7 @@ def get_rewards_both(
     device: str = "cuda",
     max_length: int = 2048,
     show_progress: bool = True,
+    null_alpha: float = 1.0,
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     """Compute BOTH baseline and nulled rewards in a single forward pass.
     
@@ -609,6 +614,7 @@ def get_rewards_both(
         device: Device to use
         max_length: Maximum sequence length
         show_progress: Whether to show progress bar
+        null_alpha: Nullification strength (0=no change, 1=full projection).
         
     Returns:
         Tuple of (baseline_rewards, nulled_rewards) tensors, each [n_texts]
@@ -674,7 +680,7 @@ def get_rewards_both(
 
             # Nulled score
             if do_nulling:
-                nulled_hidden = project_to_null_space(last_hidden, probe)
+                nulled_hidden = project_to_null_space(last_hidden, probe, alpha=null_alpha)
                 nulled_scores = score_head(
                     nulled_hidden.to(score_device).to(hidden_states.dtype)
                 ).squeeze(-1)

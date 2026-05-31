@@ -530,10 +530,10 @@ def main():
     if not all_probes:
         logger.error("No probes found in %s", args.probes_dir)
         logger.error("Run bias experiments first to generate probes:")
-        logger.error("  python experiments/run_experiment.py --config experiments/configs/length_skywork.yaml")
-        logger.error("  python experiments/run_experiment.py --config experiments/configs/position_skywork_gsm8k.yaml")
-        logger.error("  python experiments/run_experiment.py --config experiments/configs/sycophancy_skywork_gsm8k_mc.yaml")
-        logger.error("  python experiments/run_experiment.py --config experiments/configs/uncertainty_skywork_gsm8k_mc.yaml")
+        logger.error("  python experiments/run_experiment.py --config configs/length_skywork.yaml")
+        logger.error("  python experiments/run_experiment.py --config configs/position_skywork_gsm8k.yaml")
+        logger.error("  python experiments/run_experiment.py --config configs/sycophancy_skywork_gsm8k_mc.yaml")
+        logger.error("  python experiments/run_experiment.py --config configs/uncertainty_skywork_gsm8k_mc.yaml")
         sys.exit(1)
     
     # Filter probes by model name if specified
@@ -562,12 +562,14 @@ def main():
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
     
+    device_map = "auto" if args.device in ("cuda", "auto") else args.device
     model = AutoModelForSequenceClassification.from_pretrained(
         args.model,
         trust_remote_code=True,
-        torch_dtype=torch.bfloat16,
+        dtype=torch.bfloat16,
+        device_map=device_map,
     )
-    model = model.to(args.device)
+    # .to() intentionally omitted: device_map handles placement.
     
     # Get model's hidden dimension
     base_model = get_base_model(model)
