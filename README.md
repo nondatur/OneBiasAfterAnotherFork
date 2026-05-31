@@ -25,9 +25,9 @@ python experiments/run_experiment.py --config configs/position_skywork_gsm8k.yam
 
 # Run with CLI overrides
 python experiments/run_experiment.py \
-    --bias_type position \
-    --model_path Skywork/Skywork-Reward-Llama-3.1-8B-v0.2 \
-    --dataset_source guipenedo/gsm8k-mc
+    --bias-type position \
+    --model-path Skywork/Skywork-Reward-Llama-3.1-8B-v0.2 \
+    --dataset-source guipenedo/gsm8k-mc
 
 # Run all experiments (optionally filtered)
 python experiments/run_all.py --filter position
@@ -37,8 +37,8 @@ python experiments/run_all.py --list            # preview without running
 python experiments/run_rewardbench_multiprobe.py --config configs/rewardbench_skywork.yaml
 
 # Analysis scripts (no GPU required)
-uv run experiments/eval_perplexity.py     # reward–perplexity correlation
-uv run experiments/eval_rb2_data.py       # RB2 probe-debiasing analysis
+python experiments/eval_perplexity.py     # reward–perplexity correlation
+python experiments/eval_rb2_data.py       # RB2 probe-debiasing analysis
 ```
 
 ### Notebooks (Python API)
@@ -49,25 +49,16 @@ them; keyword arguments override everything.
 
 ```python
 # run_experiment.ipynb — single bias experiment
+...
 run("configs/length_skywork.yaml")
+...
 run("configs/position_skywork_gsm8k.yaml", device="cpu", batch_size=4)
 
-# run_all.ipynb — full sweep
-run_all()
-run_all(filter_str="skywork", device="cuda")
-run_all(list_only=True)                        # preview without running
-
 # run_rewardbench_multiprobe.ipynb — multi-probe RB2 evaluation
+...
 run("configs/rewardbench_skywork.yaml")
+...
 run("configs/rewardbench_skywork.yaml", null_alpha=0.5)
-
-# eval_perplexity.ipynb — reward–perplexity correlation (no GPU)
-run()
-run(corr_kind="pearson", nll_norm="token")
-
-# eval_rb2_data.ipynb — RB2 OOD analysis (no GPU)
-run()
-run(filepath="rb2_data/my_results.json")
 ```
 
 ## Notebooks
