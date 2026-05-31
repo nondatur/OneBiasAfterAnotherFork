@@ -190,6 +190,7 @@ class LengthBiasDataset(ProbeDataset):
 
 def compute_length_bias_metrics(
     rewards: Dict[str, List[float]],
+    n_examples: int | None = None,
 ) -> Dict[str, float]:
     """Compute length bias metrics from reward scores.
     

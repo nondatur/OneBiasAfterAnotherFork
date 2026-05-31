@@ -105,10 +105,7 @@ experiments/
 notebooks/
 ├── configs -> ../configs   # Symlink to shared configs/
 ├── run_experiment.ipynb
-#├── run_all.ipynb
 └── run_rewardbench_multiprobe.ipynb
-#├── eval_perplexity.ipynb
-#└── eval_rb2_data.ipynb
 ```
 
 ## Hardware & Device Support
