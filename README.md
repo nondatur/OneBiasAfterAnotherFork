@@ -136,6 +136,8 @@ is determined automatically at runtime.
 
 When using this codebase, please cite:
 
+- https://arxiv.org/abs/2603.03291
+
 ```bibtex
 @misc{fein2026biasanothermechanisticreward,
       title={One Bias After Another: Mechanistic Reward Shaping and Persistent Biases in Language Reward Models}, 
