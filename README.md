@@ -132,6 +132,22 @@ is determined automatically at runtime.
 
 **Not supported:** Apple MPS (Metal). The codebase targets CUDA-capable hardware only.
 
+## References
+
+When using this codebase, please cite:
+
+```bibtex
+@misc{fein2026biasanothermechanisticreward,
+      title={One Bias After Another: Mechanistic Reward Shaping and Persistent Biases in Language Reward Models}, 
+      author={Daniel Fein and Max Lamparth and Violet Xiang and Mykel J. Kochenderfer and Nick Haber},
+      year={2026},
+      eprint={2603.03291},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2603.03291}, 
+}
+```
+
 ## Requirements
 
 ```bash
