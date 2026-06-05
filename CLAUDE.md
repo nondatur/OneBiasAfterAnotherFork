@@ -88,26 +88,67 @@ python experiments/eval_rb2_data.py
 
 ## Hardware / device (current state)
 - `--device` flag: `cuda` (default; multi-GPU via HF `accelerate` `device_map="auto"`),
-  `cuda:N`, `cpu`, `auto`.
-- **CUDA-only.** Apple MPS (Metal) is explicitly NOT supported.
+  `cuda:N`, `cpu`, `auto`, **`mlx`** (Apple Silicon).
+- `auto`: CUDA host → `cuda` (unchanged); Apple Silicon w/o CUDA → `mlx` when `mlx-lm`
+  installed, else `cpu`.
+- MPS (PyTorch Metal) is **not** used; the Apple Silicon path is the MLX backend.
 - Primary models are Llama-based reward models (e.g. `Skywork-Reward-Llama-3.1-8B-v0.2`).
 - There is also a DeBERTa-based perplexity/RM eval (`perplexity_eval_RM_specialDeberta.py`)
-  with `auto`→`cpu` fallback and `bfloat16`→`float32` downgrade.
+  with `auto`→`cpu` fallback and `bfloat16`→`float32` downgrade. **DeBERTa is CPU-only on
+  Mac** (no MLX port — encoder-only, unsupported by mlx-lm).
+- Install flavors: `requirements.txt` (cross-platform base), `requirements-mlx.txt`
+  (`mlx`, `mlx-lm`; prefer a Python 3.12/3.13 venv — 3.14 MLX wheels may be missing),
+  `requirements-cuda.txt` (`vllm`).
 
-## Active goal: add a local MLX backend (Apple Silicon)
-Target hardware: 14" MacBook Pro, **base Apple M4, 32 GB** unified memory.
+## MLX backend (Apple Silicon) — implemented
+Target hardware: 14" MacBook Pro, **base Apple M4, 32 GB** unified memory. MLX is an
+**additive, opt-in dev/prototyping** path; CUDA/CPU paths are unchanged.
 
-- Add an MLX execution path as an **additive, opt-in** backend (e.g. `--device mlx`,
-  plus auto-detect on Apple Silicon). Do not break or regress the CUDA/CPU paths.
-- Keep `nullbias/` math and experiment orchestration **backend-agnostic**; isolate
-  framework specifics behind a backend interface.
-- The MLX path must expose **reward scores AND per-layer hidden states**. `mlx-lm`
-  does not expose hidden states or reward heads out of the box — expect custom
-  forward instrumentation and custom head loading.
-- Prefer quantized (4-bit/8-bit) MLX weights for memory, **but**: quantization can
-  shift bias measurements. Treat the local MLX path as a **development/prototyping**
-  target and validate research-grade numbers against full-precision CUDA. Include a
-  numerical-parity check on a small sample.
+Architecture (`src/nb/backends/`):
+- `base.py` — `ModelBackend` ABC: `embed_texts`, `score_texts`, `score_texts_both`,
+  all returning **CPU float32 torch tensors**.
+- `__init__.py` — `select_backend(device)` (routing) + `create_backend(config)`
+  (factory). The transformers path returns the **raw HF model** (unchanged); only
+  MLX is a `ModelBackend`.
+- `mlx_backend.py` — loads the transformer **backbone** via `mlx-lm`'s model registry
+  (keyed by `config.json` `model_type`; Llama/Qwen supported) from the checkpoint's
+  own safetensors, and loads the scalar reward **`score` head** separately into a
+  torch `nn.Linear`. Forward = `backbone(input_ids)` (post-final-norm hidden states),
+  then the **score head + null-space projection run in shared CPU-torch** → numerical
+  drift vs. the reference is confined to the backbone alone.
+
+Integration: `nullbias/probe.py`'s `get_embeddings` / `get_rewards_with_nulling` /
+`get_rewards_both` **dispatch** to a backend when their `model` arg is a `ModelBackend`;
+`BiasExperiment.load_model` sets `self.model` to the backend. So every experiment routes
+through MLX with no per-call-site changes, and the pure math (`project_to_null_space`,
+`gram_schmidt`, diff-of-means, metrics) is untouched.
+
+Key facts:
+- Only `hidden_states[-1]` is used → `mlx-lm` `model.model(input_ids)` suffices (no deep
+  instrumentation needed).
+- Batched scoring uses **right padding** so causal masking makes the last non-pad token
+  independent of trailing pads (matches the transformers reference).
+- **bf16 default** (matches CUDA bf16 → best parity). `--mlx-quant 4bit/8bit` is opt-in,
+  **not for publishable numbers**.
+- Parity gate (`experiments/parity_check.py`): MLX-bf16 vs CPU-fp32 → reward Pearson
+  r ≥ 0.99, **significant** probe-subspace overlap ≥ 0.99 (mean of principal-angle
+  cosines over non-degenerate directions; multi-vector position bases have one
+  degenerate orthonormalized direction that is precision-noise in both runs and is
+  excluded), and **headline** bias-metric |Δ| ≤ 0.02 (overall accuracy / bias
+  magnitude / gaps — per-bucket sub-stats like `accuracy_when_A`, `position_C_pct`
+  are reported as diagnostics, not gated, since they quantize at 1/N_bucket).
+- Parity configs (public 0.6B; the existing `*_shp_qwen3_*` configs point at a
+  non-existent local cluster path, not a HF id):
+  `configs/position_skywork_qwen06_gsm8k.yaml` (multi-vector probe) and
+  `configs/uncertainty_skywork_qwen06_gsm8k.yaml` (single-vector probe).
+- **Observed parity (Skywork-Qwen3-0.6B, n=100):** reward r ≈ 0.999, probe overlap
+  ≈ 0.995 (position) / 0.9998 (uncertainty), baseline metrics |Δ| ≈ 0.01. **Caveat:**
+  *nulled/debiased* headline metrics can differ by ~0.03 (≈3 comparison-flips/100) —
+  a stable **bf16-vs-fp32 precision effect near decision ties**, not a framework bug
+  (reward correlation is 0.999). Use fp32/CUDA for publishable *debiased* numbers.
+- 8B Llama (`Skywork-Reward-V2-Llama-3.1-8B`) runs on MLX (bf16 ≈ 16 GB). Its fp32
+  parity *reference* does not fit in 32 GB RAM — run that reference on CUDA (or use
+  `parity_check.py --ref-dtype bfloat16` for a same-precision framework check).
 
 ## Conventions
 - Config-driven; do not hardcode model/dataset paths — use `configs/models.yaml`.

@@ -2,6 +2,11 @@
 __pycache__/
 *.pyc
 
+# Virtual environments
+.venv/
+.venv-*/
+venv/
+
 # Environment variables
 .env
 /data

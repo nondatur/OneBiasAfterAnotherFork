@@ -1,0 +1,14 @@
+# Apple Silicon (MLX) backend extras.
+#   pip install -r requirements-mlx.txt
+#
+# Installs the cross-platform base plus the MLX runtime used by the
+# `--device mlx` backend (src/nb/backends/mlx_backend.py).
+#
+# NOTE: MLX runs only on Apple Silicon (arm64 macOS). Wheels are published for
+# CPython 3.9–3.13; prefer a Python 3.12/3.13 venv (3.14 wheels may be missing).
+-r requirements.txt
+
+mlx>=0.18.0
+mlx-lm>=0.18.0
+safetensors>=0.4.0       # direct reward-head weight loading
+huggingface_hub>=0.23.0  # snapshot_download of model weights/config

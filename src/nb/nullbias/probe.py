@@ -15,6 +15,7 @@ from tqdm import tqdm
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 from src.nb.datasets.base import ContrastivePair
+from src.nb.backends.base import ModelBackend
 
 logger = logging.getLogger(__name__)
 
@@ -359,6 +360,16 @@ def get_embeddings(
     Returns:
         [n_texts, hidden_dim] tensor of embeddings
     """
+    # Backend dispatch: when ``model`` is a ModelBackend (e.g. MLX), delegate.
+    # The CUDA/CPU transformers path (raw HF model) falls through unchanged.
+    if isinstance(model, ModelBackend):
+        return model.embed_texts(
+            texts,
+            batch_size=batch_size,
+            max_length=max_length,
+            show_progress=show_progress,
+        )
+
     model.eval()
     all_embeddings = []
     base_model = get_base_model(model)
@@ -520,13 +531,25 @@ def get_rewards_with_nulling(
     Returns:
         [n_texts] tensor of reward scores
     """
+    # Backend dispatch: when ``model`` is a ModelBackend (e.g. MLX), delegate.
+    # The CUDA/CPU transformers path (raw HF model) falls through unchanged.
+    if isinstance(model, ModelBackend):
+        return model.score_texts(
+            texts,
+            probe=probe,
+            null_alpha=null_alpha,
+            batch_size=batch_size,
+            max_length=max_length,
+            show_progress=show_progress,
+        )
+
     model.eval()
     base_model = get_base_model(model)
     score_head = get_score_head(model)
-    
+
     # Prepare probe for nulling
     do_nulling = probe is not None
-    
+
     all_scores = []
     n_batches = (len(texts) + batch_size - 1) // batch_size
     
@@ -619,13 +642,25 @@ def get_rewards_both(
     Returns:
         Tuple of (baseline_rewards, nulled_rewards) tensors, each [n_texts]
     """
+    # Backend dispatch: when ``model`` is a ModelBackend (e.g. MLX), delegate.
+    # The CUDA/CPU transformers path (raw HF model) falls through unchanged.
+    if isinstance(model, ModelBackend):
+        return model.score_texts_both(
+            texts,
+            probe=probe,
+            null_alpha=null_alpha,
+            batch_size=batch_size,
+            max_length=max_length,
+            show_progress=show_progress,
+        )
+
     model.eval()
     base_model = get_base_model(model)
     score_head = get_score_head(model)
-    
+
     # Prepare probe for nulling
     do_nulling = probe is not None
-    
+
     all_baseline_scores = []
     all_nulled_scores = []
     n_batches = (len(texts) + batch_size - 1) // batch_size

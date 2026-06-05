@@ -1,0 +1,6 @@
+# NVIDIA CUDA extras (Linux). These pull CUDA-only packages and will not
+# install on macOS.
+#   pip install -r requirements-cuda.txt
+-r requirements.txt
+
+vllm>=0.4.0              # fast GSM8K generation (src/nb/datasets/generate_length_data.py only)
