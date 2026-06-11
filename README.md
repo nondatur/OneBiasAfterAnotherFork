@@ -5,6 +5,7 @@ Evaluates and mitigates spurious biases in reward models using null-space projec
 ## Biases Evaluated
 
 - **Position**: Preference for answer positions (A/B/C/D) in MCQ
+  - **Multi-class variant** (experimental): Variable-class position bias with custom labels (2-4 classes)
 - **Sycophancy**: Agreement with user's stated opinion
 - **Length**: Preference for longer responses
 - **Uncertainty**: Penalizing hedged/uncertain language
@@ -54,12 +55,35 @@ run("configs/length_skywork.yaml")
 ...
 run("configs/position_skywork_gsm8k.yaml", device="cpu", batch_size=4)
 
+# Multi-class position bias (custom class labels, 2-4 classes)
+...
+run("experiments/position_multi_class_example.yaml")
+
 # run_rewardbench_multiprobe.ipynb — multi-probe RB2 evaluation
 ...
 run("configs/rewardbench_skywork.yaml")
 ...
 run("configs/rewardbench_skywork.yaml", null_alpha=0.5)
 ```
+
+### Multi-Class Position Bias
+
+For custom class labels and variable position counts (2-4 classes), use the `position_multi_class` dataset:
+
+```bash
+# CLI
+python experiments/run_experiment.py --config experiments/position_multi_class_example.yaml
+
+# Or with custom labels at runtime
+python experiments/run_experiment.py \
+    --bias-type position \
+    --model Skywork/Skywork-Reward-Llama-3.1-8B \
+    --dataset-source guipenedo/gsm8k-mc \
+    --extra-dataset_class position_multi_class \
+    --extra-num_classes 3
+```
+
+See [MULTI_CLASS_USAGE.md](MULTI_CLASS_USAGE.md) for detailed documentation and examples.
 
 ## Notebooks
 
