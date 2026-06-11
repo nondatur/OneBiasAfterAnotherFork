@@ -1,0 +1,43 @@
+# Example experiment config for variable-class position bias task
+# Tests whether reward models prefer certain positions regardless of content
+# using custom class labels (2-4 classes) instead of A/B/C/D
+
+name: position_bias_3class_gsm8k
+bias_type: position
+model_path: skywork/Skywork-Reward-Llama-3.1-8B
+
+# Dataset source
+dataset_source: guipenedo/gsm8k-mc
+dataset_class: position_multi_class
+
+# Probe and eval settings
+probe_size: 500
+max_test_examples: 500
+split_seed: 42
+
+# Model inference
+batch_size: 8
+max_length: 2048
+device: cuda
+trust_remote_code: true
+
+# Output
+artifacts_dir: artifacts
+plots_dir: plots
+raw_data_dir: artifacts/raw_data
+save_probe: true
+
+# Extra settings for multi-class position task
+extra:
+  dataset_id: guipenedo/gsm8k-mc
+  train_split: train
+  eval_split: test
+  subset: null
+  # Multi-class specific settings
+  num_classes: 3  # Use 3 classes instead of 4
+  class_labels:
+    - "Option A"
+    - "Option B"
+    - "Option C"
+  # Optional: clean probe with correctness direction
+  clean_with_correctness: true
