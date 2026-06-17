@@ -60,6 +60,10 @@ from src.nb.nullbias.probe import (
 logger = logging.getLogger(__name__)
 
 
+def _is_multi_class_label_set(labels: List[str]) -> bool:
+    return labels != POSITION_LABELS[: len(labels)]
+
+
 class PositionBiasExperiment(BiasExperiment):
     """Experiment for evaluating position bias on MCQ.
     
@@ -312,12 +316,14 @@ class PositionBiasExperiment(BiasExperiment):
         output_path: Path,
     ) -> None:
         """Create position bias plot."""
+        position_labels = list(getattr(self.dataset, "position_labels", POSITION_LABELS))
         create_position_bias_plot(
             baseline_metrics=results.baseline_metrics,
             nulled_metrics=results.nulled_metrics or {},
             output_path=output_path,
             title=f"{self.config.name} Position Bias",
             n_examples=results.n_eval_examples,
+            position_labels=position_labels,
         )
         accuracy_path = output_path.parent / f"{self.config.name}_accuracy.png"
         create_accuracy_plot(
@@ -327,6 +333,49 @@ class PositionBiasExperiment(BiasExperiment):
             title=f"{self.config.name} Accuracy",
             n_examples=results.n_eval_examples,
         )
+
+    def _print_summary(self) -> None:
+        if self.results is None:
+            return
+
+        labels = list(getattr(self.dataset, "position_labels", POSITION_LABELS))
+        hide_aliases = _is_multi_class_label_set(labels)
+        alias_suffixes = set(POSITION_LABELS)
+
+        logger.info("\n" + "=" * 60)
+        logger.info("EXPERIMENT SUMMARY: %s", self.config.name)
+        logger.info("=" * 60)
+        logger.info("Probe examples: %d", self.results.n_probe_examples)
+        logger.info("Eval examples: %d", self.results.n_eval_examples)
+
+        if self.results.probe_metadata:
+            logger.info("Probe accuracy: %.2f%%", 100 * self.results.probe_metadata.get("probe_accuracy", 0))
+            logger.info("Probe separation: %.4f", self.results.probe_metadata.get("separation", 0))
+
+        def _should_log_metric(key: str) -> bool:
+            if not hide_aliases:
+                return True
+            for prefix in ("accuracy_when_", "position_", "n_correct_at_"):
+                if key.startswith(prefix):
+                    suffix = key[len(prefix):]
+                    if suffix in alias_suffixes:
+                        return False
+            return True
+
+        logger.info("\nBaseline metrics:")
+        for key, val in self.results.baseline_metrics.items():
+            if isinstance(val, float) and _should_log_metric(key):
+                logger.info("  %s: %.4f", key, val)
+
+        if self.results.nulled_metrics:
+            logger.info("\nNulled metrics (alpha=%.2f):", self.config.null_alpha)
+            for key, val in self.results.nulled_metrics.items():
+                if isinstance(val, float) and _should_log_metric(key):
+                    baseline_val = self.results.baseline_metrics.get(key, 0)
+                    delta = val - baseline_val
+                    logger.info("  %s: %.4f (%+.4f)", key, val, delta)
+
+        logger.info("=" * 60)
     
     def fast_eval_from_cache(
         self,

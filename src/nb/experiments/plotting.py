@@ -243,21 +243,23 @@ def create_position_bias_plot(
     output_path: Path,
     title: str,
     n_examples: Optional[int] = None,
+    position_labels: Optional[List[str]] = None,
     style: PlotStyle = DEFAULT_STYLE,
 ) -> None:
     """Create position bias bar plot showing accuracy when answer is at each position.
     
     Args:
-        baseline_metrics: Baseline metrics dict with accuracy_when_A/B/C/D keys
-        nulled_metrics: Nulled metrics dict with accuracy_when_A/B/C/D keys
+        baseline_metrics: Baseline metrics dict with accuracy_when_<label> keys
+        nulled_metrics: Nulled metrics dict with accuracy_when_<label> keys
         output_path: Path to save the plot
         title: Plot title
         n_examples: Number of examples (for error bars)
+        position_labels: Ordered labels to plot. Defaults to A/B/C/D.
         style: Plot style settings
     """
     style.apply()
     
-    positions = ["A", "B", "C", "D"]
+    positions = list(position_labels or ["A", "B", "C", "D"])
     fig, ax = plt.subplots(figsize=style.figsize)
     
     x = np.arange(len(positions))
@@ -329,7 +331,7 @@ def create_position_bias_plot(
     
     # Labels
     ax.set_ylabel("Accuracy (%)")
-    ax.set_xlabel("Correct Answer Position")
+    ax.set_xlabel("Correct Answer" if positions != ["A", "B", "C", "D"] else "Correct Answer Position")
     ax.set_xticks(x)
     ax.set_xticklabels(positions)
     max_val = max(max(baseline_accs) if baseline_accs else 50, max(nulled_accs) if nulled_accs else 50)

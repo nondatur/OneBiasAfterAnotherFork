@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import pytest
+import matplotlib.pyplot as plt
+from unittest.mock import patch
 
 from src.nb.datasets.muti_class_parsing import (
     format_multi_class_prompt,
@@ -11,6 +13,7 @@ from src.nb.datasets.muti_class_parsing import (
 from src.nb.datasets.position import compute_position_metrics_with_labels
 from src.nb.experiments.base import ExperimentConfig
 from src.nb.experiments.position import PositionBiasExperiment
+from src.nb.experiments.plotting import create_position_bias_plot
 
 
 class TestMultiClassParsing:
@@ -192,3 +195,35 @@ class TestPositionProbeFallback:
         assert metadata["n_basis_vectors"] == 0
         assert metadata["n_embeddings_by_pos"]["Class 2"] == 0
         assert exp.probe is None
+
+
+class TestMultiClassPositionPlotLabels:
+    def test_create_position_bias_plot_uses_custom_labels(self, tmp_path):
+        baseline = {
+            "accuracy": 0.5,
+            "accuracy_when_SAFE": 0.4,
+            "accuracy_when_UNSAFE": 0.6,
+            "n_correct_at_SAFE": 10,
+            "n_correct_at_UNSAFE": 10,
+        }
+        nulled = {
+            "accuracy": 0.55,
+            "accuracy_when_SAFE": 0.45,
+            "accuracy_when_UNSAFE": 0.65,
+            "n_correct_at_SAFE": 10,
+            "n_correct_at_UNSAFE": 10,
+        }
+
+        with patch("matplotlib.pyplot.close", lambda *args, **kwargs: None):
+            create_position_bias_plot(
+                baseline_metrics=baseline,
+                nulled_metrics=nulled,
+                output_path=tmp_path / "plot.png",
+                title="Test Plot",
+                n_examples=20,
+                position_labels=["SAFE", "UNSAFE"],
+            )
+            ax = plt.gca()
+            assert ax.get_xlabel() == "Correct Answer"
+            assert [tick.get_text() for tick in ax.get_xticklabels()] == ["SAFE", "UNSAFE"]
+            plt.close("all")
