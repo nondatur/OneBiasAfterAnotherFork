@@ -16,6 +16,17 @@ Evaluates and mitigates spurious biases in reward models using null-space projec
 2. **Project out** the probe direction from hidden states via null-space projection
 3. Evaluate whether bias is reduced without harming accuracy
 
+## Documentation & Guides
+
+Quick links to key documentation:
+
+| Guide | Purpose |
+|---|---|
+| [**DATASET_FORMATS.md**](DATASET_FORMATS.md) | Comprehensive reference for all supported dataset input formats and schema. Required reading for working with custom datasets. |
+| [**MULTI_CLASS_USAGE.md**](MULTI_CLASS_USAGE.md) | Detailed guide on multi-class position bias experiments with variable class labels (2-4 classes). Includes usage patterns, constraints, and examples. |
+| [**DEBUG_EMPTY_EMBEDDINGS.md**](DEBUG_EMPTY_EMBEDDINGS.md) | Troubleshooting guide for embedding/parsing issues with custom datasets. Shows the `correct_idx` field support and common solutions. |
+| [examples/](examples/) | Runnable Python examples demonstrating multi-class usage patterns and practical workflows. |
+
 ## Usage
 
 ### Scripts (CLI)
@@ -83,7 +94,10 @@ python experiments/run_experiment.py \
     --extra-num_classes 3
 ```
 
-See [MULTI_CLASS_USAGE.md](MULTI_CLASS_USAGE.md) for detailed documentation and examples.
+**Documentation:**
+- [**MULTI_CLASS_USAGE.md**](MULTI_CLASS_USAGE.md) — Detailed guide with usage patterns, working with custom class labels, and examples
+- [**DATASET_FORMATS.md**](DATASET_FORMATS.md) — Input format specifications and field naming conventions
+- [examples/](examples/) — Runnable Python examples
 
 ## Notebooks
 
@@ -161,10 +175,10 @@ is determined automatically at runtime.
 This codebase supports multiple input formats for datasets:
 
 - **Standard MCQ** (4-choice): GSM8K-MC, MMLU, PlausibleQA
-- **Multi-class MCQ** (2-4 choice): Custom variable-class position bias experiments
+- **Multi-class MCQ** (2-4 choice): Custom variable-class position bias experiments — see [MULTI_CLASS_USAGE.md](MULTI_CLASS_USAGE.md)
 - **Freeform**: BigBench and generative task formats
 
-See [DATASET_FORMATS.md](DATASET_FORMATS.md) for detailed documentation on all supported input schemas and how to work with custom datasets.
+See [DATASET_FORMATS.md](DATASET_FORMATS.md) for comprehensive documentation on all supported input schemas, field naming conventions, and how to work with custom datasets. For multi-class experiments specifically, refer to [MULTI_CLASS_USAGE.md](MULTI_CLASS_USAGE.md) for usage patterns and examples.
 
 ## References
 
