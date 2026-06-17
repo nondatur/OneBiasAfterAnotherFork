@@ -24,7 +24,7 @@ Quick links to key documentation:
 |---|---|
 | [**DATASET_FORMATS.md**](DATASET_FORMATS.md) | Comprehensive reference for all supported dataset input formats and schema. Required reading for working with custom datasets. |
 | [**MULTI_CLASS_USAGE.md**](MULTI_CLASS_USAGE.md) | Detailed guide on multi-class position bias experiments with variable class labels (2-4 classes). Includes usage patterns, constraints, and examples. |
-| [**DEBUG_EMPTY_EMBEDDINGS.md**](DEBUG_EMPTY_EMBEDDINGS.md) | Troubleshooting guide for embedding/parsing issues with custom datasets. Shows the `correct_idx` field support and common solutions. |
+| [**debug_empty_embeddings.md**](debug_empty_embeddings.md) | Troubleshooting guide for embedding/parsing issues with custom datasets. Shows the `correct_idx` field support and common solutions. |
 | [examples/](examples/) | Runnable Python examples demonstrating multi-class usage patterns and practical workflows. |
 
 ## Usage
