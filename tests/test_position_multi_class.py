@@ -11,7 +11,7 @@ from src.nb.datasets.muti_class_parsing import (
     validate_class_labels,
 )
 from src.nb.datasets.position import compute_position_metrics_with_labels
-from src.nb.experiments.base import ExperimentConfig
+from src.nb.experiments.base import ExperimentConfig, ExperimentResults
 from src.nb.experiments.position import PositionBiasExperiment
 from src.nb.experiments.plotting import create_position_bias_plot
 
@@ -227,3 +227,91 @@ class TestMultiClassPositionPlotLabels:
             assert ax.get_xlabel() == "Correct Answer"
             assert [tick.get_text() for tick in ax.get_xticklabels()] == ["SAFE", "UNSAFE"]
             plt.close("all")
+
+
+class TestMultiClassResultsSerialization:
+    def test_to_dict_prunes_legacy_aliases_for_multi_class(self):
+        config = ExperimentConfig(
+            name="serialize_multi_class",
+            bias_type="position",
+            model_path="dummy/model",
+            dataset_source="dummy",
+            dataset_class="position_multi_class",
+        )
+
+        baseline = {
+            "accuracy": 0.5,
+            "accuracy_when_SAFE": 0.4,
+            "accuracy_when_UNSAFE": 0.6,
+            "position_SAFE_pct": 40.0,
+            "position_UNSAFE_pct": 60.0,
+            "n_correct_at_SAFE": 10,
+            "n_correct_at_UNSAFE": 10,
+            "accuracy_when_A": 0.4,
+            "accuracy_when_B": 0.6,
+            "position_A_pct": 40.0,
+            "position_B_pct": 60.0,
+            "n_correct_at_A": 10,
+            "n_correct_at_B": 10,
+        }
+
+        nulled = {
+            "accuracy": 0.55,
+            "accuracy_when_SAFE": 0.45,
+            "accuracy_when_UNSAFE": 0.65,
+            "position_SAFE_pct": 45.0,
+            "position_UNSAFE_pct": 55.0,
+            "n_correct_at_SAFE": 10,
+            "n_correct_at_UNSAFE": 10,
+            "accuracy_when_A": 0.45,
+            "position_A_pct": 45.0,
+            "n_correct_at_A": 10,
+        }
+
+        results = ExperimentResults(
+            config=config,
+            baseline_metrics=baseline,
+            nulled_metrics=nulled,
+            probe_metadata={},
+            n_probe_examples=100,
+            n_eval_examples=100,
+        )
+
+        out = results.to_dict()
+        assert "accuracy_when_SAFE" in out["baseline"]
+        assert "position_SAFE_pct" in out["baseline"]
+        assert "n_correct_at_SAFE" in out["baseline"]
+        assert "accuracy_when_A" not in out["baseline"]
+        assert "position_A_pct" not in out["baseline"]
+        assert "n_correct_at_A" not in out["baseline"]
+        assert "accuracy_when_A" not in out["nulled"]
+
+    def test_to_dict_keeps_aliases_for_standard_position(self):
+        config = ExperimentConfig(
+            name="serialize_standard_position",
+            bias_type="position",
+            model_path="dummy/model",
+            dataset_source="dummy",
+            dataset_class="position",
+        )
+
+        baseline = {
+            "accuracy": 0.5,
+            "accuracy_when_A": 0.4,
+            "position_A_pct": 40.0,
+            "n_correct_at_A": 10,
+        }
+
+        results = ExperimentResults(
+            config=config,
+            baseline_metrics=baseline,
+            nulled_metrics=None,
+            probe_metadata={},
+            n_probe_examples=100,
+            n_eval_examples=100,
+        )
+
+        out = results.to_dict()
+        assert "accuracy_when_A" in out["baseline"]
+        assert "position_A_pct" in out["baseline"]
+        assert "n_correct_at_A" in out["baseline"]
