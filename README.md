@@ -156,6 +156,16 @@ is determined automatically at runtime.
 
 **Not supported:** Apple MPS (Metal). The codebase targets CUDA-capable hardware only.
 
+## Dataset Formats
+
+This codebase supports multiple input formats for datasets:
+
+- **Standard MCQ** (4-choice): GSM8K-MC, MMLU, PlausibleQA
+- **Multi-class MCQ** (2-4 choice): Custom variable-class position bias experiments
+- **Freeform**: BigBench and generative task formats
+
+See [DATASET_FORMATS.md](DATASET_FORMATS.md) for detailed documentation on all supported input schemas and how to work with custom datasets.
+
 ## References
 
 When using this codebase, please cite:
