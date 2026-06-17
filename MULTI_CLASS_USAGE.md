@@ -123,6 +123,10 @@ eval_examples = dataset.get_eval_examples(tokenizer)
 - **class_labels**: Optional list of strings matching num_classes (defaults to "Class 1", "Class 2", etc.)
 - **Probe building**: Learns which position/class the model prefers, independent of content
 - **Metrics**: Generates labels for accuracy_when_X, position_X_pct, etc. where X is your label
+- **Supported field names**: The parser supports multiple field names for the correct answer:
+  - `"answer"` or `"Answer"` (standard)
+  - `"correct_idx"` (string label or integer index)
+  - See [DATASET_FORMATS.md](../DATASET_FORMATS.md) for complete documentation
 
 ## Metrics Output
 
@@ -150,6 +154,38 @@ For a 3-class task with labels `["Option A", "Option B", "Option C"]`:
 - Existing A/B/C/D position task remains unchanged
 - Metrics include legacy position_A_pct, accuracy_when_A, etc. as aliases to avoid plotting/reporting breakage
 - Old experiments unaffected
+
+## Working with Custom Datasets
+
+The parser automatically handles multiple dataset formats:
+
+**Supported field names for correct answer:**
+- `"answer"` or `"Answer"` (standard)
+- `"correct_idx"` (string label or integer index)
+
+**Example custom dataset:**
+```python
+from src.nb.datasets.position import PositionMultiClassDataset
+
+# Your dataset has "correct_idx" field with label values
+dataset = PositionMultiClassDataset(
+    source="your_custom_dataset",
+    num_classes=2,
+    class_labels=["Safe", "Unsafe"],
+)
+# Parser automatically recognizes and uses the "correct_idx" field
+
+# If your dataset uses non-standard field names, preprocess it:
+from datasets import load_dataset
+
+dataset = load_dataset("your_dataset")
+dataset = dataset.rename_column("my_answer_field", "answer")
+dataset = dataset.rename_column("my_choices_field", "choices")
+
+position_dataset = PositionMultiClassDataset(source=dataset, num_classes=2)
+```
+
+For complete details on supported dataset formats, see [DATASET_FORMATS.md](../DATASET_FORMATS.md).
 
 ## Example Run
 
