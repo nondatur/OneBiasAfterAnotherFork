@@ -148,7 +148,10 @@ def parse_to_nchoice_mcq(
         if len(choices_raw) < n_choices:
             return None
 
-        answer = row.get("answer", row.get("Answer", 0))
+        # Support multiple field names for the correct answer:
+        # - "answer" or "Answer" (standard)
+        # - "correct_idx" (string label or integer index)
+        answer = row.get("answer", row.get("Answer", row.get("correct_idx", 0)))
         correct_idx: Optional[int] = None
         if isinstance(answer, int):
             correct_idx = answer

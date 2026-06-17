@@ -57,6 +57,31 @@ class TestMultiClassParsing:
         assert 0 <= parsed["correct_idx"] < 3
         assert "Jupiter" in parsed["choices"]
 
+    def test_parse_to_nchoice_mcq_with_correct_idx_field(self):
+        """Test parsing with 'correct_idx' field (string label)."""
+        row = {
+            "question": "Safety classification",
+            "choices": ["Safe", "Unsafe"],
+            "correct_idx": "Unsafe",
+        }
+        parsed = parse_to_nchoice_mcq(row, n_choices=2, seed=42)
+        assert parsed is not None
+        assert parsed["choices"] == ["Safe", "Unsafe"]
+        assert parsed["correct_idx"] == 1
+        assert parsed["choices"][parsed["correct_idx"]] == "Unsafe"
+
+    def test_parse_to_nchoice_mcq_with_correct_idx_integer(self):
+        """Test parsing with 'correct_idx' field (integer index)."""
+        row = {
+            "question": "What is 2+2?",
+            "choices": ["3", "4", "5"],
+            "correct_idx": 1,
+        }
+        parsed = parse_to_nchoice_mcq(row, n_choices=3, seed=42)
+        assert parsed is not None
+        assert parsed["correct_idx"] == 1
+        assert parsed["choices"][parsed["correct_idx"]] == "4"
+
     def test_parse_to_nchoice_mcq_from_abcd_schema(self):
         row = {
             "Question": "2+2?",
