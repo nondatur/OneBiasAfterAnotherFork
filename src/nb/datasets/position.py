@@ -483,13 +483,27 @@ class PositionMultiClassDataset(PositionBiasDataset):
         max_to_load = self.probe_size * 2
 
         examples = []
+        first_row_keys: Optional[List[str]] = None
         for idx, row in enumerate(dataset):
+            if idx == 0 and isinstance(row, dict):
+                first_row_keys = sorted([str(k) for k in row.keys()])
             parsed = parse_to_nchoice_mcq(row, n_choices=self.num_classes, seed=self.split_seed)
             if parsed:
                 parsed["idx"] = idx
                 examples.append(parsed)
                 if len(examples) >= max_to_load:
                     break
+
+        if not examples:
+            keys_msg = f" First row keys: {first_row_keys}." if first_row_keys is not None else ""
+            raise ValueError(
+                "No valid examples were parsed for position_multi_class probe training."
+                " Expected a question field (e.g., question/prompt/input), a choices field"
+                " (e.g., choices/options/answers), and an answer field"
+                " (e.g., answer/Answer/correct_idx/label)."
+                f" Dataset source={self.source}, split={self.train_split}, num_classes={self.num_classes}."
+                f"{keys_msg}"
+            )
 
         logger.info("Loaded %d MCQ examples for probe training", len(examples))
         return examples

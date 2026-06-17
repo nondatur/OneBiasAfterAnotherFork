@@ -82,6 +82,30 @@ class TestMultiClassParsing:
         assert parsed["correct_idx"] == 1
         assert parsed["choices"][parsed["correct_idx"]] == "4"
 
+    def test_parse_to_nchoice_mcq_custom_prompt_options_label(self):
+        row = {
+            "prompt": "Classify this response",
+            "options": ["Safe", "Unsafe"],
+            "label": "1",
+        }
+        parsed = parse_to_nchoice_mcq(row, n_choices=2, seed=42)
+        assert parsed is not None
+        assert parsed["question"] == "Classify this response"
+        assert parsed["choices"] == ["Safe", "Unsafe"]
+        assert parsed["correct_idx"] == 1
+
+    def test_parse_to_nchoice_mcq_ab_schema_with_correct_idx_digit_string(self):
+        row = {
+            "question": "Binary decision",
+            "A": "Accept",
+            "B": "Reject",
+            "correct_idx": "1",
+        }
+        parsed = parse_to_nchoice_mcq(row, n_choices=2, seed=42)
+        assert parsed is not None
+        assert parsed["choices"] == ["Accept", "Reject"]
+        assert parsed["correct_idx"] == 1
+
     def test_parse_to_nchoice_mcq_from_abcd_schema(self):
         row = {
             "Question": "2+2?",

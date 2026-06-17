@@ -95,7 +95,15 @@ def parse_to_nchoice_mcq(
             f"n_choices must be between {MIN_CLASSES} and {MAX_CLASSES}, got {n_choices}"
         )
 
-    question = row.get("Question", row.get("question", ""))
+    question = (
+        row.get("Question")
+        or row.get("question")
+        or row.get("prompt")
+        or row.get("input")
+        or row.get("instruction")
+        or row.get("query")
+        or ""
+    )
     if not question:
         return None
 
@@ -142,8 +150,15 @@ def parse_to_nchoice_mcq(
         return {"question": question, "choices": choices, "correct_idx": choices.index(best)}
 
     # List-of-choices schema (MMLU-style; may have > n options)
-    if "choices" in row and isinstance(row["choices"], list):
-        choices_raw = [str(c).strip() for c in row["choices"]]
+    choices_source = row.get("choices")
+    if choices_source is None:
+        for alt in ("options", "answers", "responses"):
+            if isinstance(row.get(alt), list):
+                choices_source = row.get(alt)
+                break
+
+    if isinstance(choices_source, list):
+        choices_raw = [str(c).strip() for c in choices_source]
         choices_raw = [c for c in choices_raw if c]
         if len(choices_raw) < n_choices:
             return None
@@ -151,7 +166,25 @@ def parse_to_nchoice_mcq(
         # Support multiple field names for the correct answer:
         # - "answer" or "Answer" (standard)
         # - "correct_idx" (string label or integer index)
-        answer = row.get("answer", row.get("Answer", row.get("correct_idx", 0)))
+        answer = row.get(
+            "answer",
+            row.get(
+                "Answer",
+                row.get(
+                    "correct_idx",
+                    row.get(
+                        "label",
+                        row.get(
+                            "target",
+                            row.get(
+                                "correct_answer",
+                                row.get("gold", row.get("ground_truth", 0)),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        )
         correct_idx: Optional[int] = None
         if isinstance(answer, int):
             correct_idx = answer
@@ -159,6 +192,8 @@ def parse_to_nchoice_mcq(
             a = answer.strip()
             if a in POSITION_LABELS:
                 correct_idx = POSITION_LABELS.index(a)
+            elif a.isdigit():
+                correct_idx = int(a)
             elif a in choices_raw:
                 correct_idx = choices_raw.index(a)
 
@@ -189,12 +224,24 @@ def parse_to_nchoice_mcq(
     if not all(choices):
         return None
 
-    answer = row.get("Answer", row.get("answer", "A"))
+    answer = row.get(
+        "Answer",
+        row.get(
+            "answer",
+            row.get("correct_idx", row.get("label", row.get("target", "A"))),
+        ),
+    )
     if isinstance(answer, int):
         answer_idx = answer
     elif isinstance(answer, str):
-        a = answer.strip().upper()
-        answer_idx = POSITION_LABELS.index(a) if a in POSITION_LABELS else 0
+        a_raw = answer.strip()
+        a = a_raw.upper()
+        if a in POSITION_LABELS:
+            answer_idx = POSITION_LABELS.index(a)
+        elif a_raw.isdigit():
+            answer_idx = int(a_raw)
+        else:
+            answer_idx = 0
     else:
         answer_idx = 0
 
