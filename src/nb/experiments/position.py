@@ -79,12 +79,13 @@ class PositionBiasExperiment(BiasExperiment):
     def _create_dataset(self) -> ProbeDataset:
         """Create position bias dataset."""
         extra = self.config.extra
-        dataset_class = extra.get("dataset_class", "position")
+        dataset_class = self.config.dataset_class or extra.get("dataset_class", "position")
+        dataset_source = self.config.dataset_source or extra.get("dataset_id", "guipenedo/gsm8k-mc")
         
         # Check for BigBench dataset
         if dataset_class == "position_bigbench":
             return PositionBigBenchDataset(
-                source=self.config.dataset_source,
+                source=dataset_source,
                 probe_tasks=extra.get("probe_tasks"),
                 eval_tasks=extra.get("eval_tasks"),
                 max_per_task_probe=extra.get("max_per_task_probe", 20),
@@ -95,14 +96,14 @@ class PositionBiasExperiment(BiasExperiment):
             )
         elif dataset_class == "position_plausibleqa_mcq":
             return PositionPlausibleQAMCQDataset(
-                source=self.config.dataset_source,
+                source=dataset_source,
                 probe_size=self.config.probe_size,
                 split_seed=self.config.split_seed,
                 max_test_examples=self.config.max_test_examples,
             )
         elif dataset_class == "position_multi_class":
             return PositionMultiClassDataset(
-                source=extra.get("dataset_id", "guipenedo/gsm8k-mc"),
+                source=dataset_source,
                 split=extra.get("train_split", "train"),
                 eval_split=extra.get("eval_split", "test"),
                 probe_size=self.config.probe_size,
@@ -115,7 +116,7 @@ class PositionBiasExperiment(BiasExperiment):
         else:
             # Default: MCQ dataset (GSM8K-MC, MMLU, etc.)
             return PositionBiasDataset(
-                source=extra.get("dataset_id", "guipenedo/gsm8k-mc"),
+                source=dataset_source,
                 split=extra.get("train_split", "train"),
                 eval_split=extra.get("eval_split", "test"),
                 probe_size=self.config.probe_size,
@@ -450,7 +451,7 @@ class BinaryPositionBiasExperiment(BiasExperiment):
     def _create_correctness_dataset(self) -> ProbeDataset:
         """Create correctness probe dataset."""
         extra = self.config.extra
-        dataset_class = extra.get("dataset_class", "position_plausibleqa")
+        dataset_class = self.config.dataset_class or extra.get("dataset_class", "position_plausibleqa")
         
         if dataset_class == "position_bigbench":
             return CorrectnessPositionBigBenchDataset(
@@ -564,11 +565,12 @@ class FreeformPositionBiasExperiment(BiasExperiment):
     def _create_correctness_dataset(self) -> ProbeDataset:
         """Create correctness probe dataset."""
         extra = self.config.extra
-        dataset_class = extra.get("dataset_class", "position_freeform")
+        dataset_class = self.config.dataset_class or extra.get("dataset_class", "position_freeform")
+        dataset_source = self.config.dataset_source or extra.get("dataset_id", "guipenedo/gsm8k-mc")
         
         if dataset_class == "position_freeform_bigbench":
             return CorrectnessPositionFreeformBigBenchDataset(
-                source=self.config.dataset_source,
+                source=dataset_source,
                 probe_tasks=extra.get("probe_tasks"),
                 eval_tasks=extra.get("eval_tasks"),
                 max_per_task_probe=extra.get("max_per_task_probe", 20),
@@ -579,7 +581,7 @@ class FreeformPositionBiasExperiment(BiasExperiment):
             )
         elif dataset_class == "position_freeform_plausibleqa":
             return CorrectnessPositionFreeformPlausibleQADataset(
-                source=self.config.dataset_source,
+                source=dataset_source,
                 probe_size=self.config.probe_size,
                 split_seed=self.config.split_seed,
                 max_test_examples=self.config.max_test_examples,
@@ -587,7 +589,7 @@ class FreeformPositionBiasExperiment(BiasExperiment):
         else:
             # Default: GSM8K-MC or MMLU style freeform
             return CorrectnessPositionFreeformDataset(
-                source=extra.get("dataset_id", "guipenedo/gsm8k-mc"),
+                source=dataset_source,
                 split=extra.get("train_split", "train"),
                 eval_split=extra.get("eval_split", "test"),
                 num_choices=int(extra.get("num_choices", 4)),
@@ -631,11 +633,12 @@ class FreeformPositionBiasExperiment(BiasExperiment):
     def _create_dataset(self) -> ProbeDataset:
         """Create freeform position bias dataset."""
         extra = self.config.extra
-        dataset_class = extra.get("dataset_class", "position_freeform")
+        dataset_class = self.config.dataset_class or extra.get("dataset_class", "position_freeform")
+        dataset_source = self.config.dataset_source or extra.get("dataset_id", "guipenedo/gsm8k-mc")
         
         if dataset_class == "position_freeform_bigbench":
             return PositionFreeformBigBenchDataset(
-                source=self.config.dataset_source,
+                source=dataset_source,
                 probe_tasks=extra.get("probe_tasks"),
                 eval_tasks=extra.get("eval_tasks"),
                 max_per_task_probe=extra.get("max_per_task_probe", 100),
@@ -646,7 +649,7 @@ class FreeformPositionBiasExperiment(BiasExperiment):
             )
         elif dataset_class == "position_freeform_plausibleqa":
             return PositionFreeformPlausibleQADataset(
-                source=self.config.dataset_source,
+                source=dataset_source,
                 probe_size=self.config.probe_size,
                 split_seed=self.config.split_seed,
                 max_test_examples=self.config.max_test_examples,
@@ -654,7 +657,7 @@ class FreeformPositionBiasExperiment(BiasExperiment):
         else:
             # Default: GSM8K-MC or MMLU style freeform
             return PositionFreeformDataset(
-                source=extra.get("dataset_id", "guipenedo/gsm8k-mc"),
+                source=dataset_source,
                 split=extra.get("train_split", "train"),
                 eval_split=extra.get("eval_split", "test"),
                 num_choices=int(extra.get("num_choices", 4)),
@@ -715,7 +718,7 @@ def run_position_experiment(config_path: Path) -> ExperimentResults:
     
     # Choose experiment class based on dataset
     extra = config.extra
-    dataset_class = extra.get("dataset_class", "")
+    dataset_class = config.dataset_class or extra.get("dataset_class", "")
     
     if (
         "plausibleqa" in config.dataset_source.lower()

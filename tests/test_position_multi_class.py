@@ -148,13 +148,13 @@ class TestMultiClassExperimentDispatch:
             model_path="dummy/model",
             dataset_source="guipenedo/gsm8k-mc",
             extra={
-                "dataset_class": "position_multi_class",
                 "dataset_id": "guipenedo/gsm8k-mc",
                 "train_split": "train",
                 "eval_split": "test",
                 "num_classes": 3,
                 "class_labels": ["Class 1", "Class 2", "Class 3"],
             },
+            dataset_class="position_multi_class",
         )
 
         exp = PositionBiasExperiment(config)
