@@ -361,6 +361,21 @@ class BiasExperiment(ABC):
                    self.config.probe_size, dataset_for_probe.name)
         
         contrastive_pairs = dataset_for_probe.get_probe_pairs(self.tokenizer)
+
+        if not contrastive_pairs:
+            reason = (
+                "Skipping probe build: no contrastive pairs were generated. "
+                "This usually means all rows were filtered during dataset parsing "
+                "or the split has no usable probe examples."
+            )
+            logger.warning(reason)
+            self.probe = None
+            return {
+                "probe_skipped": True,
+                "probe_skip_reason": reason,
+                "probe_type": "difference_of_means",
+                "n_contrastive_pairs": 0,
+            }
         
         self.probe, metadata = build_probe_direction(
             model=self.model,
@@ -372,7 +387,7 @@ class BiasExperiment(ABC):
         )
         
         # Save probe if configured
-        if self.config.save_probe:
+        if self.config.save_probe and self.probe is not None:
             artifacts_root = Path(self.config.artifacts_dir)
             probe_dir = artifacts_root / "probes" / self.config.bias_type / self.config.name
             probe_dir.mkdir(parents=True, exist_ok=True)

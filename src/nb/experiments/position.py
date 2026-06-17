@@ -148,6 +148,24 @@ class PositionBiasExperiment(BiasExperiment):
         
         # Get texts organized by position
         texts_by_pos = self.dataset.get_position_embeddings_texts(self.tokenizer)
+
+        n_embeddings_by_pos = {labels[pos]: len(texts_by_pos.get(pos, [])) for pos in range(n_pos)}
+        empty_labels = [label for label, n in n_embeddings_by_pos.items() if n == 0]
+        if empty_labels:
+            reason = (
+                "Skipping position probe: empty text buckets for positions "
+                f"{empty_labels}. This usually means probe examples were filtered out "
+                "by dataset parsing."
+            )
+            logger.warning(reason)
+            self.probe = None
+            return {
+                "probe_type": "pos_vs_rest_basis",
+                "probe_skipped": True,
+                "probe_skip_reason": reason,
+                "n_embeddings_by_pos": n_embeddings_by_pos,
+                "n_basis_vectors": 0,
+            }
         
         # Extract embeddings for all positions
         embeddings_by_pos = {}
@@ -249,7 +267,7 @@ class PositionBiasExperiment(BiasExperiment):
         metadata: Dict[str, Any] = {
             "hidden_dim": hidden_dim,
             "probe_type": "pos_vs_rest_basis",
-            "n_embeddings_by_pos": {labels[pos]: len(texts_by_pos[pos]) for pos in range(n_pos)},
+            "n_embeddings_by_pos": n_embeddings_by_pos,
             "raw_direction_norms_by_pos": raw_norms_by_pos,
             "n_basis_vectors": int(self.probe.shape[0]),
         }

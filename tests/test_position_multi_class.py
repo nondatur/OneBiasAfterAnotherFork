@@ -162,3 +162,33 @@ class TestMultiClassExperimentDispatch:
         assert ds.name == "position_multi_class"
         assert ds.num_classes == 3
         assert ds.position_labels == ["Class 1", "Class 2", "Class 3"]
+
+
+class TestPositionProbeFallback:
+    def test_build_probe_skips_when_position_bucket_empty(self):
+        config = ExperimentConfig(
+            name="test_probe_skip",
+            bias_type="position",
+            model_path="dummy/model",
+            dataset_source="dummy",
+            dataset_class="position_multi_class",
+        )
+
+        exp = PositionBiasExperiment(config)
+        exp.model = object()      # type: ignore[assignment]
+        exp.tokenizer = object()  # type: ignore[assignment]
+
+        class _DummyDataset:
+            position_labels = ["Class 1", "Class 2"]
+
+            def get_position_embeddings_texts(self, tokenizer):
+                return {0: ["x"], 1: []}
+
+        exp.dataset = _DummyDataset()  # type: ignore[assignment]
+
+        metadata = exp.build_probe()
+
+        assert metadata["probe_skipped"] is True
+        assert metadata["n_basis_vectors"] == 0
+        assert metadata["n_embeddings_by_pos"]["Class 2"] == 0
+        assert exp.probe is None
