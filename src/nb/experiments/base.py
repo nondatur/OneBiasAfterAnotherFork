@@ -171,13 +171,53 @@ class ExperimentResults:
     
     n_eval_examples: int = 0
     """Number of examples used for evaluation"""
+
+    @staticmethod
+    def _is_position_multi_class(config: ExperimentConfig) -> bool:
+        dataset_class = config.dataset_class or config.extra.get("dataset_class", "")
+        return config.bias_type == "position" and dataset_class == "position_multi_class"
+
+    @staticmethod
+    def _prune_legacy_position_aliases(metrics: Optional[Dict[str, float]]) -> Optional[Dict[str, float]]:
+        """Remove legacy A/B/C/D alias metrics used for backward compatibility.
+
+        These aliases are redundant for position_multi_class runs where class labels
+        are custom (e.g., SAFE/UNSAFE).
+        """
+        if metrics is None:
+            return None
+
+        aliases = {"A", "B", "C", "D"}
+        prefixes = ("accuracy_when_", "position_", "n_correct_at_")
+
+        pruned: Dict[str, float] = {}
+        for key, value in metrics.items():
+            drop = False
+            for prefix in prefixes:
+                if key.startswith(prefix):
+                    suffix = key[len(prefix):]
+                    if prefix == "position_" and suffix.endswith("_pct"):
+                        suffix = suffix[:-4]
+                    if suffix in aliases:
+                        drop = True
+                    break
+            if not drop:
+                pruned[key] = value
+        return pruned
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
+        baseline = self.baseline_metrics
+        nulled = self.nulled_metrics
+
+        if self._is_position_multi_class(self.config):
+            baseline = self._prune_legacy_position_aliases(baseline) or {}
+            nulled = self._prune_legacy_position_aliases(nulled)
+
         return {
             "config": self.config.to_dict(),
-            "baseline": self.baseline_metrics,
-            "nulled": self.nulled_metrics,
+            "baseline": baseline,
+            "nulled": nulled,
             "probe_metadata": self.probe_metadata,
             "n_probe_examples": self.n_probe_examples,
             "n_eval_examples": self.n_eval_examples,
@@ -361,6 +401,21 @@ class BiasExperiment(ABC):
                    self.config.probe_size, dataset_for_probe.name)
         
         contrastive_pairs = dataset_for_probe.get_probe_pairs(self.tokenizer)
+
+        if not contrastive_pairs:
+            reason = (
+                "Skipping probe build: no contrastive pairs were generated. "
+                "This usually means all rows were filtered during dataset parsing "
+                "or the split has no usable probe examples."
+            )
+            logger.warning(reason)
+            self.probe = None
+            return {
+                "probe_skipped": True,
+                "probe_skip_reason": reason,
+                "probe_type": "difference_of_means",
+                "n_contrastive_pairs": 0,
+            }
         
         self.probe, metadata = build_probe_direction(
             model=self.model,
@@ -372,7 +427,7 @@ class BiasExperiment(ABC):
         )
         
         # Save probe if configured
-        if self.config.save_probe:
+        if self.config.save_probe and self.probe is not None:
             artifacts_root = Path(self.config.artifacts_dir)
             probe_dir = artifacts_root / "probes" / self.config.bias_type / self.config.name
             probe_dir.mkdir(parents=True, exist_ok=True)

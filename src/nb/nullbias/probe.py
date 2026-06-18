@@ -358,7 +358,17 @@ def get_embeddings(
         
     Returns:
         [n_texts, hidden_dim] tensor of embeddings
+        
+    Raises:
+        ValueError: If texts is empty (no embeddings to extract)
     """
+    if not texts:
+        raise ValueError(
+            "Cannot extract embeddings: no texts provided. "
+            "This usually means a dataset position/category has no examples after filtering. "
+            "Check that your dataset has enough examples and the parser is working correctly."
+        )
+    
     model.eval()
     all_embeddings = []
     base_model = get_base_model(model)

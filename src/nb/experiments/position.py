@@ -21,12 +21,15 @@ from src.nb.datasets.position import (
     CorrectnessPositionPlausibleQADataset,
     CorrectnessPositionPlausibleQAMCQDataset,
     CorrectnessPositionMCQDataset,
+    CorrectnessPositionMultiClassDataset,
     PositionBiasDataset, 
+    PositionMultiClassDataset,
     PositionPlausibleQADataset,
     PositionPlausibleQAMCQDataset,
     PositionFreeformDataset,
     PositionFreeformPlausibleQADataset,
     compute_position_metrics, 
+    compute_position_metrics_with_labels,
     compute_binary_position_metrics,
     compute_freeform_position_metrics,
     POSITION_LABELS,
@@ -57,6 +60,10 @@ from src.nb.nullbias.probe import (
 logger = logging.getLogger(__name__)
 
 
+def _is_multi_class_label_set(labels: List[str]) -> bool:
+    return labels != POSITION_LABELS[: len(labels)]
+
+
 class PositionBiasExperiment(BiasExperiment):
     """Experiment for evaluating position bias on MCQ.
     
@@ -76,12 +83,13 @@ class PositionBiasExperiment(BiasExperiment):
     def _create_dataset(self) -> ProbeDataset:
         """Create position bias dataset."""
         extra = self.config.extra
-        dataset_class = extra.get("dataset_class", "position")
+        dataset_class = self.config.dataset_class or extra.get("dataset_class", "position")
+        dataset_source = self.config.dataset_source or extra.get("dataset_id", "guipenedo/gsm8k-mc")
         
         # Check for BigBench dataset
         if dataset_class == "position_bigbench":
             return PositionBigBenchDataset(
-                source=self.config.dataset_source,
+                source=dataset_source,
                 probe_tasks=extra.get("probe_tasks"),
                 eval_tasks=extra.get("eval_tasks"),
                 max_per_task_probe=extra.get("max_per_task_probe", 20),
@@ -92,15 +100,27 @@ class PositionBiasExperiment(BiasExperiment):
             )
         elif dataset_class == "position_plausibleqa_mcq":
             return PositionPlausibleQAMCQDataset(
-                source=self.config.dataset_source,
+                source=dataset_source,
                 probe_size=self.config.probe_size,
                 split_seed=self.config.split_seed,
                 max_test_examples=self.config.max_test_examples,
             )
+        elif dataset_class == "position_multi_class":
+            return PositionMultiClassDataset(
+                source=dataset_source,
+                split=extra.get("train_split", "train"),
+                eval_split=extra.get("eval_split", "test"),
+                probe_size=self.config.probe_size,
+                split_seed=self.config.split_seed,
+                max_test_examples=self.config.max_test_examples,
+                subset=extra.get("subset", None),
+                num_classes=int(extra.get("num_classes", 4)),
+                class_labels=extra.get("class_labels", None),
+            )
         else:
             # Default: MCQ dataset (GSM8K-MC, MMLU, etc.)
             return PositionBiasDataset(
-                source=extra.get("dataset_id", "guipenedo/gsm8k-mc"),
+                source=dataset_source,
                 split=extra.get("train_split", "train"),
                 eval_split=extra.get("eval_split", "test"),
                 probe_size=self.config.probe_size,
@@ -127,16 +147,36 @@ class PositionBiasExperiment(BiasExperiment):
         if self.dataset is None:
             raise RuntimeError("Dataset not loaded. Call load_dataset() first.")
         
-        logger.info("Building position bias probe basis (A/B/C/D vs rest)...")
+        labels = list(getattr(self.dataset, "position_labels", POSITION_LABELS))
+        n_pos = len(labels)
+        logger.info("Building position bias probe basis (%d-way vs rest)...", n_pos)
         
         # Get texts organized by position
         texts_by_pos = self.dataset.get_position_embeddings_texts(self.tokenizer)
+
+        n_embeddings_by_pos = {labels[pos]: len(texts_by_pos.get(pos, [])) for pos in range(n_pos)}
+        empty_labels = [label for label, n in n_embeddings_by_pos.items() if n == 0]
+        if empty_labels:
+            reason = (
+                "Skipping position probe: empty text buckets for positions "
+                f"{empty_labels}. This usually means probe examples were filtered out "
+                "by dataset parsing."
+            )
+            logger.warning(reason)
+            self.probe = None
+            return {
+                "probe_type": "pos_vs_rest_basis",
+                "probe_skipped": True,
+                "probe_skip_reason": reason,
+                "n_embeddings_by_pos": n_embeddings_by_pos,
+                "n_basis_vectors": 0,
+            }
         
         # Extract embeddings for all positions
         embeddings_by_pos = {}
-        for pos in [0, 1, 2, 3]:
+        for pos in range(n_pos):
             logger.info("Extracting embeddings for position %s (%d texts)...", 
-                       POSITION_LABELS[pos], len(texts_by_pos[pos]))
+                       labels[pos], len(texts_by_pos[pos]))
             embeddings_by_pos[pos] = get_embeddings(
                 model=self.model,
                 tokenizer=self.tokenizer,
@@ -149,12 +189,12 @@ class PositionBiasExperiment(BiasExperiment):
         # Build position-vs-rest probe directions (one per position)
         probes: List[torch.Tensor] = []
         raw_norms_by_pos: Dict[str, float] = {}
-        for pos in [0, 1, 2, 3]:
+        for pos in range(n_pos):
             mean_pos = embeddings_by_pos[pos].mean(dim=0)
-            rest = torch.cat([embeddings_by_pos[p] for p in [0, 1, 2, 3] if p != pos], dim=0)
+            rest = torch.cat([embeddings_by_pos[p] for p in range(n_pos) if p != pos], dim=0)
             mean_rest = rest.mean(dim=0)
             v = mean_pos - mean_rest
-            raw_norms_by_pos[POSITION_LABELS[pos]] = float(v.norm().item())
+            raw_norms_by_pos[labels[pos]] = float(v.norm().item())
             v = v / (v.norm() + 1e-8)
             probes.append(v)
         
@@ -181,6 +221,18 @@ class PositionBiasExperiment(BiasExperiment):
                     probe_size=self.config.probe_size,
                     split_seed=self.config.split_seed,
                     max_test_examples=self.config.max_test_examples,
+                )
+            elif isinstance(self.dataset, PositionMultiClassDataset):
+                correctness_dataset = CorrectnessPositionMultiClassDataset(
+                    source=extra.get("dataset_id", "guipenedo/gsm8k-mc"),
+                    split=extra.get("train_split", "train"),
+                    eval_split=extra.get("eval_split", "test"),
+                    probe_size=self.config.probe_size,
+                    split_seed=self.config.split_seed,
+                    max_test_examples=self.config.max_test_examples,
+                    subset=extra.get("subset", None),
+                    num_classes=int(extra.get("num_classes", 4)),
+                    class_labels=extra.get("class_labels", None),
                 )
             else:
                 correctness_dataset = CorrectnessPositionMCQDataset(
@@ -220,12 +272,7 @@ class PositionBiasExperiment(BiasExperiment):
         metadata: Dict[str, Any] = {
             "hidden_dim": hidden_dim,
             "probe_type": "pos_vs_rest_basis",
-            "n_embeddings_by_pos": {
-                "A": len(texts_by_pos[0]),
-                "B": len(texts_by_pos[1]),
-                "C": len(texts_by_pos[2]),
-                "D": len(texts_by_pos[3]),
-            },
+            "n_embeddings_by_pos": n_embeddings_by_pos,
             "raw_direction_norms_by_pos": raw_norms_by_pos,
             "n_basis_vectors": int(self.probe.shape[0]),
         }
@@ -251,6 +298,13 @@ class PositionBiasExperiment(BiasExperiment):
     ) -> Dict[str, float]:
         """Compute position bias metrics."""
         correct_positions = [ex.metadata["correct_idx"] for ex in eval_examples]
+        labels = list(getattr(self.dataset, "position_labels", POSITION_LABELS))
+        if labels != POSITION_LABELS:
+            return compute_position_metrics_with_labels(
+                rewards=rewards,
+                correct_positions=correct_positions,
+                labels=labels,
+            )
         return compute_position_metrics(
             rewards=rewards,
             correct_positions=correct_positions,
@@ -262,12 +316,14 @@ class PositionBiasExperiment(BiasExperiment):
         output_path: Path,
     ) -> None:
         """Create position bias plot."""
+        position_labels = list(getattr(self.dataset, "position_labels", POSITION_LABELS))
         create_position_bias_plot(
             baseline_metrics=results.baseline_metrics,
             nulled_metrics=results.nulled_metrics or {},
             output_path=output_path,
             title=f"{self.config.name} Position Bias",
             n_examples=results.n_eval_examples,
+            position_labels=position_labels,
         )
         accuracy_path = output_path.parent / f"{self.config.name}_accuracy.png"
         create_accuracy_plot(
@@ -277,6 +333,49 @@ class PositionBiasExperiment(BiasExperiment):
             title=f"{self.config.name} Accuracy",
             n_examples=results.n_eval_examples,
         )
+
+    def _print_summary(self) -> None:
+        if self.results is None:
+            return
+
+        labels = list(getattr(self.dataset, "position_labels", POSITION_LABELS))
+        hide_aliases = _is_multi_class_label_set(labels)
+        alias_suffixes = set(POSITION_LABELS)
+
+        logger.info("\n" + "=" * 60)
+        logger.info("EXPERIMENT SUMMARY: %s", self.config.name)
+        logger.info("=" * 60)
+        logger.info("Probe examples: %d", self.results.n_probe_examples)
+        logger.info("Eval examples: %d", self.results.n_eval_examples)
+
+        if self.results.probe_metadata:
+            logger.info("Probe accuracy: %.2f%%", 100 * self.results.probe_metadata.get("probe_accuracy", 0))
+            logger.info("Probe separation: %.4f", self.results.probe_metadata.get("separation", 0))
+
+        def _should_log_metric(key: str) -> bool:
+            if not hide_aliases:
+                return True
+            for prefix in ("accuracy_when_", "position_", "n_correct_at_"):
+                if key.startswith(prefix):
+                    suffix = key[len(prefix):]
+                    if suffix in alias_suffixes:
+                        return False
+            return True
+
+        logger.info("\nBaseline metrics:")
+        for key, val in self.results.baseline_metrics.items():
+            if isinstance(val, float) and _should_log_metric(key):
+                logger.info("  %s: %.4f", key, val)
+
+        if self.results.nulled_metrics:
+            logger.info("\nNulled metrics (alpha=%.2f):", self.config.null_alpha)
+            for key, val in self.results.nulled_metrics.items():
+                if isinstance(val, float) and _should_log_metric(key):
+                    baseline_val = self.results.baseline_metrics.get(key, 0)
+                    delta = val - baseline_val
+                    logger.info("  %s: %.4f (%+.4f)", key, val, delta)
+
+        logger.info("=" * 60)
     
     def fast_eval_from_cache(
         self,
@@ -314,11 +413,14 @@ class PositionBiasExperiment(BiasExperiment):
                 null_directions = null_directions.unsqueeze(0)
             null_directions = null_directions / (null_directions.norm(dim=1, keepdim=True) + 1e-8)
         
+        labels = list(getattr(self.dataset, "position_labels", POSITION_LABELS))
+        n_pos = len(labels)
+
         # Evaluate
-        position_counts = [0, 0, 0, 0]
+        position_counts = [0 for _ in range(n_pos)]
         correct_count = 0
-        correct_at_pos = [0, 0, 0, 0]  # How many times correct is at each position
-        correct_when_at_pos = [0, 0, 0, 0]  # Correct predictions when answer at that position
+        correct_at_pos = [0 for _ in range(n_pos)]
+        correct_when_at_pos = [0 for _ in range(n_pos)]
         
         for idx, meta in enumerate(tqdm(metadata, desc="Fast eval")):
             q_embeddings = embeddings[idx].to(self.config.device)
@@ -344,26 +446,37 @@ class PositionBiasExperiment(BiasExperiment):
         total = len(metadata)
         accuracy = correct_count / total
         position_dist = [c / total * 100 for c in position_counts]
+        uniform_pct = 100.0 / n_pos
         
         # Compute accuracy per position
         result = {
             "accuracy": accuracy,
             "position_distribution": position_dist,
-            "position_A_pct": position_dist[0],
-            "position_B_pct": position_dist[1],
-            "position_C_pct": position_dist[2],
-            "position_D_pct": position_dist[3],
-            "max_position_bias": max(abs(p - 25) for p in position_dist),
+            "max_position_bias": max(abs(p - uniform_pct) for p in position_dist),
             "n_examples": total,
         }
+
+        for pos, label in enumerate(labels):
+            result[f"position_{label}_pct"] = position_dist[pos]
         
         # Add accuracy per position
-        for pos, label in enumerate(POSITION_LABELS):
+        for pos, label in enumerate(labels):
             if correct_at_pos[pos] > 0:
                 result[f"accuracy_when_{label}"] = correct_when_at_pos[pos] / correct_at_pos[pos]
             else:
                 result[f"accuracy_when_{label}"] = 0.0
             result[f"n_correct_at_{label}"] = correct_at_pos[pos]
+
+        for pos, alias in enumerate(POSITION_LABELS):
+            if pos < n_pos:
+                label = labels[pos]
+                result[f"position_{alias}_pct"] = position_dist[pos]
+                result[f"accuracy_when_{alias}"] = result[f"accuracy_when_{label}"]
+                result[f"n_correct_at_{alias}"] = result[f"n_correct_at_{label}"]
+            else:
+                result[f"position_{alias}_pct"] = 0.0
+                result[f"accuracy_when_{alias}"] = 0.0
+                result[f"n_correct_at_{alias}"] = 0
         
         return result
 
@@ -387,7 +500,7 @@ class BinaryPositionBiasExperiment(BiasExperiment):
     def _create_correctness_dataset(self) -> ProbeDataset:
         """Create correctness probe dataset."""
         extra = self.config.extra
-        dataset_class = extra.get("dataset_class", "position_plausibleqa")
+        dataset_class = self.config.dataset_class or extra.get("dataset_class", "position_plausibleqa")
         
         if dataset_class == "position_bigbench":
             return CorrectnessPositionBigBenchDataset(
@@ -501,11 +614,12 @@ class FreeformPositionBiasExperiment(BiasExperiment):
     def _create_correctness_dataset(self) -> ProbeDataset:
         """Create correctness probe dataset."""
         extra = self.config.extra
-        dataset_class = extra.get("dataset_class", "position_freeform")
+        dataset_class = self.config.dataset_class or extra.get("dataset_class", "position_freeform")
+        dataset_source = self.config.dataset_source or extra.get("dataset_id", "guipenedo/gsm8k-mc")
         
         if dataset_class == "position_freeform_bigbench":
             return CorrectnessPositionFreeformBigBenchDataset(
-                source=self.config.dataset_source,
+                source=dataset_source,
                 probe_tasks=extra.get("probe_tasks"),
                 eval_tasks=extra.get("eval_tasks"),
                 max_per_task_probe=extra.get("max_per_task_probe", 20),
@@ -516,7 +630,7 @@ class FreeformPositionBiasExperiment(BiasExperiment):
             )
         elif dataset_class == "position_freeform_plausibleqa":
             return CorrectnessPositionFreeformPlausibleQADataset(
-                source=self.config.dataset_source,
+                source=dataset_source,
                 probe_size=self.config.probe_size,
                 split_seed=self.config.split_seed,
                 max_test_examples=self.config.max_test_examples,
@@ -524,7 +638,7 @@ class FreeformPositionBiasExperiment(BiasExperiment):
         else:
             # Default: GSM8K-MC or MMLU style freeform
             return CorrectnessPositionFreeformDataset(
-                source=extra.get("dataset_id", "guipenedo/gsm8k-mc"),
+                source=dataset_source,
                 split=extra.get("train_split", "train"),
                 eval_split=extra.get("eval_split", "test"),
                 num_choices=int(extra.get("num_choices", 4)),
@@ -568,11 +682,12 @@ class FreeformPositionBiasExperiment(BiasExperiment):
     def _create_dataset(self) -> ProbeDataset:
         """Create freeform position bias dataset."""
         extra = self.config.extra
-        dataset_class = extra.get("dataset_class", "position_freeform")
+        dataset_class = self.config.dataset_class or extra.get("dataset_class", "position_freeform")
+        dataset_source = self.config.dataset_source or extra.get("dataset_id", "guipenedo/gsm8k-mc")
         
         if dataset_class == "position_freeform_bigbench":
             return PositionFreeformBigBenchDataset(
-                source=self.config.dataset_source,
+                source=dataset_source,
                 probe_tasks=extra.get("probe_tasks"),
                 eval_tasks=extra.get("eval_tasks"),
                 max_per_task_probe=extra.get("max_per_task_probe", 100),
@@ -583,7 +698,7 @@ class FreeformPositionBiasExperiment(BiasExperiment):
             )
         elif dataset_class == "position_freeform_plausibleqa":
             return PositionFreeformPlausibleQADataset(
-                source=self.config.dataset_source,
+                source=dataset_source,
                 probe_size=self.config.probe_size,
                 split_seed=self.config.split_seed,
                 max_test_examples=self.config.max_test_examples,
@@ -591,7 +706,7 @@ class FreeformPositionBiasExperiment(BiasExperiment):
         else:
             # Default: GSM8K-MC or MMLU style freeform
             return PositionFreeformDataset(
-                source=extra.get("dataset_id", "guipenedo/gsm8k-mc"),
+                source=dataset_source,
                 split=extra.get("train_split", "train"),
                 eval_split=extra.get("eval_split", "test"),
                 num_choices=int(extra.get("num_choices", 4)),
@@ -652,9 +767,12 @@ def run_position_experiment(config_path: Path) -> ExperimentResults:
     
     # Choose experiment class based on dataset
     extra = config.extra
-    dataset_class = extra.get("dataset_class", "")
+    dataset_class = config.dataset_class or extra.get("dataset_class", "")
     
-    if "plausibleqa" in config.dataset_source.lower() and dataset_class != "position_bigbench":
+    if (
+        "plausibleqa" in config.dataset_source.lower()
+        and dataset_class not in {"position_bigbench", "position_plausibleqa_mcq", "position_multi_class"}
+    ):
         experiment = BinaryPositionBiasExperiment(config)
     elif dataset_class == "position_freeform":
         experiment = FreeformPositionBiasExperiment(config)
