@@ -572,7 +572,7 @@ def main():
     parser.add_argument("--plots-dir", type=Path, default=Path("plots/rewardbench"))
     parser.add_argument("--batch-size", type=int, default=8)
     parser.add_argument("--max-length", type=int, default=2048)
-    parser.add_argument("--device", type=str, default="cuda", help="cuda|cuda:N|cpu|auto|mlx")
+    parser.add_argument("--device", type=str, default="auto", help="auto|cuda|cuda:N|cpu|mlx")
     parser.add_argument("--mlx-quant", type=str, default=None, choices=["4bit", "8bit"],
                         help="MLX weight quantization (Apple Silicon only; opt-in)")
     parser.add_argument("--null-alpha", type=float, default=1.0)

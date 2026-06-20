@@ -76,8 +76,10 @@ class ExperimentConfig:
     max_length: int = 2048
     """Maximum sequence length"""
     
-    device: str = "cuda"
-    """Device for inference: 'cuda', 'cuda:N', 'cpu', 'auto', or 'mlx' (Apple Silicon)."""
+    device: str = "auto"
+    """Device for inference: 'auto' (default), 'cuda', 'cuda:N', 'cpu', or 'mlx'.
+    'auto' resolves to CUDA when present, else MLX on Apple Silicon (if mlx-lm is
+    installed), else CPU — so it adapts to the host without a code change."""
 
     mlx_quant: Optional[str] = None
     """MLX-only weight quantization: None (bf16, default), '4bit', or '8bit'.

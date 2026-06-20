@@ -6,7 +6,7 @@
 run_experiment:
   artifacts_dir: artifacts
   plots_dir: plots
-  device: cuda
+  device: auto
   null_alpha: 1.0
   probe_size: 500
   split_seed: 42
@@ -15,7 +15,7 @@ run_experiment:
   trust_remote_code: true
 
 run_all:
-  device: cuda
+  device: auto
   cross: false
   dry_run: false
 
@@ -26,7 +26,7 @@ rewardbench_multiprobe:
   plots_dir: plots/rewardbench
   batch_size: 8
   max_length: 2048
-  device: cuda
+  device: auto
   null_alpha: 1.0
   split: test
 

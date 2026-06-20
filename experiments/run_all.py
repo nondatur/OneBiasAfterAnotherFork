@@ -206,7 +206,7 @@ def print_summary(results: List[Dict[str, Any]]) -> None:
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--filter", type=str, help="Filter experiments by name substring")
-    parser.add_argument("--device", type=str, default="cuda", help="Device")
+    parser.add_argument("--device", type=str, default="auto", help="Device: auto|cuda|cuda:N|cpu|mlx")
     parser.add_argument("--list", action="store_true", help="List experiments without running")
     parser.add_argument("--cross", action="store_true", help="Include cross-dataset generalization")
     parser.add_argument("--dry-run", action="store_true", help="Print commands without running")

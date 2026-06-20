@@ -105,14 +105,14 @@ All experiment scripts accept a `--device` flag that controls where models run.
 
 | Value | Behaviour |
 |---|---|
-| `cuda` *(default)* | Multi-GPU — `device_map="auto"` shards the model across all visible GPUs |
+| `auto` *(default)* | Adapts to the host: CUDA if present → same as `cuda` (multi-GPU, unchanged); else MLX on Apple Silicon when `mlx-lm` is installed; else CPU. `perplexity_eval_RM_specialDeberta.py` also uses `auto` and falls back to `cpu`. |
+| `cuda` | Multi-GPU — `device_map="auto"` shards the model across all visible GPUs |
 | `cuda:0`, `cuda:1`, … | Single specified GPU |
 | `cpu` | CPU-only inference (slow; useful for small models or debugging) |
 | `mlx` | **Apple Silicon (MLX) backend.** Runs the transformer backbone via `mlx`/`mlx-lm`; the reward `score` head and null-space projection run in shared CPU-torch. bf16 by default; add `--mlx-quant 4bit`/`8bit` for memory headroom (opt-in, not for publishable numbers). Requires `pip install -r requirements-mlx.txt`. |
-| `auto` | If CUDA is present → same as `cuda` (unchanged). On Apple Silicon with no CUDA → resolves to `mlx` when `mlx-lm` is installed, else `cpu`. `perplexity_eval_RM_specialDeberta.py` also uses `auto` as its default and falls back to `cpu`. |
 
 ```bash
-# Multi-GPU (default)
+# Default: auto (multi-GPU on a CUDA host; MLX on Apple Silicon; else CPU)
 python experiments/run_experiment.py --config configs/position_skywork_gsm8k.yaml
 
 # Single GPU
