@@ -34,6 +34,12 @@ from src.nb.datasets.mcq_parsing import (
     format_mcq_response,
     POSITION_LABELS,
 )
+from src.nb.datasets.muti_class_parsing import (
+    format_multi_class_prompt,
+    format_multi_class_response,
+    parse_to_nchoice_mcq,
+    validate_class_labels,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +58,19 @@ def parse_mcq_row(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     reduce datasets with >4 options (e.g., PlausibleQA) while preserving the correct answer.
     """
     return parse_to_4choice_mcq(row, seed=42)
+
+
+def format_multi_class_conversation(
+    tokenizer: Any,
+    question: str,
+    choices: List[str],
+    answer_idx: int,
+    class_labels: List[str],
+):
+    """Format variable-size multi-class MCQ as a user/assistant conversation."""
+    prompt = format_multi_class_prompt(question, choices, class_labels)
+    response = format_multi_class_response(answer_idx, choices, class_labels)
+    return format_conversation(tokenizer, prompt, response)
 
 
 @DatasetRegistry.register("position")
@@ -427,73 +446,394 @@ class CorrectnessPositionMCQDataset(PositionBiasDataset):
         return pairs
 
 
+@DatasetRegistry.register("position_multi_class")
+class PositionMultiClassDataset(PositionBiasDataset):
+    """Position bias dataset with variable class labels and 2-4 classes."""
+
+    def __init__(
+        self,
+        source: str = "guipenedo/gsm8k-mc",
+        split: str = "train",
+        eval_split: str = "test",
+        probe_size: int = 500,
+        split_seed: int = 42,
+        max_test_examples: Optional[int] = None,
+        subset: Optional[str] = None,
+        num_classes: int = 4,
+        class_labels: Optional[List[str]] = None,
+    ):
+        self.num_classes = num_classes
+        self.position_labels = validate_class_labels(class_labels, num_classes)
+        super().__init__(
+            source=source,
+            split=split,
+            eval_split=eval_split,
+            probe_size=probe_size,
+            split_seed=split_seed,
+            max_test_examples=max_test_examples,
+            subset=subset,
+        )
+
+    @property
+    def name(self) -> str:
+        return "position_multi_class"
+
+    def _load_raw_data(self) -> List[Dict[str, Any]]:
+        dataset = self._load_dataset_split(self.train_split)
+        max_to_load = self.probe_size * 2
+
+        examples = []
+        first_row_keys: Optional[List[str]] = None
+        for idx, row in enumerate(dataset):
+            if idx == 0 and isinstance(row, dict):
+                first_row_keys = sorted([str(k) for k in row.keys()])
+            parsed = parse_to_nchoice_mcq(row, n_choices=self.num_classes, seed=self.split_seed)
+            if parsed:
+                parsed["idx"] = idx
+                examples.append(parsed)
+                if len(examples) >= max_to_load:
+                    break
+
+        if not examples:
+            keys_msg = f" First row keys: {first_row_keys}." if first_row_keys is not None else ""
+            raise ValueError(
+                "No valid examples were parsed for position_multi_class probe training."
+                " Expected a question field (e.g., question/prompt/input), a choices field"
+                " (e.g., choices/options/answers), and an answer field"
+                " (e.g., answer/Answer/correct_idx/label)."
+                f" Dataset source={self.source}, split={self.train_split}, num_classes={self.num_classes}."
+                f"{keys_msg}"
+            )
+
+        logger.info("Loaded %d MCQ examples for probe training", len(examples))
+        return examples
+
+    def _load_eval_data(self) -> List[Dict[str, Any]]:
+        if self._eval_data is not None:
+            return self._eval_data
+
+        dataset = self._load_dataset_split(self.eval_split)
+        examples = []
+        for idx, row in enumerate(dataset):
+            parsed = parse_to_nchoice_mcq(row, n_choices=self.num_classes, seed=self.split_seed)
+            if parsed:
+                parsed["idx"] = idx
+                examples.append(parsed)
+
+        if self.max_test_examples is not None:
+            examples = examples[:self.max_test_examples]
+
+        self._eval_data = examples
+        logger.info("Loaded %d MCQ examples for evaluation", len(examples))
+        return examples
+
+    def get_probe_pairs(self, tokenizer: Any) -> List[ContrastivePair]:
+        self._ensure_loaded()
+
+        pairs = []
+        n_pos = self.num_classes
+        for idx in self._probe_indices:
+            example = self._raw_data[idx]
+            question = example["question"]
+            choices = example["choices"]
+
+            for choice_idx, choice_content in enumerate(choices):
+                other_choices = [c for i, c in enumerate(choices) if i != choice_idx]
+
+                texts_by_pos: List[str] = []
+                for target_pos in range(n_pos):
+                    shuffled = []
+                    other_idx = 0
+                    for pos in range(n_pos):
+                        if pos == target_pos:
+                            shuffled.append(choice_content)
+                        else:
+                            shuffled.append(other_choices[other_idx])
+                            other_idx += 1
+                    texts_by_pos.append(
+                        format_multi_class_conversation(
+                            tokenizer,
+                            question,
+                            shuffled,
+                            target_pos,
+                            self.position_labels,
+                        )
+                    )
+
+                for neg_pos in range(1, n_pos):
+                    pairs.append(
+                        ContrastivePair(
+                            positive_text=texts_by_pos[0],
+                            negative_text=texts_by_pos[neg_pos],
+                            metadata={
+                                "choice_idx": choice_idx,
+                                "neg_position": self.position_labels[neg_pos],
+                            },
+                        )
+                    )
+
+        logger.info("Created %d multi-class position bias contrastive pairs", len(pairs))
+        return pairs
+
+    def get_position_embeddings_texts(self, tokenizer: Any) -> Dict[int, List[str]]:
+        self._ensure_loaded()
+
+        texts_by_pos = {i: [] for i in range(self.num_classes)}
+
+        for idx in self._probe_indices:
+            example = self._raw_data[idx]
+            question = example["question"]
+            choices = example["choices"]
+
+            for choice_idx, choice_content in enumerate(choices):
+                other_choices = [c for i, c in enumerate(choices) if i != choice_idx]
+
+                for target_pos in range(self.num_classes):
+                    shuffled = []
+                    other_idx = 0
+                    for pos in range(self.num_classes):
+                        if pos == target_pos:
+                            shuffled.append(choice_content)
+                        else:
+                            shuffled.append(other_choices[other_idx])
+                            other_idx += 1
+
+                    text = format_multi_class_conversation(
+                        tokenizer,
+                        question,
+                        shuffled,
+                        target_pos,
+                        self.position_labels,
+                    )
+                    texts_by_pos[target_pos].append(text)
+
+        return texts_by_pos
+
+    def get_eval_examples(self, tokenizer: Any) -> List[EvalExample]:
+        eval_data = self._load_eval_data()
+
+        examples = []
+        n_pos = self.num_classes
+        for idx, example in enumerate(eval_data):
+            question = example["question"]
+            choices = example["choices"]
+            original_correct_idx = example["correct_idx"]
+
+            target_correct_pos = idx % n_pos
+
+            correct_answer = choices[original_correct_idx]
+            wrong_answers = [c for i, c in enumerate(choices) if i != original_correct_idx]
+
+            rng = random.Random(idx + self.split_seed)
+            rng.shuffle(wrong_answers)
+
+            shuffled_choices = []
+            wrong_idx = 0
+            for pos in range(n_pos):
+                if pos == target_correct_pos:
+                    shuffled_choices.append(correct_answer)
+                else:
+                    shuffled_choices.append(wrong_answers[wrong_idx])
+                    wrong_idx += 1
+
+            texts = {}
+            for pos in range(n_pos):
+                texts[self.position_labels[pos]] = format_multi_class_conversation(
+                    tokenizer,
+                    question,
+                    shuffled_choices,
+                    pos,
+                    self.position_labels,
+                )
+
+            examples.append(
+                EvalExample(
+                    texts=texts,
+                    metadata={
+                        "question_idx": idx,
+                        "question": question,
+                        "correct_position": self.position_labels[target_correct_pos],
+                        "correct_idx": target_correct_pos,
+                        "shuffled_choices": shuffled_choices,
+                        "position_labels": list(self.position_labels),
+                    },
+                )
+            )
+
+        return examples
+
+
+@DatasetRegistry.register("correctness_position_multi_class")
+class CorrectnessPositionMultiClassDataset(PositionMultiClassDataset):
+    """Correctness probe dataset for variable-size multi-class position experiments."""
+
+    @property
+    def name(self) -> str:
+        return "correctness_position_multi_class"
+
+    def get_probe_pairs(self, tokenizer: Any) -> List[ContrastivePair]:
+        self._ensure_loaded()
+
+        pairs: List[ContrastivePair] = []
+        n_pos = self.num_classes
+        for idx in self._probe_indices:
+            example = self._raw_data[idx]
+            question = example["question"]
+            choices = example["choices"]
+            correct_idx = example["correct_idx"]
+
+            target_pos = idx % n_pos
+
+            correct_answer = choices[correct_idx]
+            wrong_answers = [c for i, c in enumerate(choices) if i != correct_idx]
+            if not wrong_answers:
+                continue
+
+            rng = random.Random(idx + self.split_seed)
+            rng.shuffle(wrong_answers)
+
+            wrong_selected = wrong_answers[0]
+            remaining_wrongs = wrong_answers[1:]
+
+            correct_choices: List[str] = []
+            w_i = 0
+            for pos in range(n_pos):
+                if pos == target_pos:
+                    correct_choices.append(correct_answer)
+                else:
+                    correct_choices.append(wrong_answers[w_i])
+                    w_i += 1
+
+            incorrect_choices: List[Optional[str]] = [None] * n_pos
+            incorrect_choices[target_pos] = wrong_selected
+            correct_pos_other = (target_pos + 1) % n_pos
+            incorrect_choices[correct_pos_other] = correct_answer
+
+            fill = list(remaining_wrongs)
+            needed = n_pos - 2
+            while len(fill) < needed:
+                for w in wrong_answers:
+                    if w != wrong_selected:
+                        fill.append(w)
+                        if len(fill) >= needed:
+                            break
+
+            fill_i = 0
+            for pos in range(n_pos):
+                if incorrect_choices[pos] is None:
+                    incorrect_choices[pos] = fill[fill_i]
+                    fill_i += 1
+
+            pos_text = self.position_labels[target_pos]
+            positive_text = format_multi_class_conversation(
+                tokenizer,
+                question,
+                correct_choices,
+                target_pos,
+                self.position_labels,
+            )
+            negative_text = format_multi_class_conversation(
+                tokenizer,
+                question,
+                [str(x) for x in incorrect_choices],
+                target_pos,
+                self.position_labels,
+            )
+
+            pairs.append(
+                ContrastivePair(
+                    positive_text=positive_text,
+                    negative_text=negative_text,
+                    metadata={"position": pos_text, "target_pos": target_pos},
+                )
+            )
+
+        logger.info("Created %d correctness probe pairs for multi-class position", len(pairs))
+        return pairs
+
+
+def compute_position_metrics_with_labels(
+    rewards: Dict[str, List[float]],
+    correct_positions: List[int],
+    labels: List[str],
+) -> Dict[str, float]:
+    """Compute position bias metrics for arbitrary label names (2-4 labels)."""
+    n = len(correct_positions)
+    n_pos = len(labels)
+
+    if n_pos < 2 or n_pos > 4:
+        raise ValueError(f"labels length must be 2..4, got {n_pos}")
+    if n == 0:
+        return {
+            "accuracy": 0.0,
+            "position_distribution": [0.0 for _ in range(n_pos)],
+            "max_position_bias": 0.0,
+            "n_examples": 0,
+        }
+
+    correct_count = 0
+    position_counts = [0 for _ in range(n_pos)]
+    correct_at_pos = [0 for _ in range(n_pos)]
+    correct_when_at_pos = [0 for _ in range(n_pos)]
+
+    for i in range(n):
+        pos_rewards = [rewards[labels[p]][i] for p in range(n_pos)]
+        predicted = pos_rewards.index(max(pos_rewards))
+        correct_pos = correct_positions[i]
+
+        position_counts[predicted] += 1
+        correct_at_pos[correct_pos] += 1
+
+        if predicted == correct_pos:
+            correct_count += 1
+            correct_when_at_pos[correct_pos] += 1
+
+    accuracy = correct_count / n
+    position_dist = [c / n * 100 for c in position_counts]
+    uniform_pct = 100.0 / n_pos
+    max_bias = max(abs(p - uniform_pct) for p in position_dist)
+
+    result: Dict[str, float] = {
+        "accuracy": accuracy,
+        "position_distribution": position_dist,
+        "max_position_bias": max_bias,
+        "n_examples": n,
+    }
+
+    for pos, label in enumerate(labels):
+        if correct_at_pos[pos] > 0:
+            result[f"accuracy_when_{label}"] = correct_when_at_pos[pos] / correct_at_pos[pos]
+            result[f"n_correct_at_{label}"] = correct_at_pos[pos]
+        else:
+            result[f"accuracy_when_{label}"] = 0.0
+            result[f"n_correct_at_{label}"] = 0
+        result[f"position_{label}_pct"] = position_dist[pos]
+
+    # Keep legacy aliases for 4-way plots/reporting compatibility.
+    for pos, alias in enumerate(POSITION_LABELS):
+        if pos < n_pos:
+            label = labels[pos]
+            result[f"position_{alias}_pct"] = position_dist[pos]
+            result[f"accuracy_when_{alias}"] = result[f"accuracy_when_{label}"]
+            result[f"n_correct_at_{alias}"] = result[f"n_correct_at_{label}"]
+        else:
+            result[f"position_{alias}_pct"] = 0.0
+            result[f"accuracy_when_{alias}"] = 0.0
+            result[f"n_correct_at_{alias}"] = 0
+
+    return result
+
+
 def compute_position_metrics(
     rewards: Dict[str, List[float]],
     correct_positions: List[int],
 ) -> Dict[str, float]:
-    """Compute position bias metrics.
-    
-    Args:
-        rewards: Dictionary mapping position labels to reward lists
-        correct_positions: List of correct position indices (0-3)
-        
-    Returns:
-        Dictionary with metrics:
-        - accuracy: Overall accuracy (highest reward = correct position)
-        - accuracy_when_A/B/C/D: Accuracy when correct answer is at that position
-        - position_selection: Distribution of selected positions
-        - position_bias: Max deviation from uniform (25%)
-    """
-    n = len(correct_positions)
-    
-    # Count correct predictions and position selections
-    correct_count = 0
-    position_counts = [0, 0, 0, 0]
-    
-    # Track accuracy per correct position
-    correct_at_pos = [0, 0, 0, 0]  # How many times correct is at each position
-    correct_when_at_pos = [0, 0, 0, 0]  # How many times we got it right when correct is at that position
-    
-    for i in range(n):
-        # Get rewards for each position
-        pos_rewards = [rewards[POSITION_LABELS[p]][i] for p in range(4)]
-        predicted = pos_rewards.index(max(pos_rewards))
-        correct_pos = correct_positions[i]
-        
-        position_counts[predicted] += 1
-        correct_at_pos[correct_pos] += 1
-        
-        if predicted == correct_pos:
-            correct_count += 1
-            correct_when_at_pos[correct_pos] += 1
-    
-    accuracy = correct_count / n
-    position_dist = [c / n * 100 for c in position_counts]
-    max_bias = max(abs(p - 25) for p in position_dist)
-    
-    # Compute accuracy per position (avoid division by zero)
-    accuracy_per_pos = {}
-    for pos in range(4):
-        if correct_at_pos[pos] > 0:
-            accuracy_per_pos[f"accuracy_when_{POSITION_LABELS[pos]}"] = correct_when_at_pos[pos] / correct_at_pos[pos]
-            accuracy_per_pos[f"n_correct_at_{POSITION_LABELS[pos]}"] = correct_at_pos[pos]
-        else:
-            accuracy_per_pos[f"accuracy_when_{POSITION_LABELS[pos]}"] = 0.0
-            accuracy_per_pos[f"n_correct_at_{POSITION_LABELS[pos]}"] = 0
-    
-    result = {
-        "accuracy": accuracy,
-        "position_distribution": position_dist,
-        "position_A_pct": position_dist[0],
-        "position_B_pct": position_dist[1],
-        "position_C_pct": position_dist[2],
-        "position_D_pct": position_dist[3],
-        "max_position_bias": max_bias,
-        "n_examples": n,
-    }
-    result.update(accuracy_per_pos)
-    
-    return result
+    """Compute position bias metrics for the default A/B/C/D task."""
+    return compute_position_metrics_with_labels(
+        rewards=rewards,
+        correct_positions=correct_positions,
+        labels=POSITION_LABELS,
+    )
 
 
 def format_numbered_choices_prompt(question: str, choices: List[str]) -> str:

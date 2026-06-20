@@ -5,6 +5,7 @@ Evaluates and mitigates spurious biases in reward models using null-space projec
 ## Biases Evaluated
 
 - **Position**: Preference for answer positions (A/B/C/D) in MCQ
+  - **Multi-class variant** (experimental): Variable-class position bias with custom labels (2-4 classes)
 - **Sycophancy**: Agreement with user's stated opinion
 - **Length**: Preference for longer responses
 - **Uncertainty**: Penalizing hedged/uncertain language
@@ -14,6 +15,17 @@ Evaluates and mitigates spurious biases in reward models using null-space projec
 1. Build a **probe direction** from contrastive pairs (e.g., same content at position A vs B)
 2. **Project out** the probe direction from hidden states via null-space projection
 3. Evaluate whether bias is reduced without harming accuracy
+
+## Documentation & Guides
+
+Quick links to key documentation:
+
+| Guide | Purpose |
+|---|---|
+| [**DATASET_FORMATS.md**](DATASET_FORMATS.md) | Comprehensive reference for all supported dataset input formats and schema. Required reading for working with custom datasets. |
+| [**MULTI_CLASS_USAGE.md**](MULTI_CLASS_USAGE.md) | Detailed guide on multi-class position bias experiments with variable class labels (2-4 classes). Includes usage patterns, constraints, and examples. |
+| [**debug_empty_embeddings.md**](debug_empty_embeddings.md) | Troubleshooting guide for embedding/parsing issues with custom datasets. Shows the `correct_idx` field support and common solutions. |
+| [examples/](examples/) | Runnable Python examples demonstrating multi-class usage patterns and practical workflows. |
 
 ## Usage
 
@@ -54,12 +66,38 @@ run("configs/length_skywork.yaml")
 ...
 run("configs/position_skywork_gsm8k.yaml", device="cpu", batch_size=4)
 
+# Multi-class position bias (custom class labels, 2-4 classes)
+...
+run("experiments/position_multi_class_example.yaml")
+
 # run_rewardbench_multiprobe.ipynb — multi-probe RB2 evaluation
 ...
 run("configs/rewardbench_skywork.yaml")
 ...
 run("configs/rewardbench_skywork.yaml", null_alpha=0.5)
 ```
+
+### Multi-Class Position Bias
+
+For custom class labels and variable position counts (2-4 classes), use the `position_multi_class` dataset:
+
+```bash
+# CLI
+python experiments/run_experiment.py --config experiments/position_multi_class_example.yaml
+
+# Or with custom labels at runtime
+python experiments/run_experiment.py \
+    --bias-type position \
+    --model Skywork/Skywork-Reward-Llama-3.1-8B \
+    --dataset-source guipenedo/gsm8k-mc \
+    --extra-dataset_class position_multi_class \
+    --extra-num_classes 3
+```
+
+**Documentation:**
+- [**MULTI_CLASS_USAGE.md**](MULTI_CLASS_USAGE.md) — Detailed guide with usage patterns, working with custom class labels, and examples
+- [**DATASET_FORMATS.md**](DATASET_FORMATS.md) — Input format specifications and field naming conventions
+- [examples/](examples/) — Runnable Python examples
 
 ## Notebooks
 
@@ -134,6 +172,16 @@ is determined automatically at runtime.
 **Apple Silicon:** use `--device mlx` (the MLX backend), not PyTorch MPS. MPS is not
 used. The MLX path is a **development/prototyping** target — validate publishable
 numbers against full-precision CUDA (see `experiments/parity_check.py`).
+
+## Dataset Formats
+
+This codebase supports multiple input formats for datasets:
+
+- **Standard MCQ** (4-choice): GSM8K-MC, MMLU, PlausibleQA
+- **Multi-class MCQ** (2-4 choice): Custom variable-class position bias experiments — see [MULTI_CLASS_USAGE.md](MULTI_CLASS_USAGE.md)
+- **Freeform**: BigBench and generative task formats
+
+See [DATASET_FORMATS.md](DATASET_FORMATS.md) for comprehensive documentation on all supported input schemas, field naming conventions, and how to work with custom datasets. For multi-class experiments specifically, refer to [MULTI_CLASS_USAGE.md](MULTI_CLASS_USAGE.md) for usage patterns and examples.
 
 ## References
 

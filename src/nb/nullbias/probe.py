@@ -359,7 +359,17 @@ def get_embeddings(
         
     Returns:
         [n_texts, hidden_dim] tensor of embeddings
+        
+    Raises:
+        ValueError: If texts is empty (no embeddings to extract)
     """
+    if not texts:
+        raise ValueError(
+            "Cannot extract embeddings: no texts provided. "
+            "This usually means a dataset position/category has no examples after filtering. "
+            "Check that your dataset has enough examples and the parser is working correctly."
+        )
+
     # Backend dispatch: when ``model`` is a ModelBackend (e.g. MLX), delegate.
     # The CUDA/CPU transformers path (raw HF model) falls through unchanged.
     if isinstance(model, ModelBackend):

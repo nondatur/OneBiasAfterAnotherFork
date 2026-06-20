@@ -112,6 +112,7 @@ Your answer may contain a mistake; do not apologize or mention uncertainty."""
             messages,
             add_generation_prompt=True,
             tokenize=False,
+            return_dict=False, 
         )
         outputs = generator.generate(prompt_text, sampling_params)
         # vLLM returns list of RequestOutput; take first candidate
@@ -123,6 +124,7 @@ Your answer may contain a mistake; do not apologize or mention uncertainty."""
         messages,
         add_generation_prompt=True,
         return_tensors="pt",
+        return_dict=False, 
     ).to(generator.device)
     
     with torch.no_grad():
@@ -162,6 +164,7 @@ def generate_batch_vllm(
             msgs,
             add_generation_prompt=True,
             tokenize=False,
+            return_dict=False, 
         )
         for msgs in prompt_messages
     ]
@@ -198,6 +201,7 @@ Verbose rewrite:"""
             messages,
             add_generation_prompt=True,
             tokenize=False,
+            return_dict=False, 
         )
         outputs = generator.generate(prompt_text, sampling_params)
         response = outputs[0].outputs[0].text
@@ -207,6 +211,7 @@ Verbose rewrite:"""
         messages,
         add_generation_prompt=True,
         return_tensors="pt",
+        return_dict=False, 
     ).to(generator.device)
     
     with torch.no_grad():

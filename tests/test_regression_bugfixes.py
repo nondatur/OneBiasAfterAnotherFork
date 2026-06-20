@@ -890,3 +890,52 @@ class TestIssue10PositionProbePairs:
                 f"negative_text should NOT be position A: {pair.negative_text!r}"
             )
 
+
+# ---------------------------------------------------------------------------
+# Issue 11 — Empty probe pairs should not crash embedding extraction
+# ---------------------------------------------------------------------------
+
+
+class TestIssue11EmptyProbePairsFallback:
+    """Base probe building should skip cleanly when dataset returns no pairs."""
+
+    def test_build_probe_skips_when_no_contrastive_pairs(self):
+        from src.nb.experiments.base import BiasExperiment, ExperimentConfig
+
+        class _DummyDataset:
+            name = "dummy"
+
+            def get_probe_pairs(self, tokenizer):
+                return []
+
+        class _DummyExperiment(BiasExperiment):
+            @property
+            def bias_type(self) -> str:
+                return "dummy"
+
+            def _create_dataset(self):
+                return _DummyDataset()
+
+            def _compute_metrics(self, rewards, eval_examples):
+                return {"accuracy": 0.0}
+
+            def _create_plot(self, results, output_path):
+                return None
+
+        config = ExperimentConfig(
+            name="dummy",
+            bias_type="dummy",
+            model_path="dummy/model",
+            save_probe=False,
+        )
+        exp = _DummyExperiment(config)
+        exp.model = object()      # type: ignore[assignment]
+        exp.tokenizer = object()  # type: ignore[assignment]
+        exp.probe_dataset = _DummyDataset()  # type: ignore[assignment]
+
+        metadata = exp.build_probe()
+
+        assert metadata["probe_skipped"] is True
+        assert metadata["n_contrastive_pairs"] == 0
+        assert exp.probe is None
+
