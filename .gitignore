@@ -24,3 +24,6 @@ venv/
 
 # Local review notes
 /code_review.md
+
+#claude artifacts
+/.claude
