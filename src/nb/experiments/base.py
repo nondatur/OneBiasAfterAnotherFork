@@ -76,9 +76,15 @@ class ExperimentConfig:
     max_length: int = 2048
     """Maximum sequence length"""
     
-    device: str = "cuda"
-    """Device for inference"""
-    
+    device: str = "auto"
+    """Device for inference: 'auto' (default), 'cuda', 'cuda:N', 'cpu', or 'mlx'.
+    'auto' resolves to CUDA when present, else MLX on Apple Silicon (if mlx-lm is
+    installed), else CPU — so it adapts to the host without a code change."""
+
+    mlx_quant: Optional[str] = None
+    """MLX-only weight quantization: None (bf16, default), '4bit', or '8bit'.
+    Opt-in, not for publishable numbers. Ignored by the CUDA/CPU paths."""
+
     # Output settings
     raw_data_dir: str = "artifacts/raw_data"
     """Directory for raw per-example data (rewards, predictions)"""
@@ -136,6 +142,7 @@ class ExperimentConfig:
             "batch_size": self.batch_size,
             "max_length": self.max_length,
             "device": self.device,
+            "mlx_quant": self.mlx_quant,
             "raw_data_dir": self.raw_data_dir,
             "artifacts_dir": self.artifacts_dir,
             "plots_dir": self.plots_dir,
@@ -313,34 +320,17 @@ class BiasExperiment(ABC):
         pass
     
     def load_model(self) -> None:
-        """Load the reward model and tokenizer."""
+        """Load the reward model and tokenizer via the configured backend.
+
+        For the CUDA/CPU (``transformers``) path, ``self.model`` is the raw
+        HuggingFace ``AutoModelForSequenceClassification`` exactly as before. For
+        ``--device mlx``, ``self.model`` is a :class:`~src.nb.backends.base.ModelBackend`;
+        the probe / reward functions in ``nullbias/probe.py`` dispatch to it.
+        """
+        from src.nb.backends import create_backend
+
         logger.info("Loading model from %s", self.config.model_path)
-        
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            self.config.model_path,
-            trust_remote_code=self.config.trust_remote_code,
-        )
-        if self.tokenizer.pad_token is None:
-            self.tokenizer.pad_token = self.tokenizer.eos_token
-        
-        # "cuda" / "auto" → let HF shard the model across all visible GPUs.
-        # An explicit single-device string (e.g. "cuda:0", "cpu") is passed
-        # through unchanged so the caller retains control.
-        device_map = (
-            "auto"
-            if self.config.device in ("cuda", "auto")
-            else self.config.device
-        )
-        self.model = AutoModelForSequenceClassification.from_pretrained(
-            self.config.model_path,
-            trust_remote_code=self.config.trust_remote_code,
-            dtype=torch.bfloat16,
-            device_map=device_map,
-        )
-        # .to() intentionally omitted: device_map handles placement.
-        
-        if self.model.config.pad_token_id is None:
-            self.model.config.pad_token_id = self.tokenizer.pad_token_id
+        self.model, self.tokenizer = create_backend(self.config)
     
     def load_dataset(self) -> None:
         """Load and split the dataset(s).

@@ -38,12 +38,13 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.nb.nullbias.probe import (
-    get_base_model, 
-    get_score_head, 
+    get_base_model,
+    get_score_head,
     tokenize_inputs,
     gram_schmidt,
     project_to_null_space,
 )
+from src.nb.backends import create_backend, ModelBackend
 
 logging.basicConfig(
     level=logging.INFO,
@@ -83,6 +84,52 @@ def load_probes(probes_dir: Path) -> Dict[str, torch.Tensor]:
     return probes
 
 
+def _get_rewards_multi_backend(
+    backend: ModelBackend,
+    texts: List[str],
+    probes: Dict[str, torch.Tensor],
+    combined_basis: Optional[torch.Tensor],
+    null_alpha: float,
+    batch_size: int,
+    max_length: int,
+    show_progress: bool,
+) -> Dict[str, torch.Tensor]:
+    """Multi-probe scoring for a ModelBackend (e.g. MLX).
+
+    Extracts last-token post-norm hidden states once via the backend, then applies
+    the backend's torch score head and every projection in CPU-torch — mirroring
+    the GPU loop in :func:`get_rewards_multi` exactly (combined basis at alpha=1.0,
+    individual probes at ``null_alpha``).
+    """
+    hidden = backend.embed_texts(
+        texts, batch_size=batch_size, max_length=max_length, show_progress=show_progress
+    )  # [N, d] cpu float32
+    score_head = backend.score_head  # torch nn.Linear (cpu, fp32)
+
+    probe_vecs: Dict[str, torch.Tensor] = {}
+    for name, probe in probes.items():
+        p = probe.float()
+        v = p if p.dim() == 1 else p[0]
+        probe_vecs[name] = v / (v.norm() + 1e-8)
+
+    cb = None
+    if combined_basis is not None and combined_basis.shape[0] > 0:
+        cb = combined_basis.float()
+
+    out: Dict[str, torch.Tensor] = {}
+    with torch.no_grad():
+        out["baseline"] = score_head(hidden).squeeze(-1)
+        if cb is not None:
+            out["all_probes"] = score_head(project_to_null_space(hidden, cb)).squeeze(-1)
+        else:
+            out["all_probes"] = out["baseline"]
+        for name, pv in probe_vecs.items():
+            proj = (hidden @ pv).unsqueeze(-1)
+            nulled = hidden - null_alpha * proj * pv.unsqueeze(0)
+            out[name] = score_head(nulled).squeeze(-1)
+    return out
+
+
 def get_rewards_multi(
     model: AutoModelForSequenceClassification,
     tokenizer: AutoTokenizer,
@@ -115,6 +162,14 @@ def get_rewards_multi(
         - "all_probes": all probes combined
         - "{probe_name}": each individual probe
     """
+    # Backend dispatch (e.g. MLX): extract hidden states via the backend, then run
+    # the score head + all projections in shared CPU-torch (identical math).
+    if isinstance(model, ModelBackend):
+        return _get_rewards_multi_backend(
+            model, texts, probes, combined_basis, null_alpha,
+            batch_size, max_length, show_progress,
+        )
+
     model.eval()
     base_model = get_base_model(model)
     score_head = get_score_head(model)
@@ -517,7 +572,9 @@ def main():
     parser.add_argument("--plots-dir", type=Path, default=Path("plots/rewardbench"))
     parser.add_argument("--batch-size", type=int, default=8)
     parser.add_argument("--max-length", type=int, default=2048)
-    parser.add_argument("--device", type=str, default="cuda")
+    parser.add_argument("--device", type=str, default="auto", help="auto|cuda|cuda:N|cpu|mlx")
+    parser.add_argument("--mlx-quant", type=str, default=None, choices=["4bit", "8bit"],
+                        help="MLX weight quantization (Apple Silicon only; opt-in)")
     parser.add_argument("--null-alpha", type=float, default=1.0)
     parser.add_argument("--split", type=str, default="test")
     parser.add_argument("--probes", type=str, nargs="*", help="Specific probes to use (default: all)")
@@ -556,24 +613,24 @@ def main():
                 filtered[m] = all_probes[m]
         all_probes = filtered
     
-    # Load model first to get hidden dimension
+    # Load model (or MLX backend) first to get hidden dimension.
     logger.info("Loading model: %s", args.model)
-    tokenizer = AutoTokenizer.from_pretrained(args.model, trust_remote_code=True)
-    if tokenizer.pad_token is None:
-        tokenizer.pad_token = tokenizer.eos_token
-    
-    device_map = "auto" if args.device in ("cuda", "auto") else args.device
-    model = AutoModelForSequenceClassification.from_pretrained(
-        args.model,
+    from types import SimpleNamespace
+
+    backend_cfg = SimpleNamespace(
+        device=args.device,
+        model_path=args.model,
         trust_remote_code=True,
-        dtype=torch.bfloat16,
-        device_map=device_map,
+        mlx_quant=getattr(args, "mlx_quant", None),
+        max_length=args.max_length,
     )
-    # .to() intentionally omitted: device_map handles placement.
-    
-    # Get model's hidden dimension
-    base_model = get_base_model(model)
-    hidden_dim = base_model.config.hidden_size
+    model, tokenizer = create_backend(backend_cfg)
+
+    # Get model's hidden dimension (backend exposes it directly).
+    if isinstance(model, ModelBackend):
+        hidden_dim = model.hidden_size
+    else:
+        hidden_dim = get_base_model(model).config.hidden_size
     logger.info("Model hidden dimension: %d", hidden_dim)
     
     # Filter probes to only those compatible with model's hidden dimension

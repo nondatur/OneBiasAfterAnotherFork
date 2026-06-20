@@ -102,7 +102,8 @@ def build_config_from_args(args: argparse.Namespace) -> ExperimentConfig:
         null_alpha=args.null_alpha,
         batch_size=args.batch_size,
         max_length=args.max_length,
-        device=args.device or "cuda",
+        device=args.device or "auto",
+        mlx_quant=args.mlx_quant,
         artifacts_dir=args.artifacts_dir,
         plots_dir=args.plots_dir,
         save_probe=True,
@@ -132,7 +133,11 @@ def main():
     # Common options
     parser.add_argument("--artifacts-dir", type=str, default="artifacts", help="Directory for results/probes")
     parser.add_argument("--plots-dir", type=str, default="plots", help="Directory for plots")
-    parser.add_argument("--device", type=str, default=None, help="Device (default: cuda)")
+    parser.add_argument("--device", type=str, default=None,
+                        help="Device: auto|cuda|cuda:N|cpu|mlx (default: auto — CUDA if present, "
+                             "else MLX on Apple Silicon, else CPU)")
+    parser.add_argument("--mlx-quant", type=str, default=None, choices=["4bit", "8bit"],
+                        help="MLX weight quantization (Apple Silicon only; opt-in, not for publishable numbers)")
     parser.add_argument("--null-alpha", type=float, default=1.0, help="Nullification strength")
     parser.add_argument("--probe-size", type=int, default=500, help="Probe training size")
     parser.add_argument("--max-examples", type=int, default=None, help="Max test examples")
@@ -174,6 +179,8 @@ def main():
             config.plots_dir = args.plots_dir
         if args.device is not None:
             config.device = args.device
+        if args.mlx_quant is not None:
+            config.mlx_quant = args.mlx_quant
         if args.null_alpha != 1.0:
             config.null_alpha = args.null_alpha
         if args.probe_size != 500:

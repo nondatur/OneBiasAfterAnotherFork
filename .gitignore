@@ -2,6 +2,11 @@
 __pycache__/
 *.pyc
 
+# Virtual environments
+.venv/
+.venv-*/
+venv/
+
 # Environment variables
 .env
 /data
@@ -19,3 +24,6 @@ __pycache__/
 
 # Local review notes
 /code_review.md
+
+#claude artifacts
+/.claude

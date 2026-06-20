@@ -143,13 +143,14 @@ All experiment scripts accept a `--device` flag that controls where models run.
 
 | Value | Behaviour |
 |---|---|
-| `cuda` *(default)* | Multi-GPU — `device_map="auto"` shards the model across all visible GPUs |
+| `auto` *(default)* | Adapts to the host: CUDA if present → same as `cuda` (multi-GPU, unchanged); else MLX on Apple Silicon when `mlx-lm` is installed; else CPU. `perplexity_eval_RM_specialDeberta.py` also uses `auto` and falls back to `cpu`. |
+| `cuda` | Multi-GPU — `device_map="auto"` shards the model across all visible GPUs |
 | `cuda:0`, `cuda:1`, … | Single specified GPU |
 | `cpu` | CPU-only inference (slow; useful for small models or debugging) |
-| `auto` | Same as `cuda` for model loading; `perplexity_eval_RM_specialDeberta.py` also uses this as its default and falls back to `cpu` automatically if no GPU is present |
+| `mlx` | **Apple Silicon (MLX) backend.** Runs the transformer backbone via `mlx`/`mlx-lm`; the reward `score` head and null-space projection run in shared CPU-torch. bf16 by default; add `--mlx-quant 4bit`/`8bit` for memory headroom (opt-in, not for publishable numbers). Requires `pip install -r requirements-mlx.txt`. |
 
 ```bash
-# Multi-GPU (default)
+# Default: auto (multi-GPU on a CUDA host; MLX on Apple Silicon; else CPU)
 python experiments/run_experiment.py --config configs/position_skywork_gsm8k.yaml
 
 # Single GPU
@@ -168,7 +169,9 @@ is determined automatically at runtime.
 `bfloat16` is automatically downgraded to `float32` where needed
 (`perplexity_eval_RM_specialDeberta.py`).
 
-**Not supported:** Apple MPS (Metal). The codebase targets CUDA-capable hardware only.
+**Apple Silicon:** use `--device mlx` (the MLX backend), not PyTorch MPS. MPS is not
+used. The MLX path is a **development/prototyping** target — validate publishable
+numbers against full-precision CUDA (see `experiments/parity_check.py`).
 
 ## Dataset Formats
 
@@ -200,6 +203,25 @@ When using this codebase, please cite:
 
 ## Requirements
 
+The base requirements install on both Linux/CUDA and macOS/Apple Silicon:
+
 ```bash
 pip install -r requirements.txt
+```
+
+Backend-specific extras:
+
+```bash
+# Apple Silicon (MLX) — prefer a Python 3.12/3.13 venv (3.14 MLX wheels may be missing)
+pip install -r requirements-mlx.txt
+
+# NVIDIA CUDA extras (vLLM for fast GSM8K generation)
+pip install -r requirements-cuda.txt
+```
+
+Numerical parity (Apple Silicon MLX vs. CPU/transformers reference):
+
+```bash
+python experiments/parity_check.py \
+    --config configs/position_skywork_qwen06_gsm8k.yaml --max-examples 50 --probe-size 100
 ```

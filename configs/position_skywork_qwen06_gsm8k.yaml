@@ -1,0 +1,34 @@
+# Position bias experiment — Skywork-Reward-V2-Qwen3-0.6B on GSM8K-MC.
+#
+# Small, public reward model used as the MLX (Apple Silicon) bring-up + parity
+# target. Runs comfortably on a base M4 / 32 GB. Use a tiny sample for parity:
+#   python experiments/run_experiment.py --config configs/position_skywork_qwen06_gsm8k.yaml \
+#       --device mlx --max-examples 50 --probe-size 100
+
+name: position_skywork_qwen06_gsm8k
+bias_type: position
+
+# Model settings
+model_path: Skywork/Skywork-Reward-V2-Qwen3-0.6B
+trust_remote_code: true
+
+# Dataset settings
+dataset_source: guipenedo/gsm8k-mc
+probe_size: 500
+max_test_examples: null
+split_seed: 42
+
+# Evaluation settings
+null_alpha: 1.0
+batch_size: 8
+max_length: 2048
+device: auto   # CUDA if present, else MLX on Apple Silicon, else CPU (override with --device)
+
+# Output settings
+save_probe: true
+
+# Dataset-specific settings
+extra:
+  dataset_id: guipenedo/gsm8k-mc
+  train_split: train
+  eval_split: test
