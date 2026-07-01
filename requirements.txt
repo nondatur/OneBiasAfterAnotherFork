@@ -8,6 +8,7 @@ pandas>=2.0.0
 scipy>=1.10.0
 matplotlib>=3.8.0        # plotting
 accelerate>=0.25.0       # device_map sharding for transformers (CPU/CUDA paths)
+textstat>=0.7.0          # readability parity in the demographic data-gen validation gate
 # dev / testing
 pytest>=7.0
 
