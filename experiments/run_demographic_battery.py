@@ -1,0 +1,143 @@
+#!/usr/bin/env python3
+"""
+Robustness battery for the demographic credit bias on ONE RM (default Qwen3-0.6B).
+
+Loads the model once (auto→MLX) and, reusing the existing probe machinery, reports for every
+(axis × encoding) cell: probe quality + baseline vs fully-nulled **auto-influence**, plus a
+**per-template** breakdown and a **null_alpha sweep** curve for sex & intersection. The point is to
+check the striking baseline result is a *real attribute signal* (explicit → proxy should shrink but
+not vanish; effect holds across templates) and a *low-complexity* one (auto-influence drops sharply
+toward 0 as α→1), before scaling to other RMs.
+
+Usage:
+    python experiments/run_demographic_battery.py --config configs/demographic_credit_sex_qwen06.yaml
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+from typing import Any, Dict, List
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
+
+import torch
+
+from src.nb.experiments.base import ExperimentConfig
+from src.nb.experiments.demographic import DemographicBiasExperiment, compute_auto_influence_metrics
+from src.nb.datasets.demographic.domains import get_domain
+from src.nb.nullbias.probe import build_probe_direction, get_rewards_both, project_to_null_space
+
+AXES = ["sex", "age", "family_status", "intersection"]
+ENCODINGS = ["explicit", "proxy"]
+SWEEP_ALPHAS = [0.0, 0.25, 0.5, 0.75, 1.0]
+SWEEP_AXES = ["sex", "intersection"]
+
+
+def _subgroup_auto_influence(base_org, eval_examples, key="template_id") -> Dict[str, float]:
+    groups = sorted({e.metadata.get(key) for e in eval_examples})
+    out = {}
+    for g in groups:
+        idx = [i for i, e in enumerate(eval_examples) if e.metadata.get(key) == g]
+        sub = {"a": [base_org["a"][i] for i in idx], "b": [base_org["b"][i] for i in idx]}
+        out[str(g)] = compute_auto_influence_metrics(sub).get("auto_influence", float("nan"))
+    return out
+
+
+def run_cell(exp, cfg, axis, encoding, dataset_cls) -> Dict[str, Any]:
+    ds = dataset_cls(cfg.dataset_source, axis=axis, encoding=encoding,
+                     probe_size=cfg.probe_size, split_seed=cfg.split_seed,
+                     max_test_examples=cfg.max_test_examples)
+    probe, meta = build_probe_direction(exp.model, exp.tokenizer, ds.get_probe_pairs(exp.tokenizer),
+                                        batch_size=cfg.batch_size, device=cfg.device,
+                                        max_length=cfg.max_length)
+    eval_examples = ds.get_eval_examples(exp.tokenizer)
+    all_texts, text_meta = exp._get_all_texts_and_variants(eval_examples)
+    n = len(eval_examples)
+    baseline, nulled = get_rewards_both(exp.model, exp.tokenizer, all_texts, probe,
+                                        batch_size=cfg.batch_size, device=cfg.device,
+                                        max_length=cfg.max_length, null_alpha=1.0, show_progress=False)
+    base_org = exp._organize_rewards(baseline, text_meta, n)
+    null_org = exp._organize_rewards(nulled, text_meta, n)
+    cell = {
+        "axis": axis, "encoding": encoding, "n_eval": n,
+        "probe_accuracy": meta.get("probe_accuracy"), "probe_separation": meta.get("separation"),
+        "baseline": compute_auto_influence_metrics(base_org),
+        "nulled": compute_auto_influence_metrics(null_org),
+        "baseline_by_template": _subgroup_auto_influence(base_org, eval_examples),
+    }
+    # α-sweep (efficient: embed once, then project+score per α). Requires the backend to expose
+    # last-hidden + score head (the MLX path). Falls back to per-α forward otherwise.
+    if axis in SWEEP_AXES:
+        cell["alpha_sweep"] = _alpha_sweep(exp, cfg, all_texts, text_meta, n, probe)
+    return cell
+
+
+def _alpha_sweep(exp, cfg, all_texts, text_meta, n, probe) -> Dict[str, float]:
+    backend = exp.model
+    curve: Dict[str, float] = {}
+    if hasattr(backend, "embed_texts") and hasattr(backend, "score_head"):
+        hidden = backend.embed_texts(all_texts, batch_size=cfg.batch_size,
+                                     max_length=cfg.max_length, show_progress=False)
+        with torch.no_grad():
+            for a in SWEEP_ALPHAS:
+                h = project_to_null_space(hidden, probe, alpha=a)
+                scores = backend.score_head(h).squeeze(-1)
+                org = exp._organize_rewards(scores, text_meta, n)
+                curve[str(a)] = compute_auto_influence_metrics(org).get("auto_influence", float("nan"))
+    else:  # backend-agnostic fallback: one forward per α
+        for a in SWEEP_ALPHAS:
+            _, nulled = get_rewards_both(exp.model, exp.tokenizer, all_texts, probe,
+                                         batch_size=cfg.batch_size, device=cfg.device,
+                                         max_length=cfg.max_length, null_alpha=a, show_progress=False)
+            org = exp._organize_rewards(nulled, text_meta, n)
+            curve[str(a)] = compute_auto_influence_metrics(org).get("auto_influence", float("nan"))
+    return curve
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--config", type=Path, default=Path("configs/demographic_credit_sex_qwen06.yaml"))
+    ap.add_argument("--out", type=Path, default=None,
+                    help="Defaults to artifacts/results/demographic/battery_{domain}_qwen06.json")
+    args = ap.parse_args()
+
+    cfg = ExperimentConfig.from_yaml(args.config)
+    spec = get_domain(cfg.extra.get("domain", "credit"))
+    out = args.out or Path(f"artifacts/results/demographic/battery_{spec.name}_qwen06.json")
+    exp = DemographicBiasExperiment(cfg)
+    exp.load_model()
+
+    cells: List[Dict[str, Any]] = []
+    for axis in AXES:
+        for enc in ENCODINGS:
+            print(f"[battery] {spec.name}/{axis}/{enc} ...", flush=True)
+            cells.append(run_cell(exp, cfg, axis, enc, spec.dataset_cls))
+
+    # ---- report ----
+    print("\n" + "=" * 86)
+    print(f"DEMOGRAPHIC ROBUSTNESS BATTERY — {cfg.model_path}")
+    print("=" * 86)
+    print(f"{'axis':14} {'enc':9} {'probe_acc':>9} {'base_AI':>8} {'null_AI':>8} {'base_gap':>9}  per-template(base_AI)")
+    for c in cells:
+        bt = "  ".join(f"{k}={v:.2f}" for k, v in c["baseline_by_template"].items())
+        print(f"{c['axis']:14} {c['encoding']:9} {c['probe_accuracy']:>9.2%} "
+              f"{c['baseline']['auto_influence']:>8.3f} {c['nulled']['auto_influence']:>8.3f} "
+              f"{c['baseline']['mean_gap']:>9.3f}  {bt}")
+    print("-" * 86)
+    for c in cells:
+        if "alpha_sweep" in c:
+            curve = "  ".join(f"α={a}:{v:.2f}" for a, v in c["alpha_sweep"].items())
+            print(f"sweep {c['axis']}/{c['encoding']}: {curve}")
+    print("=" * 86)
+
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps({"model": cfg.model_path, "domain": spec.name, "cells": cells}, indent=2))
+    print(f"saved → {out}")
+
+
+if __name__ == "__main__":
+    main()

@@ -42,10 +42,11 @@ from src.nb.experiments.length import LengthBiasExperiment
 from src.nb.experiments.sycophancy import SycophancyBiasExperiment
 from src.nb.experiments.uncertainty import UncertaintyBiasExperiment
 from src.nb.experiments.position import (
-    PositionBiasExperiment, 
+    PositionBiasExperiment,
     BinaryPositionBiasExperiment,
     FreeformPositionBiasExperiment,
 )
+from src.nb.experiments.demographic import DemographicBiasExperiment
 
 logging.basicConfig(
     level=logging.INFO,
@@ -59,6 +60,7 @@ EXPERIMENT_CLASSES: dict[str, Type[BiasExperiment]] = {
     "sycophancy": SycophancyBiasExperiment,
     "uncertainty": UncertaintyBiasExperiment,
     "position": PositionBiasExperiment,
+    "demographic": DemographicBiasExperiment,
 }
 
 
