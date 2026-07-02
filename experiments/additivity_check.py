@@ -52,6 +52,8 @@ def main() -> None:
     ap.add_argument("--device", default="auto")
     ap.add_argument("--batch-size", type=int, default=8)
     ap.add_argument("--max-length", type=int, default=2048)
+    ap.add_argument("--out", type=Path, default=None,
+                    help="Optional JSON output (feeds experiments/export_paper_numbers.py)")
     args = ap.parse_args()
 
     spec = get_domain(args.domain)
@@ -92,6 +94,19 @@ def main() -> None:
                else "NON-ADDITIVE (distinct interaction)")
     print(f"\nverdict: {verdict}  [first linear look; LEACE/MLP test deferred]")
     print("=" * 64)
+
+    if args.out is not None:
+        import json
+        args.out.parent.mkdir(parents=True, exist_ok=True)
+        args.out.write_text(json.dumps({
+            "model": args.model, "domain": args.domain, "encoding": args.encoding,
+            "cos_intersection_vs_marginal_sum": cos_inter_sum,
+            "cos_sex_age": _cos(probes["sex"], probes["age"]),
+            "cos_sex_family": _cos(probes["sex"], probes["family_status"]),
+            "cos_age_family": _cos(probes["age"], probes["family_status"]),
+            "verdict": verdict,
+        }, indent=2))
+        print(f"saved → {args.out}")
 
 
 if __name__ == "__main__":
