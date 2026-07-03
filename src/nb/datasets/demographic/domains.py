@@ -18,10 +18,13 @@ from typing import Any, Callable, List, Tuple
 
 from src.nb.datasets.demographic.dataset import ASSESSMENT_PROMPT, CreditDemographicDataset
 from src.nb.datasets.demographic.cv_dataset import CV_ASSESSMENT_PROMPT, CVDemographicDataset
+from src.nb.datasets.demographic.edu_dataset import EDU_ASSESSMENT_PROMPT, EducationDemographicDataset
 from src.nb.datasets.demographic.ingest import load_german_credit
 from src.nb.datasets.demographic.cv_ingest import generate_candidates
+from src.nb.datasets.demographic.edu_ingest import DEFAULT_PERSUADE_PATH, load_persuade
 from src.nb.datasets.demographic.render import TEMPLATES, render_profile
 from src.nb.datasets.demographic.cv_render import CV_TEMPLATES, render_cv
+from src.nb.datasets.demographic.edu_render import EDU_TEMPLATES, render_essay
 
 
 @dataclass(frozen=True)
@@ -60,7 +63,19 @@ CV = DomainSpec(
     is_strong=lambda r: r.qualified,
 )
 
-DOMAINS = {CREDIT.name: CREDIT, CV.name: CV}
+EDUCATION = DomainSpec(
+    name="education",
+    dataset_cls=EducationDemographicDataset,
+    default_pairs="data/demographic/education/persuade/pairs.jsonl",
+    render_fn=render_essay,
+    assessment_prompt=EDU_ASSESSMENT_PROMPT,
+    template_ids=tuple(sorted(EDU_TEMPLATES)),
+    # Real essays are user-downloaded; load the PERSUADE corpus (raises with instructions if absent).
+    load_records=lambda: load_persuade(DEFAULT_PERSUADE_PATH),
+    is_strong=lambda r: r.high_quality,
+)
+
+DOMAINS = {CREDIT.name: CREDIT, CV.name: CV, EDUCATION.name: EDUCATION}
 
 
 def get_domain(name: str) -> DomainSpec:

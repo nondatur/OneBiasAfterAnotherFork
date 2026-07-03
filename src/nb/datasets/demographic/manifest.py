@@ -30,8 +30,13 @@ try:  # CV templates live in a sibling module; absent on a credit-only checkout 
 except Exception:  # pragma: no cover - defensive
     CV_TEMPLATES = {}
 
-# Combined registry so provenance hashing works for both domains' template ids.
-_ALL_TEMPLATES: Dict[str, str] = {**TEMPLATES, **CV_TEMPLATES}
+try:  # Education (essay) templates; absent on a minimal checkout is fine.
+    from src.nb.datasets.demographic.edu_render import EDU_TEMPLATES
+except Exception:  # pragma: no cover - defensive
+    EDU_TEMPLATES = {}
+
+# Combined registry so provenance hashing works for every domain's template ids.
+_ALL_TEMPLATES: Dict[str, str] = {**TEMPLATES, **CV_TEMPLATES, **EDU_TEMPLATES}
 
 GENERATOR_VERSION = "0.1.0"
 
@@ -43,6 +48,12 @@ GERMAN_CREDIT_ATTRIBUTION = (
 CV_ATTRIBUTION = (
     "Substrate: synthetic CV records, generated deterministically from seed (no external dataset). "
     "Demographic markers (sex/age/family-status) are synthetic. Self-licensed."
+)
+
+EDU_ATTRIBUTION = (
+    "Substrate: real essays — PERSUADE 2.0 (CC BY-NC-SA 4.0, research/measurement use; derived essays "
+    "NOT redistributed) and/or ASAP-AES (Kaggle 2012 Hewlett competition terms). Demographic header "
+    "markers (name -> sex/ethnicity; grade level -> age) are synthetic, injected, self-licensed."
 )
 
 

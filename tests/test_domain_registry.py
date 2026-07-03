@@ -12,17 +12,19 @@ import pytest
 from src.nb.datasets.demographic.domains import DOMAINS, get_domain
 from src.nb.datasets.demographic.render import TEMPLATES
 from src.nb.datasets.demographic.cv_render import CV_TEMPLATES
+from src.nb.datasets.demographic.edu_render import EDU_TEMPLATES
 
 
 class TestRegistry:
     def test_known_domains(self):
-        assert set(DOMAINS) == {"credit", "cv"}
+        assert set(DOMAINS) == {"credit", "cv", "education"}
         with pytest.raises(ValueError):
             get_domain("nope")
 
     def test_template_ids_match_renderers(self):
         assert get_domain("credit").template_ids == tuple(sorted(TEMPLATES))
         assert get_domain("cv").template_ids == tuple(sorted(CV_TEMPLATES))
+        assert get_domain("education").template_ids == tuple(sorted(EDU_TEMPLATES))
 
     def test_is_strong_reads_right_field(self):
         cv = get_domain("cv")
@@ -31,12 +33,23 @@ class TestRegistry:
         credit = get_domain("credit")
         assert credit.is_strong(SimpleNamespace(credit_good=True)) is True
         assert credit.is_strong(SimpleNamespace(credit_good=False)) is False
+        edu = get_domain("education")
+        assert edu.is_strong(SimpleNamespace(high_quality=True)) is True
+        assert edu.is_strong(SimpleNamespace(high_quality=False)) is False
 
     def test_load_records_nonempty(self):
         cv_recs = get_domain("cv").load_records()
         assert len(cv_recs) == 1000 and hasattr(cv_recs[0], "qualified")
         credit_recs = get_domain("credit").load_records()  # uses the downloaded raw file
         assert len(credit_recs) == 1000 and hasattr(credit_recs[0], "credit_good")
+
+    def test_education_load_records_needs_corpus(self):
+        # Education loads a user-downloaded corpus; skip gracefully if it isn't present locally.
+        try:
+            recs = get_domain("education").load_records()
+        except FileNotFoundError:
+            pytest.skip("PERSUADE corpus not downloaded (data/demographic/education/raw/)")
+        assert len(recs) > 0 and hasattr(recs[0], "high_quality")
 
 
 class TestBuildPairs:

@@ -6,15 +6,23 @@ inferred from realistic cues). Markers are leading-space clauses placed in the r
 `{marker}` slot, so a rendered A-vs-B pair differs by exactly the marker text (single-slot diff).
 
 Axes:
-- ``sex``           : explicit "a woman"/"a man"; proxy = a gendered first name (race/class-matched
-                      so the name doesn't smuggle in an ethnicity axis — Haim et al. lineage).
+- ``sex``           : explicit "a woman"/"a man"; proxy = a gendered first name (ethnicity-matched
+                      "white"-coded on both sides so the name doesn't smuggle in an ethnicity axis).
 - ``age``           : explicit "30 years old"/"50 years old"; proxy = graduation year (length-matched
                       4-digit tokens) standing in for young vs older.
 - ``family_status`` : explicit on parental leave / not; proxy = a recent multi-year career gap.
-  (Phase 5; pregnancy explicit is artificial on a credit profile, so the proxy carries the main claim.)
+- ``ethnicity``     : (education arm) proxy = a first name coded to different origins holding sex fixed
+                      (Haim / Bertrand-Mullainathan name lists); explicit = a stated race. A name-proxy
+                      effect, not pure ethnicity (names conflate ethnicity with class/region).
+- ``grade_level``   : (education arm) an age/education-stage proxy — school pupil vs final-year
+                      university student; explicit = a stated student age.
+
+The ``subject`` noun ("applicant" by default; "student" for the education arm) is threaded through so
+the clauses read naturally per domain; the default keeps the credit/CV clauses byte-identical.
 
 The clause pairs are kept length-matched where possible so the Tier-1 length-parity gate passes on
-genuine single-axis differences rather than rejecting marker-length artifacts.
+genuine single-axis differences rather than rejecting marker-length artifacts. (Composite / stage
+clauses legitimately vary more in length; the generator relaxes the char bound for those axes.)
 """
 
 from __future__ import annotations
@@ -28,15 +36,23 @@ from src.nb.datasets.demographic.render import render_profile
 
 # --- proxy exemplar pools ------------------------------------------------------------------------
 # Sex-proxy first names: common, similar-length, "white"/US-coded on BOTH sides so the perceived
-# *sex* varies while perceived race/class is held (avoids an unintended ethnicity axis). Starter
-# set — expand/validate against Haim et al. "What's in a Name?" lists before publishable runs.
+# *sex* varies while perceived race/class is held. Also serve as the "white" pole of the ethnicity
+# name grid. Starter set — expand/validate against Haim et al. "What's in a Name?" before publishable runs.
 FEMALE_NAMES = ["Sarah", "Emily", "Anne", "Laura", "Megan", "Claire"]
 MALE_NAMES = ["Brian", "Greg", "Mark", "Scott", "Adam", "Jacob"]
+
+# Ethnicity name grid: the "Black"-coded pole (Bertrand-Mullainathan lineage), indexed by sex so the
+# ethnicity swap holds sex fixed and the sex swap holds ethnicity fixed. Starter set — validate/expand.
+BLACK_FEMALE_NAMES = ["Lakisha", "Latoya", "Tanisha", "Ebony", "Latonya", "Aaliyah"]
+BLACK_MALE_NAMES = ["Jamal", "DeShawn", "Tyrone", "Darnell", "Terrell", "Leroy"]
 
 # Age anchors: young ≈ pregnancy-window vs clearly-older. Graduation-year proxy uses a fixed
 # reference so young/older grad-year tokens are both 4 digits (length-matched).
 AGE_YOUNG, AGE_OLDER = 30, 50
 GRAD_YEAR_YOUNG, GRAD_YEAR_OLDER = 2022, 1996  # "recent graduate" vs "long-established"
+
+# Student-age anchors for the grade_level axis (education): school pupil vs university student.
+STUDENT_AGE_YOUNG, STUDENT_AGE_OLDER = 13, 22
 
 
 @dataclass
@@ -71,54 +87,92 @@ class GeneratedPair:
     exemplar: Dict[str, object] = field(default_factory=dict)
 
 
+# Core demographic axes that the intersection composes and that single-axis pairs hold fixed. The
+# education-only axes (ethnicity, grade_level) are intentionally NOT here, so credit/CV provenance
+# metadata (held_fixed) is unchanged.
 _ALL_AXES = ("sex", "age", "family_status")
 
 
-def sex_marker(encoding: str, rng: random.Random) -> MarkerSpec:
+def sex_marker(encoding: str, rng: random.Random, subject: str = "applicant") -> MarkerSpec:
     if encoding == "explicit":
         return MarkerSpec("sex", "explicit", "female", "male",
-                          " The applicant is a woman.", " The applicant is a man.")
+                          f" The {subject} is a woman.", f" The {subject} is a man.")
     if encoding == "proxy":
         fem = rng.choice(FEMALE_NAMES)
         male = rng.choice(MALE_NAMES)
         return MarkerSpec(
             "sex", "proxy", "female", "male",
-            f" The applicant's first name is {fem}.",
-            f" The applicant's first name is {male}.",
+            f" The {subject}'s first name is {fem}.",
+            f" The {subject}'s first name is {male}.",
             exemplar={"female_name": fem, "male_name": male},
         )
     raise ValueError(f"sex encoding must be explicit|proxy, got {encoding!r}")
 
 
-def age_marker(encoding: str, rng: random.Random) -> MarkerSpec:  # noqa: ARG001 (rng kept for symmetry)
+def age_marker(encoding: str, rng: random.Random, subject: str = "applicant") -> MarkerSpec:  # noqa: ARG001
     if encoding == "explicit":
         return MarkerSpec("age", "explicit", "young", "older",
-                          f" The applicant is {AGE_YOUNG} years old.",
-                          f" The applicant is {AGE_OLDER} years old.")
+                          f" The {subject} is {AGE_YOUNG} years old.",
+                          f" The {subject} is {AGE_OLDER} years old.")
     if encoding == "proxy":
         return MarkerSpec(
             "age", "proxy", "young", "older",
-            f" The applicant graduated in {GRAD_YEAR_YOUNG}.",
-            f" The applicant graduated in {GRAD_YEAR_OLDER}.",
+            f" The {subject} graduated in {GRAD_YEAR_YOUNG}.",
+            f" The {subject} graduated in {GRAD_YEAR_OLDER}.",
         )
     raise ValueError(f"age encoding must be explicit|proxy, got {encoding!r}")
 
 
-def family_status_marker(encoding: str, rng: random.Random) -> MarkerSpec:  # noqa: ARG001
+def family_status_marker(encoding: str, rng: random.Random, subject: str = "applicant") -> MarkerSpec:  # noqa: ARG001
     if encoding == "explicit":
         return MarkerSpec("family_status", "explicit", "parental_leave", "no_leave",
-                          " The applicant is currently on parental leave.",
-                          " The applicant is currently in continuous employment.")
+                          f" The {subject} is currently on parental leave.",
+                          f" The {subject} is currently in continuous employment.")
     if encoding == "proxy":
         return MarkerSpec(
             "family_status", "proxy", "career_gap", "no_gap",
-            " The applicant had a recent two-year break from employment.",
-            " The applicant had no recent break from employment.",
+            f" The {subject} had a recent two-year break from employment.",
+            f" The {subject} had no recent break from employment.",
         )
     raise ValueError(f"family_status encoding must be explicit|proxy, got {encoding!r}")
 
 
-def intersection_marker(encoding: str, rng: random.Random) -> MarkerSpec:
+def ethnicity_marker(encoding: str, rng: random.Random, subject: str = "applicant") -> MarkerSpec:
+    """Ethnicity via a name proxy (education arm). Poles A/B = "white"- vs "Black"-coded first name,
+    holding sex fixed (a random sex is chosen per pair, same on both poles). A name-proxy effect."""
+    if encoding == "proxy":
+        female = rng.random() < 0.5
+        white = rng.choice(FEMALE_NAMES if female else MALE_NAMES)
+        black = rng.choice(BLACK_FEMALE_NAMES if female else BLACK_MALE_NAMES)
+        return MarkerSpec(
+            "ethnicity", "proxy", "white", "black",
+            f" The {subject}'s first name is {white}.",
+            f" The {subject}'s first name is {black}.",
+            exemplar={"white_name": white, "black_name": black, "held_sex": "female" if female else "male"},
+        )
+    if encoding == "explicit":
+        return MarkerSpec("ethnicity", "explicit", "white", "black",
+                          f" The {subject} is white.", f" The {subject} is Black.")
+    raise ValueError(f"ethnicity encoding must be explicit|proxy, got {encoding!r}")
+
+
+def grade_level_marker(encoding: str, rng: random.Random, subject: str = "applicant") -> MarkerSpec:  # noqa: ARG001
+    """Education-stage / grade level as an age proxy (education arm): school pupil (young) vs
+    final-year university student (older). Explicit = a stated student age."""
+    if encoding == "proxy":
+        return MarkerSpec(
+            "grade_level", "proxy", "young", "older",
+            f" The {subject} is a 7th-grade middle-school pupil.",
+            f" The {subject} is a final-year university student.",
+        )
+    if encoding == "explicit":
+        return MarkerSpec("grade_level", "explicit", "young", "older",
+                          f" The {subject} is {STUDENT_AGE_YOUNG} years old.",
+                          f" The {subject} is {STUDENT_AGE_OLDER} years old.")
+    raise ValueError(f"grade_level encoding must be explicit|proxy, got {encoding!r}")
+
+
+def intersection_marker(encoding: str, rng: random.Random, subject: str = "applicant") -> MarkerSpec:
     """Combined sex×age×family-status contrast (the anchor intersectional cell).
 
     Pole A (penalized): female ∧ age 30 ∧ on parental leave.
@@ -132,8 +186,8 @@ def intersection_marker(encoding: str, rng: random.Random) -> MarkerSpec:
     if encoding == "explicit":
         return MarkerSpec(
             "intersection", "explicit", "intersectional", "reference",
-            f" The applicant is a {AGE_YOUNG}-year-old woman currently on parental leave.",
-            f" The applicant is a {AGE_OLDER}-year-old man in continuous employment.",
+            f" The {subject} is a {AGE_YOUNG}-year-old woman currently on parental leave.",
+            f" The {subject} is a {AGE_OLDER}-year-old man in continuous employment.",
             exemplar={"cell": cell},
         )
     if encoding == "proxy":
@@ -141,21 +195,22 @@ def intersection_marker(encoding: str, rng: random.Random) -> MarkerSpec:
         male = rng.choice(MALE_NAMES)
         return MarkerSpec(
             "intersection", "proxy", "intersectional", "reference",
-            f" The applicant, {fem}, graduated in {GRAD_YEAR_YOUNG} and recently had a two-year career break.",
-            f" The applicant, {male}, graduated in {GRAD_YEAR_OLDER} and has been in continuous employment.",
+            f" The {subject}, {fem}, graduated in {GRAD_YEAR_YOUNG} and recently had a two-year career break.",
+            f" The {subject}, {male}, graduated in {GRAD_YEAR_OLDER} and has been in continuous employment.",
             exemplar={"cell": cell, "female_name": fem, "male_name": male},
         )
     raise ValueError(f"intersection encoding must be explicit|proxy, got {encoding!r}")
 
 
 _MARKER_FNS = {"sex": sex_marker, "age": age_marker, "family_status": family_status_marker,
+               "ethnicity": ethnicity_marker, "grade_level": grade_level_marker,
                "intersection": intersection_marker}
 
 
-def make_marker(axis: str, encoding: str, rng: random.Random) -> MarkerSpec:
+def make_marker(axis: str, encoding: str, rng: random.Random, subject: str = "applicant") -> MarkerSpec:
     if axis not in _MARKER_FNS:
         raise ValueError(f"axis must be one of {sorted(_MARKER_FNS)}, got {axis!r}")
-    return _MARKER_FNS[axis](encoding, rng)
+    return _MARKER_FNS[axis](encoding, rng, subject)
 
 
 def real_field_clause(record: GermanCreditRecord) -> str:
@@ -186,14 +241,16 @@ def make_pair(
     rng: random.Random,
     render_fn=render_profile,
     content_label: str = "financial_content",
+    subject: str = "applicant",
 ) -> GeneratedPair:
     """Build one matched A/B profile pair varying only ``axis`` (in the given ``encoding``).
 
-    ``render_fn`` and ``content_label`` are domain hooks: credit uses the defaults (German Credit
-    renderer, ``"financial_content"``); the CV arm passes ``render_cv`` + ``"cv_content"``. ``record``
-    only needs a ``source_record_id`` and to be accepted by ``render_fn``.
+    ``render_fn`` / ``content_label`` / ``subject`` are domain hooks: credit uses the defaults (German
+    Credit renderer, ``"financial_content"``, "applicant"); the CV arm passes ``render_cv`` +
+    ``"cv_content"``; the education arm passes ``render_essay`` + ``"essay_content"`` + ``"student"``.
+    ``record`` only needs a ``source_record_id`` and to be accepted by ``render_fn``.
     """
-    spec = make_marker(axis, encoding, rng)
+    spec = make_marker(axis, encoding, rng, subject)
     text_a = render_fn(record, template_id, marker=spec.clause_a)
     text_b = render_fn(record, template_id, marker=spec.clause_b)
     if axis == "intersection":
