@@ -35,6 +35,9 @@ AXES = ["sex", "age", "family_status", "intersection"]
 ENCODINGS = ["explicit", "proxy"]
 SWEEP_ALPHAS = [0.0, 0.25, 0.5, 0.75, 1.0]
 SWEEP_AXES = ["sex", "intersection"]
+# Per-domain overrides (education has its own axes; markers are already baked into pairs.jsonl).
+DOMAIN_AXES = {"education": ["sex", "ethnicity", "grade_level"]}
+DOMAIN_SWEEP = {"education": ["grade_level", "sex"]}
 
 
 def _subgroup_auto_influence(base_org, eval_examples, key="template_id") -> Dict[str, float]:
@@ -47,7 +50,7 @@ def _subgroup_auto_influence(base_org, eval_examples, key="template_id") -> Dict
     return out
 
 
-def run_cell(exp, cfg, axis, encoding, dataset_cls) -> Dict[str, Any]:
+def run_cell(exp, cfg, axis, encoding, dataset_cls, sweep_axes=SWEEP_AXES) -> Dict[str, Any]:
     ds = dataset_cls(cfg.dataset_source, axis=axis, encoding=encoding,
                      probe_size=cfg.probe_size, split_seed=cfg.split_seed,
                      max_test_examples=cfg.max_test_examples)
@@ -71,7 +74,7 @@ def run_cell(exp, cfg, axis, encoding, dataset_cls) -> Dict[str, Any]:
     }
     # α-sweep (efficient: embed once, then project+score per α). Requires the backend to expose
     # last-hidden + score head (the MLX path). Falls back to per-α forward otherwise.
-    if axis in SWEEP_AXES:
+    if axis in sweep_axes:
         cell["alpha_sweep"] = _alpha_sweep(exp, cfg, all_texts, text_meta, n, probe)
     return cell
 
@@ -101,21 +104,27 @@ def _alpha_sweep(exp, cfg, all_texts, text_meta, n, probe) -> Dict[str, float]:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--config", type=Path, default=Path("configs/demographic_credit_sex_qwen06.yaml"))
+    ap.add_argument("--axes", default=None, help="Comma-separated axes; default is domain-appropriate.")
+    ap.add_argument("--dataset-source", default=None, help="Override the matched-pair manifest (pairs.jsonl).")
     ap.add_argument("--out", type=Path, default=None,
                     help="Defaults to artifacts/results/demographic/battery_{domain}_qwen06.json")
     args = ap.parse_args()
 
     cfg = ExperimentConfig.from_yaml(args.config)
+    if args.dataset_source:
+        cfg.dataset_source = args.dataset_source
     spec = get_domain(cfg.extra.get("domain", "credit"))
+    axes = [a.strip() for a in args.axes.split(",")] if args.axes else DOMAIN_AXES.get(spec.name, AXES)
+    sweep_axes = DOMAIN_SWEEP.get(spec.name, SWEEP_AXES)
     out = args.out or Path(f"artifacts/results/demographic/battery_{spec.name}_qwen06.json")
     exp = DemographicBiasExperiment(cfg)
     exp.load_model()
 
     cells: List[Dict[str, Any]] = []
-    for axis in AXES:
+    for axis in axes:
         for enc in ENCODINGS:
             print(f"[battery] {spec.name}/{axis}/{enc} ...", flush=True)
-            cells.append(run_cell(exp, cfg, axis, enc, spec.dataset_cls))
+            cells.append(run_cell(exp, cfg, axis, enc, spec.dataset_cls, sweep_axes))
 
     # ---- report ----
     print("\n" + "=" * 86)

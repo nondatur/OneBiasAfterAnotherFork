@@ -175,6 +175,8 @@ def main():
         # Apply overrides
         if args.model:
             config.model_path = args.model
+        if args.dataset_source:
+            config.dataset_source = args.dataset_source
         if args.artifacts_dir != "artifacts":
             config.artifacts_dir = args.artifacts_dir
         if args.plots_dir != "plots":

@@ -32,12 +32,16 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.nb.datasets.base import format_conversation
 from src.nb.datasets.demographic.domains import get_domain
+from src.nb.datasets.demographic.edu_ingest import DEFAULT_ASAP_PATH, DEFAULT_PERSUADE_PATH, load_asap, load_persuade
 from src.nb.datasets.demographic.markers import make_marker
 from src.nb.experiments.base import ExperimentConfig
 from src.nb.experiments.demographic import DemographicBiasExperiment, compute_cross_influence
 from src.nb.nullbias.probe import build_probe_direction, get_rewards_both
 
 AXES = ["sex", "age", "family_status", "intersection"]
+# Default axes per domain (education uses its own set; credit/CV keep the historical AXES).
+DOMAIN_AXES = {"education": ["sex", "ethnicity", "grade_level"]}
+_EDU_LOADERS = {"persuade": (load_persuade, DEFAULT_PERSUADE_PATH), "asap": (load_asap, DEFAULT_ASAP_PATH)}
 VARIANTS = ["strong_neutral", "weak_neutral", "weak_protected", "weak_reference", "strong_protected"]
 
 
@@ -52,13 +56,13 @@ def _build_pairs(records, n_pairs, seed, is_strong, template_ids):
     return [(strong[i], weak[i], tids[i % len(tids)]) for i in range(n)]
 
 
-def run_axis(exp, cfg, dom, axis, encoding, pairs, rng) -> Dict[str, Any]:
+def run_axis(exp, cfg, dom, axis, encoding, pairs, rng, subject="applicant") -> Dict[str, Any]:
     tok = exp.tokenizer
     fmt = lambda txt: format_conversation(tok, dom.assessment_prompt, txt)
     render = dom.render_fn
     texts: Dict[str, List[Any]] = {v: [] for v in VARIANTS}
     for good, bad, tid in pairs:
-        spec = make_marker(axis, encoding, rng)  # clause_a = protected pole, clause_b = reference
+        spec = make_marker(axis, encoding, rng, subject)  # clause_a = protected pole, clause_b = reference
         texts["strong_neutral"].append(fmt(render(good, tid, "")))
         texts["weak_neutral"].append(fmt(render(bad, tid, "")))
         texts["weak_protected"].append(fmt(render(bad, tid, spec.clause_a)))
@@ -89,6 +93,11 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--config", type=Path, default=Path("configs/demographic_credit_sex_qwen06.yaml"))
     ap.add_argument("--encoding", default="explicit", choices=["explicit", "proxy"])
+    ap.add_argument("--axes", default=None, help="Comma-separated axes; default is domain-appropriate.")
+    ap.add_argument("--dataset-source", default=None, help="Override the matched-pair manifest (probe pairs).")
+    ap.add_argument("--source", default="persuade", choices=sorted(_EDU_LOADERS),
+                    help="Education only: which corpus to load strong/weak records from.")
+    ap.add_argument("--raw-path", default=None, help="Education only: override the corpus file path.")
     ap.add_argument("--n-pairs", type=int, default=300)
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--out", type=Path, default=None,
@@ -96,21 +105,30 @@ def main() -> None:
     args = ap.parse_args()
 
     cfg = ExperimentConfig.from_yaml(args.config)
+    if args.dataset_source:
+        cfg.dataset_source = args.dataset_source
     dom = get_domain(cfg.extra.get("domain", "credit"))
+    subject = "student" if dom.name == "education" else "applicant"
+    axes = [a.strip() for a in args.axes.split(",")] if args.axes else DOMAIN_AXES.get(dom.name, AXES)
     out = args.out or Path(f"artifacts/results/demographic/crossinf_{dom.name}_qwen06.json")
     exp = DemographicBiasExperiment(cfg)
     exp.load_model()
 
-    records = dom.load_records()
+    # Education loads strong/weak records from the chosen real corpus; other domains use the registry loader.
+    if dom.name == "education":
+        loader, default_path = _EDU_LOADERS[args.source]
+        records = loader(args.raw_path or default_path)
+    else:
+        records = dom.load_records()
     pairs = _build_pairs(records, args.n_pairs, args.seed, dom.is_strong, dom.template_ids)
     pairing = [{"strong": g.source_record_id, "weak": b.source_record_id, "template_id": t}
                for g, b, t in pairs]
     rng = random.Random(args.seed)
 
     results = []
-    for axis in AXES:
+    for axis in axes:
         print(f"[cross-influence] {dom.name}/{axis}/{args.encoding} ...", flush=True)
-        results.append(run_axis(exp, cfg, dom, axis, args.encoding, pairs, rng))
+        results.append(run_axis(exp, cfg, dom, axis, args.encoding, pairs, rng, subject))
 
     print("\n" + "=" * 96)
     print(f"CROSS-INFLUENCE [{dom.name}] — {cfg.model_path}  "
