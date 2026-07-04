@@ -105,6 +105,9 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--config", type=Path, default=Path("configs/demographic_credit_sex_qwen06.yaml"))
     ap.add_argument("--axes", default=None, help="Comma-separated axes; default is domain-appropriate.")
+    ap.add_argument("--encodings", default=None,
+                    help="Comma-separated encodings (default explicit,proxy). A2 uses positions here.")
+    ap.add_argument("--sweep-axes", default=None, help="Comma-separated axes to alpha-sweep; overrides default.")
     ap.add_argument("--dataset-source", default=None, help="Override the matched-pair manifest (pairs.jsonl).")
     ap.add_argument("--out", type=Path, default=None,
                     help="Defaults to artifacts/results/demographic/battery_{domain}_qwen06.json")
@@ -115,14 +118,16 @@ def main() -> None:
         cfg.dataset_source = args.dataset_source
     spec = get_domain(cfg.extra.get("domain", "credit"))
     axes = [a.strip() for a in args.axes.split(",")] if args.axes else DOMAIN_AXES.get(spec.name, AXES)
-    sweep_axes = DOMAIN_SWEEP.get(spec.name, SWEEP_AXES)
+    encodings = [e.strip() for e in args.encodings.split(",")] if args.encodings else ENCODINGS
+    sweep_axes = ([a.strip() for a in args.sweep_axes.split(",")] if args.sweep_axes
+                  else DOMAIN_SWEEP.get(spec.name, SWEEP_AXES))
     out = args.out or Path(f"artifacts/results/demographic/battery_{spec.name}_qwen06.json")
     exp = DemographicBiasExperiment(cfg)
     exp.load_model()
 
     cells: List[Dict[str, Any]] = []
     for axis in axes:
-        for enc in ENCODINGS:
+        for enc in encodings:
             print(f"[battery] {spec.name}/{axis}/{enc} ...", flush=True)
             cells.append(run_cell(exp, cfg, axis, enc, spec.dataset_cls, sweep_axes))
 
