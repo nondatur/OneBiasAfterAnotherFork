@@ -35,8 +35,13 @@ try:  # Education (essay) templates; absent on a minimal checkout is fine.
 except Exception:  # pragma: no cover - defensive
     EDU_TEMPLATES = {}
 
+try:  # Positioned-argument (A2) sentence templates.
+    from src.nb.datasets.demographic.positionality import POSITION_TEMPLATES
+except Exception:  # pragma: no cover - defensive
+    POSITION_TEMPLATES = {}
+
 # Combined registry so provenance hashing works for every domain's template ids.
-_ALL_TEMPLATES: Dict[str, str] = {**TEMPLATES, **CV_TEMPLATES, **EDU_TEMPLATES}
+_ALL_TEMPLATES: Dict[str, str] = {**TEMPLATES, **CV_TEMPLATES, **EDU_TEMPLATES, **POSITION_TEMPLATES}
 
 GENERATOR_VERSION = "0.1.0"
 
