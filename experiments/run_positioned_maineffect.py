@@ -40,7 +40,16 @@ sys.path.insert(0, str(PROJECT_ROOT))
 from src.nb.datasets.base import ContrastivePair, format_conversation
 from src.nb.datasets.demographic.domains import get_domain
 from src.nb.datasets.demographic.edu_ingest import DEFAULT_ASAP_PATH, DEFAULT_PERSUADE_PATH, load_asap, load_persuade
-from src.nb.datasets.demographic.positionality import IDENTITY_AXES, make_positioned_pair, render_neutral
+from src.nb.datasets.demographic.positionality import (
+    IDENTITY_AXES,
+    POSITION_VARIANTS,
+    POSITIONS,
+    STANCES,
+    make_positioned_pair,
+    render_neutral,
+    stance_of,
+    variants_for,
+)
 from src.nb.experiments.base import ExperimentConfig
 from src.nb.experiments.demographic import DemographicBiasExperiment
 from src.nb.nullbias.probe import build_probe_direction, get_rewards_both
@@ -52,12 +61,12 @@ def _mean(xs: List[float]) -> float:
     return sum(xs) / max(len(xs), 1)
 
 
-def run_axis(exp, cfg, dom, essays, axis, position, rng) -> Dict[str, Any]:
+def run_axis(exp, cfg, dom, essays, axis, position, rng, variant=None) -> Dict[str, Any]:
     tok = exp.tokenizer
     fmt = lambda txt: format_conversation(tok, dom.assessment_prompt, txt)
     neutral, a, b, pairs = [], [], [], []
     for rec in essays:
-        pair = make_positioned_pair(rec, axis, position, rng)
+        pair = make_positioned_pair(rec, axis, position, rng, variant=variant)
         neutral.append(fmt(render_neutral(rec)))
         a.append(fmt(pair.text_a))
         b.append(fmt(pair.text_b))
@@ -75,8 +84,10 @@ def run_axis(exp, cfg, dom, essays, axis, position, rng) -> Dict[str, Any]:
     delta_b = _mean([x - y for x, y in zip(r_b, r_neu)])
     pref_a = _mean([1.0 if x > y else 0.0 for x, y in zip(r_a, r_b)])
     la, lb, id_a, id_b = IDENTITY_AXES[axis]
+    disp = variant or f"pos_{position}"
     return {
-        "axis": axis, "n": n, "probe_accuracy": meta.get("probe_accuracy"),
+        "axis": axis, "position": position, "variant": disp, "stance": stance_of(disp), "n": n,
+        "probe_accuracy": meta.get("probe_accuracy"),
         "identity_a": id_a, "identity_b": id_b,
         "mean_neutral": _mean(r_neu), "mean_a": _mean(r_a), "mean_b": _mean(r_b),
         "delta_a": delta_a, "delta_b": delta_b,
@@ -93,40 +104,67 @@ def main() -> None:
     ap.add_argument("--source", choices=sorted(_LOADERS), default="persuade")
     ap.add_argument("--raw-path", default=None)
     ap.add_argument("--axes", default=",".join(IDENTITY_AXES))
-    ap.add_argument("--position", default="conclusion")
+    ap.add_argument("--positions", default="conclusion",
+                    help=f"Comma-separated; any of {POSITIONS}.")
+    ap.add_argument("--paraphrase", choices=["off", "sample", "per"], default="off",
+                    help="off=base wording; sample=rng paraphrase per essay; per=each paraphrase separately.")
+    ap.add_argument("--stance", choices=list(STANCES), default="endorse",
+                    help="endorse=agrees with the essay (default); neutral=non-committal grounding; "
+                         "both=base-endorse vs neutral head-to-head. neutral/both ignore --paraphrase.")
     ap.add_argument("--n-essays", type=int, default=200)
     ap.add_argument("--seed", type=int, default=42)
-    ap.add_argument("--out", type=Path,
-                    default=Path("artifacts/results/demographic/maineffect_edupos_persuade_qwen06.json"))
+    ap.add_argument("--out", type=Path, default=None)
     args = ap.parse_args()
 
     cfg = ExperimentConfig.from_yaml(args.config)
     dom = get_domain(cfg.extra.get("domain", "education"))
     axes = [a.strip() for a in args.axes.split(",") if a.strip()]
+    positions = [p.strip() for p in args.positions.split(",") if p.strip()]
     loader, default_path = _LOADERS[args.source]
     essays = loader(args.raw_path or default_path, n=args.n_essays, seed=args.seed)
+    out = args.out or Path(f"artifacts/results/demographic/maineffect_edupos_{args.source}_qwen06.json")
 
     exp = DemographicBiasExperiment(cfg)
     exp.load_model()
     rng = random.Random(args.seed)
-    results = [run_axis(exp, cfg, dom, essays, ax, args.position, rng) for ax in axes]
-    for ax in axes:
-        print(f"[maineffect] {ax} done", flush=True)
 
-    print("\n" + "=" * 100)
-    print(f"POSITIONED MAIN-EFFECT [{args.source}/{args.position}] — {cfg.model_path} (n={len(essays)})")
-    print("=" * 100)
-    print(f"{'axis':18} {'mean_neu':>8} {'delta_a':>8} {'delta_b':>8} {'main_fx':>8} {'id_gap':>8} {'auto_AI':>8}")
+    results: List[Dict[str, Any]] = []
+    for position in positions:
+        # which sentence-wording variants to run at this position
+        if args.stance != "endorse":
+            variants = variants_for(position, args.stance)   # explicit neutral (+ base for 'both')
+        elif args.paraphrase == "per":
+            variants = list(POSITION_VARIANTS[position])
+        elif args.paraphrase == "sample":
+            variants = ["sample"]
+        else:
+            variants = [None]
+        for variant in variants:
+            for ax in axes:
+                results.append(run_axis(exp, cfg, dom, essays, ax, position, rng, variant))
+                print(f"[maineffect] {position}/{variant or 'base'}/{ax} done", flush=True)
+
+    print("\n" + "=" * 118)
+    print(f"POSITIONED MAIN-EFFECT [{args.source}; stance={args.stance}; paraphrase={args.paraphrase}] "
+          f"— {cfg.model_path} (n={len(essays)})")
+    print("=" * 118)
+    print(f"{'axis':18} {'position':10} {'stance':8} {'variant':24} {'mean_neu':>8} {'main_fx':>8} "
+          f"{'id_gap':>8} {'auto_AI':>8}")
     for r in results:
-        print(f"{r['axis']:18} {r['mean_neutral']:>8.3f} {r['delta_a']:>8.3f} {r['delta_b']:>8.3f} "
+        print(f"{r['axis']:18} {r['position']:10} {r['stance']:8} {r['variant']:24} {r['mean_neutral']:>8.3f} "
               f"{r['main_effect']:>8.3f} {r['identity_gap']:>8.3f} {r['auto_influence']:>8.3f}")
-    print("=" * 100)
-    print("id_gap on demographic axes vs (near-0 on) pos_ctrl_* ⇒ demographic-specific; else persona-sensitivity.")
+    print("=" * 118)
+    if args.stance == "both":
+        print("Compare id_gap ENDORSE vs NEUTRAL per axis: gap persists under neutral ⇒ standpoint-driven;")
+        print("gap shrinks toward 0 under neutral ⇒ the RM specifically rewards marginalized *endorsement*.")
+    else:
+        print("id_gap large on demographic axes but ~0 on pos_ctrl_* ⇒ demographic-specific.")
 
-    args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(json.dumps({"model": cfg.model_path, "source": args.source,
-                                    "position": args.position, "results": results}, indent=2))
-    print(f"saved → {args.out}")
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps({"model": cfg.model_path, "source": args.source,
+                               "positions": positions, "stance": args.stance, "paraphrase": args.paraphrase,
+                               "results": results}, indent=2))
+    print(f"saved → {out}")
 
 
 if __name__ == "__main__":

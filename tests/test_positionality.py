@@ -15,9 +15,14 @@ import pytest
 from src.nb.datasets.demographic.edu_ingest import EssayRecord
 from src.nb.datasets.demographic.positionality import (
     IDENTITY_AXES,
+    POSITION_NEUTRAL,
+    POSITION_TEMPLATES,
+    POSITION_VARIANTS,
     POSITIONS,
     make_positioned_pair,
     render_neutral,
+    stance_of,
+    variants_for,
 )
 from src.nb.datasets.demographic.validate import Thresholds, validate_pair
 
@@ -79,3 +84,66 @@ class TestPositionedPair:
             make_positioned_pair(_rec(), "pos_nope", "conclusion", random.Random(0))
         with pytest.raises(ValueError):
             make_positioned_pair(_rec(), "pos_sex", "sideways", random.Random(0))
+
+
+class TestParaphrase:
+    def test_every_position_has_variants_with_identity_slot(self):
+        for position in ("conclusion", "opening", "middle", "random"):
+            variants = POSITION_VARIANTS[position]
+            assert len(variants) >= 2  # base + paraphrases
+            for key in variants:
+                assert "{identity}" in POSITION_TEMPLATES[key]
+
+    @pytest.mark.parametrize("position", ["conclusion", "opening", "middle"])
+    def test_each_paraphrase_variant_is_single_axis(self, position):
+        for variant in POSITION_VARIANTS[position]:
+            pair = make_positioned_pair(_rec(), "pos_race", position, random.Random(0), variant=variant)
+            assert pair.text_a.replace(pair.clause_a, "", 1) == _BODY
+            assert pair.text_b.replace(pair.clause_b, "", 1) == _BODY
+            assert pair.template_id == variant
+            res = validate_pair(pair, _THR)
+            assert res.ok, f"{position}/{variant} failed gate: {res.reasons}"
+
+    def test_default_variant_is_base_v0_and_unchanged(self):
+        # variant=None must reproduce the base wording exactly (regression guard).
+        pair = make_positioned_pair(_rec(), "pos_sex", "conclusion", random.Random(0))
+        assert pair.template_id == "pos_conclusion"
+        assert "who has lived these realities firsthand" in pair.clause_a
+
+    def test_sample_picks_from_the_pool(self):
+        keys = {make_positioned_pair(_rec(), "pos_sex", "conclusion", random.Random(s), variant="sample").template_id
+                for s in range(30)}
+        assert keys <= set(POSITION_VARIANTS["conclusion"]) and len(keys) >= 2  # diversifies
+
+    def test_unknown_variant_raises(self):
+        with pytest.raises(ValueError):
+            make_positioned_pair(_rec(), "pos_sex", "conclusion", random.Random(0), variant="pos_bogus")
+
+
+class TestStance:
+    @pytest.mark.parametrize("position", ["conclusion", "opening", "middle", "random"])
+    def test_neutral_variant_single_axis_and_no_endorsement(self, position):
+        key = POSITION_NEUTRAL[position]
+        pair = make_positioned_pair(_rec(), "pos_race", position, random.Random(0), variant=key)
+        assert pair.text_a.replace(pair.clause_a, "", 1) == _BODY
+        assert validate_pair(pair, _THR).ok
+        low = pair.clause_a.lower()
+        for w in ["convinced", "right conclusion", "correct position", "reject", "certain"]:
+            assert w not in low, f"neutral clause endorsed via {w!r}"
+
+    def test_neutral_shares_identity_grounding_with_endorse(self):
+        # The identity grounding must be identical; only the stance clause differs.
+        endorse = make_positioned_pair(_rec(), "pos_sex", "conclusion", random.Random(0))  # base endorse
+        neutral = make_positioned_pair(_rec(), "pos_sex", "conclusion", random.Random(0),
+                                       variant=POSITION_NEUTRAL["conclusion"])
+        assert "who has lived these realities firsthand" in endorse.clause_a
+        assert "who has lived these realities firsthand" in neutral.clause_a
+
+    def test_variants_for_and_stance_of(self):
+        assert variants_for("conclusion", "endorse") == POSITION_VARIANTS["conclusion"]
+        assert variants_for("conclusion", "neutral") == ["pos_conclusion_neutral"]
+        assert variants_for("conclusion", "both") == ["pos_conclusion", "pos_conclusion_neutral"]
+        assert stance_of("pos_conclusion") == "endorse"
+        assert stance_of("pos_conclusion_neutral") == "neutral"
+        with pytest.raises(ValueError):
+            variants_for("conclusion", "bogus")

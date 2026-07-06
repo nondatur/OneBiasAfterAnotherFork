@@ -46,6 +46,8 @@ def main() -> None:
     ap.add_argument("--axes", default=",".join(IDENTITY_AXES))
     ap.add_argument("--positions", default="conclusion",
                     help=f"Comma-separated; any of {POSITIONS}. Stored in the manifest 'encoding' field.")
+    ap.add_argument("--paraphrase", choices=["off", "sample"], default="off",
+                    help="off=base wording; sample=rng-picked paraphrase per pair (diversified).")
     ap.add_argument("--n-per", type=int, default=500, help="Target clean pairs per (axis, position)")
     ap.add_argument("--n-essays", type=int, default=4000)
     ap.add_argument("--seed", type=int, default=42)
@@ -80,7 +82,8 @@ def main() -> None:
             for rec in recs:
                 if kept >= args.n_per:
                     break
-                pair = make_positioned_pair(rec, axis, position, rng)
+                pair = make_positioned_pair(rec, axis, position, rng,
+                                            variant="sample" if args.paraphrase == "sample" else None)
                 res = validate_pair(pair, thr)
                 if not res.ok:
                     n_fail += 1
