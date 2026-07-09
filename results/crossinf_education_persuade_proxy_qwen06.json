@@ -1,0 +1,1091 @@
+{
+  "model": "Skywork/Skywork-Reward-V2-Qwen3-0.6B",
+  "domain": "education",
+  "encoding": "proxy",
+  "seed": 42,
+  "pairing": [
+    {
+      "strong": "persuade-5.50309E+12",
+      "weak": "persuade-5149286",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000574762850_OR",
+      "weak": "persuade-5054148",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-5076296",
+      "weak": "persuade-AAAUUP138180000180812125_OR",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-5299572",
+      "weak": "persuade-5196967",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001915052125_OR",
+      "weak": "persuade-AAAOPP13416000181910",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001909852125_OR",
+      "weak": "persuade-AAAXMP138200001832062144_OR",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001690642144_OR",
+      "weak": "persuade-5356437",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000752592144_OR",
+      "weak": "persuade-AAAOPP13416000145707",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001503242810_OR",
+      "weak": "persuade-2221003085",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001061272850_OR",
+      "weak": "persuade-AAAUUP138180000312592125_OR",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200002086292144_OR",
+      "weak": "persuade-2251000165",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-5184452",
+      "weak": "persuade-AAATRP14318000765062",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-5.60207E+12",
+      "weak": "persuade-AAAOPP13416000031164",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001927392125_OR",
+      "weak": "persuade-AAAOPP13416000219688",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAOPP13416000108507",
+      "weak": "persuade-AAAOPP13416000218796",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001095892144_OR",
+      "weak": "persuade-2091005056",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-5.73595E+12",
+      "weak": "persuade-5583907",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-5171850",
+      "weak": "persuade-5059663",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001885442125_OR",
+      "weak": "persuade-2241006195",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000747072810_OR",
+      "weak": "persuade-AAAOPP13416000107234",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAOPP13416000083293",
+      "weak": "persuade-AAATRP14318000700921",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001758412810_OR",
+      "weak": "persuade-AAATRP14318000386794",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000516592125_OR",
+      "weak": "persuade-AAAOPP13416000005839",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000533602125_OR",
+      "weak": "persuade-2221006670",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000821092125_OR",
+      "weak": "persuade-AAAOPP13416000071289",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAVUP14319000043045",
+      "weak": "persuade-AAAVUP14319000028974",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001958842144_OR",
+      "weak": "persuade-AAAVUP14319000107592",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001499132810_OR",
+      "weak": "persuade-AAAOPP13416000080906",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000633282850_OR",
+      "weak": "persuade-5089165",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001953602144_OR",
+      "weak": "persuade-AAAVUP14319000091065",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000792592850_OR",
+      "weak": "persuade-2141003325",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-5.98728E+12",
+      "weak": "persuade-AAATRP14318000784368",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000811992144_OR",
+      "weak": "persuade-5.58784E+12",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001615872125_OR",
+      "weak": "persuade-AAAOPP13416000050845",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001630672144_OR",
+      "weak": "persuade-2141005018",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001336082144_OR",
+      "weak": "persuade-AAAOPP13416000020740",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200002131272810_OR",
+      "weak": "persuade-AAAOPP13416000008708",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001953332125_OR",
+      "weak": "persuade-5178366",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001099722125_OR",
+      "weak": "persuade-5053875",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200002093822810_OR",
+      "weak": "persuade-2141004852",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-2221006700",
+      "weak": "persuade-AAAVUP14319000108975",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001933892125_OR",
+      "weak": "persuade-2251003709",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001011802810_OR",
+      "weak": "persuade-AAAOPP13416000116852",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-5028293",
+      "weak": "persuade-AAAOPP13416000108553",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001624792810_OR",
+      "weak": "persuade-2431004501",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000890092850_OR",
+      "weak": "persuade-AAAXMP138200001624872850_OR",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000984122144_OR",
+      "weak": "persuade-AAAOPP13416000104361",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAATRP14318000929524",
+      "weak": "persuade-2081005029",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-5.8248E+12",
+      "weak": "persuade-AAAOPP13416000007048",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000584992144_OR",
+      "weak": "persuade-AAAOPP13416000043915",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001335782144_OR",
+      "weak": "persuade-AAAOPP13416000099251",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001600592850_OR",
+      "weak": "persuade-2141001951",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001587602125_OR",
+      "weak": "persuade-5072512",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000890122850_OR",
+      "weak": "persuade-2271002864",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-5062559",
+      "weak": "persuade-AAATRP14318000361378",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001765772850_OR",
+      "weak": "persuade-5171637",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAVUP14319000102938",
+      "weak": "persuade-AAATRP14318000431134",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200002155012810_OR",
+      "weak": "persuade-AAAOPP13416000038938",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001845742125_OR",
+      "weak": "persuade-AAAVUP14319000120613",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001838952125_OR",
+      "weak": "persuade-AAAOPP13416000076818",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001674922144_OR",
+      "weak": "persuade-2141004895",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000947652125_OR",
+      "weak": "persuade-5057483",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001126592810_OR",
+      "weak": "persuade-AAAOPP13416000049267",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001515682850_OR",
+      "weak": "persuade-2171006047",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-5188652",
+      "weak": "persuade-AAATRP14318000755175",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001511492850_OR",
+      "weak": "persuade-2251003636",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001701132125_OR",
+      "weak": "persuade-5313186",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000793642850_OR",
+      "weak": "persuade-2081003441",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAVUP14319000053438",
+      "weak": "persuade-5180956",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001436992850_OR",
+      "weak": "persuade-AAAOPP13416000000750",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-5.37697E+12",
+      "weak": "persuade-5178937",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-2221005266",
+      "weak": "persuade-AAAOPP13416000148171",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAOPP13416000016616",
+      "weak": "persuade-5088654",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001101692144_OR",
+      "weak": "persuade-AAAOPP13416000072220",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001065212810_OR",
+      "weak": "persuade-AAAOPP13416000124012",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001261952810_OR",
+      "weak": "persuade-AAATRP14318000789646",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001062472125_OR",
+      "weak": "persuade-AAAOPP13416000027821",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001519942125_OR",
+      "weak": "persuade-AAAOPP13416000112613",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001693252144_OR",
+      "weak": "persuade-AAATRP14318000414851",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200002110082125_OR",
+      "weak": "persuade-AAAOPP13416000146090",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200002151012810_OR",
+      "weak": "persuade-AAAVUP14319000089813",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-5083580",
+      "weak": "persuade-2021002244",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001037232125_OR",
+      "weak": "persuade-5149125",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001691232125_OR",
+      "weak": "persuade-2021005677",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200002115692125_OR",
+      "weak": "persuade-AAAOPP13416000099279",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000806282144_OR",
+      "weak": "persuade-AAATRP14318000438593",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-5.71647E+12",
+      "weak": "persuade-AAATRP14318000731667",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-5.4141E+12",
+      "weak": "persuade-AAAXMP138200000578432810_OR",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-2311006063",
+      "weak": "persuade-2091003703",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001773242144_OR",
+      "weak": "persuade-AAAXMP138200001800002810_OR",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAATRP14318001004123",
+      "weak": "persuade-5415781",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-2081006653",
+      "weak": "persuade-5212476",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001064912125_OR",
+      "weak": "persuade-AAATRP14318000449467",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAOPP13416000083408",
+      "weak": "persuade-2431005834",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200002095332125_OR",
+      "weak": "persuade-AAATRP14318000730553",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-4.85871E+12",
+      "weak": "persuade-5162250",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-5076794",
+      "weak": "persuade-AAAOPP13416000044221",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000880722125_OR",
+      "weak": "persuade-AAAOPP13416000041711",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001383722125_OR",
+      "weak": "persuade-5265964",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001362192144_OR",
+      "weak": "persuade-5352080",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAOPP13416000138750",
+      "weak": "persuade-5178489",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000674212125_OR",
+      "weak": "persuade-AAAOPP13416000098462",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-5.60315E+12",
+      "weak": "persuade-2221001287",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAOPP13416000036048",
+      "weak": "persuade-2221000655",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001071812125_OR",
+      "weak": "persuade-AAATRP14318000984378",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-2421005084",
+      "weak": "persuade-2171002955",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200002070312850_OR",
+      "weak": "persuade-AAAOPP13416000103085",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001096242125_OR",
+      "weak": "persuade-2271003585",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-530234115212010thLitAB",
+      "weak": "persuade-AAATRP14318000711034",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001537282810_OR",
+      "weak": "persuade-AAATRP14318001077368",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000503782144_OR",
+      "weak": "persuade-AAAOPP13416000040974",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001959472144_OR",
+      "weak": "persuade-5024974",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001513832144_OR",
+      "weak": "persuade-AAAOPP13416000041084",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000805802144_OR",
+      "weak": "persuade-5026332",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001464262850_OR",
+      "weak": "persuade-AAATRP14318000174275",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000820682144_OR",
+      "weak": "persuade-AAAVUP14319000062128",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001316982810_OR",
+      "weak": "persuade-AAAOPP13416000030907",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAOPP13416000095284",
+      "weak": "persuade-AAATRP14318000093272",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001537242125_OR",
+      "weak": "persuade-2141000059",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001305782810_OR",
+      "weak": "persuade-5174662",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001107262125_OR",
+      "weak": "persuade-AAAVUP14319000109742",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200002067362850_OR",
+      "weak": "persuade-AAAOPP13416000033709",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001108702144_OR",
+      "weak": "persuade-AAAOPP13416000117897",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001949402125_OR",
+      "weak": "persuade-AAAVUP14319000049271",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001476432850_OR",
+      "weak": "persuade-AAAXMP138200001575312810_OR",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200002157312810_OR",
+      "weak": "persuade-2081004928",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001623662144_OR",
+      "weak": "persuade-AAATRP14318000675489",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200002192872125_OR",
+      "weak": "persuade-5349494",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000644042144_OR",
+      "weak": "persuade-AAATRP14318001071859",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001948492125_OR",
+      "weak": "persuade-AAAVUP14319000128221",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001855772144_OR",
+      "weak": "persuade-AAAOPP13416000117062",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001384142850_OR",
+      "weak": "persuade-AAAOPP13416000039989",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000633632810_OR",
+      "weak": "persuade-AAAOPP13416000068856",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-5178461",
+      "weak": "persuade-AAAVUP14319000049303",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001835062144_OR",
+      "weak": "persuade-AAAVUP14319000045988",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000816922125_OR",
+      "weak": "persuade-AAAOPP13416000005720",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-5.40577E+12",
+      "weak": "persuade-AAAXMP138200002205252144_OR",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001985282810_OR",
+      "weak": "persuade-5060344_cleaned",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001479572850_OR",
+      "weak": "persuade-AAATRP14318001003478",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000850812125_OR",
+      "weak": "persuade-AAATRP14318000823305",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAOPP13416000016787",
+      "weak": "persuade-2081004065",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001118952144_OR",
+      "weak": "persuade-2271006304",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200002058912125_OR",
+      "weak": "persuade-2091005668",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200002203582125_OR",
+      "weak": "persuade-5054135",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001623422850_OR",
+      "weak": "persuade-AAAXMP138200001158352810_OR",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000601472850_OR",
+      "weak": "persuade-2251005434",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-5026223",
+      "weak": "persuade-5347517",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000989102125_OR",
+      "weak": "persuade-AAAXMP138200001841952810_OR",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-5196534",
+      "weak": "persuade-AAAOPP13416000181157",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001788952144_OR",
+      "weak": "persuade-5267580",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001394922810_OR",
+      "weak": "persuade-AAATRP14318000408939",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001738842810_OR",
+      "weak": "persuade-2081004995",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001488132144_OR",
+      "weak": "persuade-2021000420",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-5022423",
+      "weak": "persuade-AAAVUP14319000073499",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAOPP13416000047485",
+      "weak": "persuade-5313338",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200002062342810_OR",
+      "weak": "persuade-5166198",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-5197989",
+      "weak": "persuade-AAAOPP13416000048366",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001488962125_OR",
+      "weak": "persuade-5.7843E+12",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000999992125_OR",
+      "weak": "persuade-AAAOPP13416000057867",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000989802125_OR",
+      "weak": "persuade-AAAOPP13416000020982",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-2431007446",
+      "weak": "persuade-AAAOPP13416000054284",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001480102850_OR",
+      "weak": "persuade-2171000545",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-2021000918",
+      "weak": "persuade-5074788",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAOPP13416000036329",
+      "weak": "persuade-AAAOPP13416000050150",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001329662125_OR",
+      "weak": "persuade-2091005234",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000673642850_OR",
+      "weak": "persuade-5171437",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-5.3303E+12",
+      "weak": "persuade-AAAVUP14319000080583",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001601132144_OR",
+      "weak": "persuade-AAAOPP13416000134632",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200002146942125_OR",
+      "weak": "persuade-AAAVUP14319000108053",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001659882125_OR",
+      "weak": "persuade-AAAXMP138200001606002810_OR",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001005572125_OR",
+      "weak": "persuade-AAAVUP14319000051450",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-4.65401E+12",
+      "weak": "persuade-2421003634",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAVUP14319000070539",
+      "weak": "persuade-AAAVUP14319000053406",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-2081006688",
+      "weak": "persuade-AAAXMP138200001399042810_OR",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAVUP14319000111210",
+      "weak": "persuade-5076153",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000883152850_OR",
+      "weak": "persuade-5351653",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAOPP13416000099308",
+      "weak": "persuade-5381607",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001838202850_OR",
+      "weak": "persuade-2271007041",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001093352144_OR",
+      "weak": "persuade-5181157",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000878292850_OR",
+      "weak": "persuade-AAAOPP13416000037056",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-2171004648",
+      "weak": "persuade-5218787",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000509212125_OR",
+      "weak": "persuade-5372090",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001271762125_OR",
+      "weak": "persuade-2271005278",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001810562810_OR",
+      "weak": "persuade-AAAOPP13416000039386",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200000810972850_OR",
+      "weak": "persuade-2421003715",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001383842850_OR",
+      "weak": "persuade-5061280",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-5061109",
+      "weak": "persuade-AAAOPP13416000036971",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001957252144_OR",
+      "weak": "persuade-2141004232",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001097062125_OR",
+      "weak": "persuade-AAAOPP13416000074525",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001604942125_OR",
+      "weak": "persuade-AAATRP14318000427786",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001653222125_OR",
+      "weak": "persuade-5171540",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001554792125_OR",
+      "weak": "persuade-AAAOPP13416000072545",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001959942144_OR",
+      "weak": "persuade-AAAXMP138200001351992850_OR",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001928312125_OR",
+      "weak": "persuade-2251001871",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-5.89602E+12",
+      "weak": "persuade-2271002414",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001077722810_OR",
+      "weak": "persuade-AAAVUP14319000141979",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-5365569",
+      "weak": "persuade-AAAOPP13416000047351",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-5216870",
+      "weak": "persuade-AAAVUP14319000092631",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "persuade-AAAXMP138200001426102144_OR",
+      "weak": "persuade-2431007373",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "persuade-AAAVUP14319000101397",
+      "weak": "persuade-5161038",
+      "template_id": "edu_v2"
+    }
+  ],
+  "results": [
+    {
+      "axis": "sex",
+      "encoding": "proxy",
+      "n_pairs": 200,
+      "baseline": {
+        "n": 200,
+        "acc_baseline": 0.88,
+        "acc_weak_protected": 0.94,
+        "cross_influence": -0.05999999999999994,
+        "baseline_tracks_quality": true,
+        "acc_weak_reference": 0.95,
+        "cross_influence_reference": -0.06999999999999995,
+        "acc_strong_protected": 0.84,
+        "marker_on_strong_effect": -0.040000000000000036
+      },
+      "nulled": {
+        "n": 200,
+        "acc_baseline": 0.87,
+        "acc_weak_protected": 0.93,
+        "cross_influence": -0.06000000000000005,
+        "baseline_tracks_quality": true,
+        "acc_weak_reference": 0.94,
+        "cross_influence_reference": -0.06999999999999995,
+        "acc_strong_protected": 0.82,
+        "marker_on_strong_effect": -0.050000000000000044
+      }
+    },
+    {
+      "axis": "ethnicity",
+      "encoding": "proxy",
+      "n_pairs": 200,
+      "baseline": {
+        "n": 200,
+        "acc_baseline": 0.88,
+        "acc_weak_protected": 0.95,
+        "cross_influence": -0.06999999999999995,
+        "baseline_tracks_quality": true,
+        "acc_weak_reference": 0.95,
+        "cross_influence_reference": -0.06999999999999995,
+        "acc_strong_protected": 0.84,
+        "marker_on_strong_effect": -0.040000000000000036
+      },
+      "nulled": {
+        "n": 200,
+        "acc_baseline": 0.88,
+        "acc_weak_protected": 0.915,
+        "cross_influence": -0.03500000000000003,
+        "baseline_tracks_quality": true,
+        "acc_weak_reference": 0.925,
+        "cross_influence_reference": -0.04500000000000004,
+        "acc_strong_protected": 0.84,
+        "marker_on_strong_effect": -0.040000000000000036
+      }
+    },
+    {
+      "axis": "grade_level",
+      "encoding": "proxy",
+      "n_pairs": 200,
+      "baseline": {
+        "n": 200,
+        "acc_baseline": 0.88,
+        "acc_weak_protected": 0.965,
+        "cross_influence": -0.08499999999999996,
+        "baseline_tracks_quality": true,
+        "acc_weak_reference": 0.915,
+        "cross_influence_reference": -0.03500000000000003,
+        "acc_strong_protected": 0.79,
+        "marker_on_strong_effect": -0.08999999999999997
+      },
+      "nulled": {
+        "n": 200,
+        "acc_baseline": 0.905,
+        "acc_weak_protected": 0.915,
+        "cross_influence": -0.010000000000000009,
+        "baseline_tracks_quality": true,
+        "acc_weak_reference": 0.91,
+        "cross_influence_reference": -0.0050000000000000044,
+        "acc_strong_protected": 0.87,
+        "marker_on_strong_effect": -0.03500000000000003
+      }
+    }
+  ]
+}

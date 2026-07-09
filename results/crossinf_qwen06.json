@@ -1,0 +1,1617 @@
+{
+  "model": "Skywork/Skywork-Reward-V2-Qwen3-0.6B",
+  "encoding": "explicit",
+  "seed": 42,
+  "pairing": [
+    {
+      "strong": "german-0582",
+      "weak": "german-0640",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0725",
+      "weak": "german-0443",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0338",
+      "weak": "german-0013",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0256",
+      "weak": "german-0724",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0912",
+      "weak": "german-0558",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0479",
+      "weak": "german-0351",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0461",
+      "weak": "german-0998",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0886",
+      "weak": "german-0701",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0657",
+      "weak": "german-0583",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0084",
+      "weak": "german-0951",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0801",
+      "weak": "german-0535",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0152",
+      "weak": "german-0911",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0530",
+      "weak": "german-0095",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0239",
+      "weak": "german-0522",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0245",
+      "weak": "german-0570",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0007",
+      "weak": "german-0563",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0897",
+      "weak": "german-0706",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0039",
+      "weak": "german-0143",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0735",
+      "weak": "german-0812",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0003",
+      "weak": "german-0004",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0250",
+      "weak": "german-0858",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0276",
+      "weak": "german-0647",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0207",
+      "weak": "german-0931",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0988",
+      "weak": "german-0359",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0377",
+      "weak": "german-0826",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0352",
+      "weak": "german-0355",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0744",
+      "weak": "german-0736",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0427",
+      "weak": "german-0652",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0672",
+      "weak": "german-0645",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0051",
+      "weak": "german-0927",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0591",
+      "weak": "german-0771",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0447",
+      "weak": "german-0240",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0553",
+      "weak": "german-0727",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0493",
+      "weak": "german-0335",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0909",
+      "weak": "german-0595",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0135",
+      "weak": "german-0381",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0246",
+      "weak": "german-0349",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0942",
+      "weak": "german-0471",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0798",
+      "weak": "german-0331",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0518",
+      "weak": "german-0333",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0836",
+      "weak": "german-0068",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0022",
+      "weak": "german-0357",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0896",
+      "weak": "german-0172",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0367",
+      "weak": "german-0751",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0769",
+      "weak": "german-0131",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0141",
+      "weak": "german-0757",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0482",
+      "weak": "german-0302",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0187",
+      "weak": "german-0775",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0523",
+      "weak": "german-0174",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0841",
+      "weak": "german-0236",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0824",
+      "weak": "german-0170",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0584",
+      "weak": "german-0759",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0586",
+      "weak": "german-0190",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0684",
+      "weak": "german-0063",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0549",
+      "weak": "german-0827",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0243",
+      "weak": "german-0540",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0749",
+      "weak": "german-0917",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0312",
+      "weak": "german-0230",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0944",
+      "weak": "german-0542",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0033",
+      "weak": "german-0180",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0428",
+      "weak": "german-0416",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0136",
+      "weak": "german-0634",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0021",
+      "weak": "german-0074",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0655",
+      "weak": "german-0118",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0452",
+      "weak": "german-0607",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0810",
+      "weak": "german-0155",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0426",
+      "weak": "german-0707",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0387",
+      "weak": "german-0569",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0852",
+      "weak": "german-0887",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0014",
+      "weak": "german-0001",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0281",
+      "weak": "german-0405",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0099",
+      "weak": "german-0414",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0705",
+      "weak": "german-0585",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0817",
+      "weak": "german-0747",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0717",
+      "weak": "german-0885",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0218",
+      "weak": "german-0972",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0017",
+      "weak": "german-0958",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0093",
+      "weak": "german-0129",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0284",
+      "weak": "german-0842",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0055",
+      "weak": "german-0472",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0533",
+      "weak": "german-0054",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0114",
+      "weak": "german-0561",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0839",
+      "weak": "german-0766",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0662",
+      "weak": "german-0721",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0486",
+      "weak": "german-0633",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0964",
+      "weak": "german-0835",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0723",
+      "weak": "german-0790",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0606",
+      "weak": "german-0521",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0176",
+      "weak": "german-0846",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0697",
+      "weak": "german-0700",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0506",
+      "weak": "german-0203",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0369",
+      "weak": "german-0642",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0156",
+      "weak": "german-0914",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0045",
+      "weak": "german-0116",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0434",
+      "weak": "german-0295",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0830",
+      "weak": "german-0278",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0903",
+      "weak": "german-0505",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0581",
+      "weak": "german-0194",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0590",
+      "weak": "german-0720",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0767",
+      "weak": "german-0653",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0682",
+      "weak": "german-0966",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0085",
+      "weak": "german-0124",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0123",
+      "weak": "german-0953",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0103",
+      "weak": "german-0900",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0371",
+      "weak": "german-0470",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0130",
+      "weak": "german-0622",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0052",
+      "weak": "german-0398",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0262",
+      "weak": "german-0076",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0502",
+      "weak": "german-0589",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0742",
+      "weak": "german-0656",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0208",
+      "weak": "german-0555",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0266",
+      "weak": "german-0268",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0468",
+      "weak": "german-0983",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0272",
+      "weak": "german-0597",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0078",
+      "weak": "german-0191",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0023",
+      "weak": "german-0029",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0679",
+      "weak": "german-0378",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0815",
+      "weak": "german-0059",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0264",
+      "weak": "german-0474",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0774",
+      "weak": "german-0840",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0200",
+      "weak": "german-0935",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0450",
+      "weak": "german-0850",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0908",
+      "weak": "german-0651",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0550",
+      "weak": "german-0175",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0501",
+      "weak": "german-0864",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0286",
+      "weak": "german-0763",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0423",
+      "weak": "german-0226",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0075",
+      "weak": "german-0531",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0795",
+      "weak": "german-0504",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0993",
+      "weak": "german-0980",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0422",
+      "weak": "german-0614",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0441",
+      "weak": "german-0548",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0290",
+      "weak": "german-0273",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0330",
+      "weak": "german-0918",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0525",
+      "weak": "german-0044",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0962",
+      "weak": "german-0594",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0433",
+      "weak": "german-0127",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0142",
+      "weak": "german-0500",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0354",
+      "weak": "german-0010",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0401",
+      "weak": "german-0289",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0222",
+      "weak": "german-0814",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0083",
+      "weak": "german-0834",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0292",
+      "weak": "german-0925",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0350",
+      "weak": "german-0602",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0481",
+      "weak": "german-0831",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0982",
+      "weak": "german-0105",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0407",
+      "weak": "german-0265",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0792",
+      "weak": "german-0495",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0799",
+      "weak": "german-0783",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0032",
+      "weak": "german-0780",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0623",
+      "weak": "german-0919",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0764",
+      "weak": "german-0849",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0733",
+      "weak": "german-0184",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0551",
+      "weak": "german-0789",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0057",
+      "weak": "german-0936",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0703",
+      "weak": "german-0301",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0299",
+      "weak": "german-0188",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0448",
+      "weak": "german-0120",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0366",
+      "weak": "german-0213",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0362",
+      "weak": "german-0949",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0157",
+      "weak": "german-0853",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0417",
+      "weak": "german-0805",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0777",
+      "weak": "german-0429",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0318",
+      "weak": "german-0674",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0604",
+      "weak": "german-0308",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0453",
+      "weak": "german-0507",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0892",
+      "weak": "german-0402",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0498",
+      "weak": "german-0321",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0800",
+      "weak": "german-0496",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0193",
+      "weak": "german-0510",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0263",
+      "weak": "german-0621",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0102",
+      "weak": "german-0337",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0465",
+      "weak": "german-0538",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0393",
+      "weak": "german-0588",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0999",
+      "weak": "german-0952",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0363",
+      "weak": "german-0862",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0670",
+      "weak": "german-0374",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0259",
+      "weak": "german-0199",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0526",
+      "weak": "german-0274",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0855",
+      "weak": "german-0092",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0874",
+      "weak": "german-0011",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0440",
+      "weak": "german-0978",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0397",
+      "weak": "german-0861",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0494",
+      "weak": "german-0611",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0904",
+      "weak": "german-0578",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0808",
+      "weak": "german-0444",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0567",
+      "weak": "german-0598",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0615",
+      "weak": "german-0755",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0565",
+      "weak": "german-0648",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0168",
+      "weak": "german-0457",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0699",
+      "weak": "german-0375",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0967",
+      "weak": "german-0618",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0564",
+      "weak": "german-0884",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0719",
+      "weak": "german-0878",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0305",
+      "weak": "german-0186",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0969",
+      "weak": "german-0485",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0326",
+      "weak": "german-0009",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0683",
+      "weak": "german-0517",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0342",
+      "weak": "german-0252",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0147",
+      "weak": "german-0979",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0658",
+      "weak": "german-0545",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0636",
+      "weak": "german-0739",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0238",
+      "weak": "german-0320",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0260",
+      "weak": "german-0237",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0702",
+      "weak": "german-0668",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0255",
+      "weak": "german-0332",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0940",
+      "weak": "german-0195",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0905",
+      "weak": "german-0899",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0529",
+      "weak": "german-0182",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0509",
+      "weak": "german-0981",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0975",
+      "weak": "german-0963",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0868",
+      "weak": "german-0018",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0403",
+      "weak": "german-0315",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0816",
+      "weak": "german-0353",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0483",
+      "weak": "german-0593",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0691",
+      "weak": "german-0556",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0205",
+      "weak": "german-0528",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0665",
+      "weak": "german-0435",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0740",
+      "weak": "german-0915",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0695",
+      "weak": "german-0754",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0215",
+      "weak": "german-0424",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0415",
+      "weak": "german-0257",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0746",
+      "weak": "german-0089",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0277",
+      "weak": "german-0828",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0392",
+      "weak": "german-0228",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0117",
+      "weak": "german-0728",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0572",
+      "weak": "german-0304",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0210",
+      "weak": "german-0242",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0681",
+      "weak": "german-0543",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0016",
+      "weak": "german-0948",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0883",
+      "weak": "german-0711",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0206",
+      "weak": "german-0819",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0060",
+      "weak": "german-0439",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0794",
+      "weak": "german-0449",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0689",
+      "weak": "german-0649",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0544",
+      "weak": "german-0503",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0628",
+      "weak": "german-0788",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0785",
+      "weak": "german-0677",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0185",
+      "weak": "german-0557",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0294",
+      "weak": "german-0249",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0671",
+      "weak": "german-0580",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0346",
+      "weak": "german-0491",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0171",
+      "weak": "german-0624",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0224",
+      "weak": "german-0181",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0989",
+      "weak": "german-0938",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0576",
+      "weak": "german-0169",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0271",
+      "weak": "german-0610",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0025",
+      "weak": "german-0431",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0303",
+      "weak": "german-0714",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0660",
+      "weak": "german-0761",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0608",
+      "weak": "german-0566",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0541",
+      "weak": "german-0334",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0690",
+      "weak": "german-0822",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0232",
+      "weak": "german-0409",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0960",
+      "weak": "german-0113",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0778",
+      "weak": "german-0832",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0153",
+      "weak": "german-0722",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0791",
+      "weak": "german-0015",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0248",
+      "weak": "german-0596",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0737",
+      "weak": "german-0973",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0138",
+      "weak": "german-0631",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0150",
+      "weak": "german-0731",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0329",
+      "weak": "german-0601",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0889",
+      "weak": "german-0087",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0269",
+      "weak": "german-0227",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0726",
+      "weak": "german-0552",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0906",
+      "weak": "german-0192",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0183",
+      "weak": "german-0454",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0926",
+      "weak": "german-0166",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0704",
+      "weak": "german-0364",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0421",
+      "weak": "german-0661",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0122",
+      "weak": "german-0639",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0020",
+      "weak": "german-0922",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0288",
+      "weak": "german-0056",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0121",
+      "weak": "german-0197",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0110",
+      "weak": "german-0559",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0620",
+      "weak": "german-0307",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0873",
+      "weak": "german-0946",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0756",
+      "weak": "german-0313",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0687",
+      "weak": "german-0627",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0070",
+      "weak": "german-0475",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0654",
+      "weak": "german-0796",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0750",
+      "weak": "german-0412",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0254",
+      "weak": "german-0212",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0520",
+      "weak": "german-0813",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0258",
+      "weak": "german-0235",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0217",
+      "weak": "german-0446",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0976",
+      "weak": "german-0291",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0793",
+      "weak": "german-0037",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0688",
+      "weak": "german-0368",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0100",
+      "weak": "german-0466",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0413",
+      "weak": "german-0062",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0467",
+      "weak": "german-0080",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0026",
+      "weak": "german-0137",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0386",
+      "weak": "german-0419",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0101",
+      "weak": "german-0603",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0646",
+      "weak": "german-0106",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0876",
+      "weak": "german-0924",
+      "template_id": "credit_v2"
+    },
+    {
+      "strong": "german-0877",
+      "weak": "german-0035",
+      "template_id": "credit_v1"
+    },
+    {
+      "strong": "german-0394",
+      "weak": "german-0809",
+      "template_id": "credit_v2"
+    }
+  ],
+  "results": [
+    {
+      "axis": "sex",
+      "encoding": "explicit",
+      "n_pairs": 300,
+      "baseline": {
+        "n": 300,
+        "acc_baseline": 0.51,
+        "acc_weak_protected": 0.41,
+        "cross_influence": 0.10000000000000003,
+        "baseline_tracks_quality": false,
+        "acc_weak_reference": 0.6466666666666666,
+        "cross_influence_reference": -0.1366666666666666,
+        "acc_strong_protected": 0.5666666666666667,
+        "marker_on_strong_effect": 0.05666666666666664
+      },
+      "nulled": {
+        "n": 300,
+        "acc_baseline": 0.48,
+        "acc_weak_protected": 0.5233333333333333,
+        "cross_influence": -0.043333333333333335,
+        "baseline_tracks_quality": false,
+        "acc_weak_reference": 0.54,
+        "cross_influence_reference": -0.06000000000000005,
+        "acc_strong_protected": 0.43333333333333335,
+        "marker_on_strong_effect": -0.046666666666666634
+      }
+    },
+    {
+      "axis": "age",
+      "encoding": "explicit",
+      "n_pairs": 300,
+      "baseline": {
+        "n": 300,
+        "acc_baseline": 0.51,
+        "acc_weak_protected": 0.7866666666666666,
+        "cross_influence": -0.2766666666666666,
+        "baseline_tracks_quality": false,
+        "acc_weak_reference": 0.6466666666666666,
+        "cross_influence_reference": -0.1366666666666666,
+        "acc_strong_protected": 0.2,
+        "marker_on_strong_effect": -0.31
+      },
+      "nulled": {
+        "n": 300,
+        "acc_baseline": 0.48,
+        "acc_weak_protected": 0.5933333333333334,
+        "cross_influence": -0.1133333333333334,
+        "baseline_tracks_quality": false,
+        "acc_weak_reference": 0.6066666666666667,
+        "cross_influence_reference": -0.1266666666666667,
+        "acc_strong_protected": 0.35,
+        "marker_on_strong_effect": -0.13
+      }
+    },
+    {
+      "axis": "family_status",
+      "encoding": "explicit",
+      "n_pairs": 300,
+      "baseline": {
+        "n": 300,
+        "acc_baseline": 0.51,
+        "acc_weak_protected": 0.2,
+        "cross_influence": 0.31,
+        "baseline_tracks_quality": false,
+        "acc_weak_reference": 0.59,
+        "cross_influence_reference": -0.07999999999999996,
+        "acc_strong_protected": 0.7833333333333333,
+        "marker_on_strong_effect": 0.2733333333333333
+      },
+      "nulled": {
+        "n": 300,
+        "acc_baseline": 0.47,
+        "acc_weak_protected": 0.2833333333333333,
+        "cross_influence": 0.18666666666666665,
+        "baseline_tracks_quality": false,
+        "acc_weak_reference": 0.28,
+        "cross_influence_reference": 0.18999999999999995,
+        "acc_strong_protected": 0.6666666666666666,
+        "marker_on_strong_effect": 0.19666666666666666
+      }
+    },
+    {
+      "axis": "intersection",
+      "encoding": "explicit",
+      "n_pairs": 300,
+      "baseline": {
+        "n": 300,
+        "acc_baseline": 0.51,
+        "acc_weak_protected": 0.27666666666666667,
+        "cross_influence": 0.23333333333333334,
+        "baseline_tracks_quality": false,
+        "acc_weak_reference": 0.71,
+        "cross_influence_reference": -0.19999999999999996,
+        "acc_strong_protected": 0.6633333333333333,
+        "marker_on_strong_effect": 0.15333333333333332
+      },
+      "nulled": {
+        "n": 300,
+        "acc_baseline": 0.47,
+        "acc_weak_protected": 0.35333333333333333,
+        "cross_influence": 0.11666666666666664,
+        "baseline_tracks_quality": false,
+        "acc_weak_reference": 0.36,
+        "cross_influence_reference": 0.10999999999999999,
+        "acc_strong_protected": 0.5633333333333334,
+        "marker_on_strong_effect": 0.09333333333333338
+      }
+    }
+  ]
+}

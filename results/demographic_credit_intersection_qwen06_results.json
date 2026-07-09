@@ -1,0 +1,60 @@
+{
+  "config": {
+    "name": "demographic_credit_intersection_qwen06",
+    "bias_type": "demographic",
+    "model_path": "Skywork/Skywork-Reward-V2-Qwen3-0.6B",
+    "trust_remote_code": true,
+    "dataset_source": "data/demographic/credit/pairs.jsonl",
+    "dataset_class": "",
+    "probe_size": 300,
+    "max_test_examples": 200,
+    "split_seed": 42,
+    "null_alpha": 1.0,
+    "batch_size": 8,
+    "max_length": 2048,
+    "device": "auto",
+    "mlx_quant": null,
+    "raw_data_dir": "artifacts/raw_data",
+    "artifacts_dir": "artifacts",
+    "plots_dir": "plots",
+    "save_probe": true,
+    "extra": {
+      "axis": "intersection",
+      "encoding": "explicit"
+    }
+  },
+  "baseline": {
+    "n_examples": 200,
+    "mean_gap": 0.7459884941577911,
+    "abs_mean_gap": 0.7459884941577911,
+    "pref_a_rate": 1.0,
+    "auto_influence": 1.0,
+    "label_a": "intersectional",
+    "label_b": "reference"
+  },
+  "nulled": {
+    "n_examples": 200,
+    "mean_gap": -0.0008247137069702148,
+    "abs_mean_gap": 0.06206402778625488,
+    "pref_a_rate": 0.5,
+    "auto_influence": 0.0,
+    "label_a": "intersectional",
+    "label_b": "reference"
+  },
+  "probe_metadata": {
+    "n_positive": 300,
+    "n_negative": 300,
+    "hidden_dim": 1024,
+    "positive_mean_norm": 130.5996551513672,
+    "negative_mean_norm": 130.74977111816406,
+    "probe_raw_norm": 3.1026461124420166,
+    "positive_proj_mean": -4.7718377113342285,
+    "positive_proj_std": 1.8466097116470337,
+    "negative_proj_mean": -7.874483108520508,
+    "negative_proj_std": 1.570469617843628,
+    "separation": 3.1026453971862793,
+    "probe_accuracy": 0.8166666666666667
+  },
+  "n_probe_examples": 300,
+  "n_eval_examples": 200
+}

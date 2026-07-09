@@ -1,0 +1,61 @@
+{
+  "config": {
+    "name": "demographic_edu_grade_level_qwen06",
+    "bias_type": "demographic",
+    "model_path": "Skywork/Skywork-Reward-V2-Qwen3-0.6B",
+    "trust_remote_code": true,
+    "dataset_source": "data/demographic/education/asap/pairs.jsonl",
+    "dataset_class": "",
+    "probe_size": 300,
+    "max_test_examples": 200,
+    "split_seed": 42,
+    "null_alpha": 1.0,
+    "batch_size": 8,
+    "max_length": 2048,
+    "device": "auto",
+    "mlx_quant": null,
+    "raw_data_dir": "artifacts/raw_data",
+    "artifacts_dir": "artifacts",
+    "plots_dir": "plots",
+    "save_probe": false,
+    "extra": {
+      "domain": "education",
+      "axis": "grade_level",
+      "encoding": "proxy"
+    }
+  },
+  "baseline": {
+    "n_examples": 200,
+    "mean_gap": -0.42017439484596253,
+    "abs_mean_gap": 0.4232191002368927,
+    "pref_a_rate": 0.02,
+    "auto_influence": 0.96,
+    "label_a": "young",
+    "label_b": "older"
+  },
+  "nulled": {
+    "n_examples": 200,
+    "mean_gap": -0.0075241029262542725,
+    "abs_mean_gap": 0.09875327467918396,
+    "pref_a_rate": 0.455,
+    "auto_influence": 0.08999999999999997,
+    "label_a": "young",
+    "label_b": "older"
+  },
+  "probe_metadata": {
+    "n_positive": 300,
+    "n_negative": 300,
+    "hidden_dim": 1024,
+    "positive_mean_norm": 130.7233428955078,
+    "negative_mean_norm": 130.5023956298828,
+    "probe_raw_norm": 3.02474045753479,
+    "positive_proj_mean": 11.053013801574707,
+    "positive_proj_std": 2.552598476409912,
+    "negative_proj_mean": 8.028273582458496,
+    "negative_proj_std": 2.7700653076171875,
+    "separation": 3.024740219116211,
+    "probe_accuracy": 0.69
+  },
+  "n_probe_examples": 300,
+  "n_eval_examples": 200
+}

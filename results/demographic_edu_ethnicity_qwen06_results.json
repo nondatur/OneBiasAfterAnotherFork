@@ -1,0 +1,61 @@
+{
+  "config": {
+    "name": "demographic_edu_ethnicity_qwen06",
+    "bias_type": "demographic",
+    "model_path": "Skywork/Skywork-Reward-V2-Qwen3-0.6B",
+    "trust_remote_code": true,
+    "dataset_source": "data/demographic/education/asap/pairs.jsonl",
+    "dataset_class": "",
+    "probe_size": 300,
+    "max_test_examples": 200,
+    "split_seed": 42,
+    "null_alpha": 1.0,
+    "batch_size": 8,
+    "max_length": 2048,
+    "device": "auto",
+    "mlx_quant": null,
+    "raw_data_dir": "artifacts/raw_data",
+    "artifacts_dir": "artifacts",
+    "plots_dir": "plots",
+    "save_probe": false,
+    "extra": {
+      "domain": "education",
+      "axis": "ethnicity",
+      "encoding": "proxy"
+    }
+  },
+  "baseline": {
+    "n_examples": 200,
+    "mean_gap": 0.03330858826637268,
+    "abs_mean_gap": 0.10243316292762757,
+    "pref_a_rate": 0.6,
+    "auto_influence": 0.19999999999999996,
+    "label_a": "white",
+    "label_b": "black"
+  },
+  "nulled": {
+    "n_examples": 200,
+    "mean_gap": -0.002927502393722534,
+    "abs_mean_gap": 0.09194185376167298,
+    "pref_a_rate": 0.465,
+    "auto_influence": 0.06999999999999995,
+    "label_a": "white",
+    "label_b": "black"
+  },
+  "probe_metadata": {
+    "n_positive": 300,
+    "n_negative": 300,
+    "hidden_dim": 1024,
+    "positive_mean_norm": 130.4646453857422,
+    "negative_mean_norm": 130.4844207763672,
+    "probe_raw_norm": 0.5788956880569458,
+    "positive_proj_mean": -4.1659650802612305,
+    "positive_proj_std": 1.4311603307724,
+    "negative_proj_mean": -4.7448601722717285,
+    "negative_proj_std": 1.4246671199798584,
+    "separation": 0.578895092010498,
+    "probe_accuracy": 0.57
+  },
+  "n_probe_examples": 300,
+  "n_eval_examples": 200
+}

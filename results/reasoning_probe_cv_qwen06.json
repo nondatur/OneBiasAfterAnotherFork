@@ -1,0 +1,79 @@
+{
+  "model": "Skywork/Skywork-Reward-V2-Qwen3-0.6B",
+  "domain": "cv",
+  "seed": 42,
+  "probe_items": 200,
+  "eval_items": 200,
+  "transfer": {
+    "commute_dir__on__parental_leave_eval": {
+      "correctness_effect_base": 1.4466915071010589,
+      "correctness_effect_null": 0.1668902254104614
+    },
+    "parental_leave_dir__on__commute_eval": {
+      "correctness_effect_base": 1.438668881058693,
+      "correctness_effect_null": -0.004246828556060844
+    },
+    "cos_correctness_parental_vs_commute": 0.9375606775283813,
+    "cos_conclusion_parental_vs_commute": 0.9046906232833862
+  },
+  "results": [
+    {
+      "premise": "parental_leave",
+      "demographic": true,
+      "n_probe": 200,
+      "n_eval": 200,
+      "correctness_probe": {
+        "acc_insample": 0.96125,
+        "acc_heldout": 1.0,
+        "separation": 6.129477500915527
+      },
+      "conclusion_probe": {
+        "acc_insample": 1.0,
+        "acc_heldout": 1.0,
+        "separation": 6.543372631072998
+      },
+      "cos_correctness_conclusion": 0.3145115375518799,
+      "heldout_baseline": {
+        "correctness_effect": 1.4466915071010589,
+        "conclusion_effect": 0.6757000386714935
+      },
+      "heldout_null_correctness_dir": {
+        "correctness_effect": -0.0019374936819076538,
+        "conclusion_effect": 0.1771612495183943
+      },
+      "heldout_null_conclusion_dir": {
+        "correctness_effect": 1.251216329932213,
+        "conclusion_effect": 0.007097622752189725
+      }
+    },
+    {
+      "premise": "commute",
+      "demographic": false,
+      "n_probe": 200,
+      "n_eval": 200,
+      "correctness_probe": {
+        "acc_insample": 0.935,
+        "acc_heldout": 1.0,
+        "separation": 6.545009136199951
+      },
+      "conclusion_probe": {
+        "acc_insample": 1.0,
+        "acc_heldout": 1.0,
+        "separation": 8.903142929077148
+      },
+      "cos_correctness_conclusion": 0.42903846502304077,
+      "heldout_baseline": {
+        "correctness_effect": 1.438668881058693,
+        "conclusion_effect": 1.4803920954465866
+      },
+      "heldout_null_correctness_dir": {
+        "correctness_effect": -0.012711215615272664,
+        "conclusion_effect": 0.6215468662977219
+      },
+      "heldout_null_conclusion_dir": {
+        "correctness_effect": 0.9829137325286865,
+        "conclusion_effect": 0.015997704267501828
+      }
+    }
+  ]
+}

@@ -1,0 +1,1091 @@
+{
+  "model": "Skywork/Skywork-Reward-V2-Qwen3-0.6B",
+  "domain": "education",
+  "encoding": "explicit",
+  "seed": 42,
+  "pairing": [
+    {
+      "strong": "asap-4-9116",
+      "weak": "asap-5-12588",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-2-4241",
+      "weak": "asap-5-12998",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-1-1097",
+      "weak": "asap-4-9712",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-8-21159",
+      "weak": "asap-1-823",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-6-16393",
+      "weak": "asap-8-21501",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-5-13528",
+      "weak": "asap-4-8943",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-4-10491",
+      "weak": "asap-5-12473",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-2-3235",
+      "weak": "asap-1-756",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-8-21094",
+      "weak": "asap-5-13393",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-8-21421",
+      "weak": "asap-3-6947",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-2-3707",
+      "weak": "asap-5-13554",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-2-4003",
+      "weak": "asap-3-6769",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-1-127",
+      "weak": "asap-7-18011",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-1-274",
+      "weak": "asap-7-18267",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-3-6599",
+      "weak": "asap-2-3267",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-3-6149",
+      "weak": "asap-5-12484",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-1-68",
+      "weak": "asap-5-12123",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-4-8922",
+      "weak": "asap-5-13105",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-3-7575",
+      "weak": "asap-8-21517",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-3-5982",
+      "weak": "asap-1-609",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-3-7490",
+      "weak": "asap-1-1377",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-5-12368",
+      "weak": "asap-2-4386",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-6-15928",
+      "weak": "asap-5-11944",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-6-16420",
+      "weak": "asap-7-19280",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-6-16081",
+      "weak": "asap-6-14878",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-6-15682",
+      "weak": "asap-7-18343",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-6-14861",
+      "weak": "asap-2-4638",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-1-1336",
+      "weak": "asap-7-18169",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-3-6686",
+      "weak": "asap-5-12946",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-3-6936",
+      "weak": "asap-2-3672",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-3-6398",
+      "weak": "asap-1-434",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-8-21118",
+      "weak": "asap-2-3967",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-6-15611",
+      "weak": "asap-6-16216",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-7-18559",
+      "weak": "asap-3-6046",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-3-7043",
+      "weak": "asap-6-14893",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-3-7271",
+      "weak": "asap-5-12173",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-2-3242",
+      "weak": "asap-5-13273",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-6-16366",
+      "weak": "asap-6-15293",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-2-3873",
+      "weak": "asap-2-4098",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-7-17923",
+      "weak": "asap-4-8928",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-1-726",
+      "weak": "asap-8-21148",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-2-3034",
+      "weak": "asap-7-18916",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-2-4694",
+      "weak": "asap-6-14997",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-4-10072",
+      "weak": "asap-5-12896",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-6-15190",
+      "weak": "asap-1-1421",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-2-3406",
+      "weak": "asap-1-702",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-1-54",
+      "weak": "asap-6-16316",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-2-4084",
+      "weak": "asap-7-17914",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-3-6586",
+      "weak": "asap-5-12006",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-8-21348",
+      "weak": "asap-5-12630",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-4-8954",
+      "weak": "asap-8-21244",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-2-4743",
+      "weak": "asap-1-579",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-7-18636",
+      "weak": "asap-2-3120",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-4-10063",
+      "weak": "asap-6-15171",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-5-13292",
+      "weak": "asap-7-19456",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-2-4406",
+      "weak": "asap-4-10007",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-3-6498",
+      "weak": "asap-2-3316",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-2-4332",
+      "weak": "asap-1-1058",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-6-16415",
+      "weak": "asap-1-1039",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-3-6102",
+      "weak": "asap-3-6430",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-6-15436",
+      "weak": "asap-5-12094",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-6-15030",
+      "weak": "asap-6-15162",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-4-8977",
+      "weak": "asap-5-12135",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-1-499",
+      "weak": "asap-3-6342",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-2-4373",
+      "weak": "asap-2-3245",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-4-9938",
+      "weak": "asap-2-3148",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-5-13471",
+      "weak": "asap-2-4682",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-2-3277",
+      "weak": "asap-4-10292",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-2-3124",
+      "weak": "asap-4-10562",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-4-10497",
+      "weak": "asap-2-3880",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-6-16490",
+      "weak": "asap-5-12751",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-8-21397",
+      "weak": "asap-7-18247",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-6-15999",
+      "weak": "asap-3-7618",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-3-7085",
+      "weak": "asap-1-788",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-7-19195",
+      "weak": "asap-6-16310",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-7-19113",
+      "weak": "asap-3-6587",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-5-12793",
+      "weak": "asap-8-21548",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-5-12841",
+      "weak": "asap-4-9410",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-6-15295",
+      "weak": "asap-6-16099",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-6-15565",
+      "weak": "asap-5-11922",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-3-7124",
+      "weak": "asap-5-12452",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-4-8906",
+      "weak": "asap-4-10315",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-4-10004",
+      "weak": "asap-5-12262",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-4-10047",
+      "weak": "asap-5-12419",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-2-4392",
+      "weak": "asap-4-9030",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-4-8905",
+      "weak": "asap-2-3915",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-7-19145",
+      "weak": "asap-2-3064",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-3-7103",
+      "weak": "asap-7-18626",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-3-6871",
+      "weak": "asap-1-1014",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-2-4436",
+      "weak": "asap-1-843",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-5-12589",
+      "weak": "asap-2-4713",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-3-6194",
+      "weak": "asap-5-12104",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-3-6325",
+      "weak": "asap-2-4159",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-8-20758",
+      "weak": "asap-5-12061",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-1-1216",
+      "weak": "asap-5-13499",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-1-1364",
+      "weak": "asap-5-12314",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-7-19146",
+      "weak": "asap-1-1034",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-5-12072",
+      "weak": "asap-2-4593",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-4-10461",
+      "weak": "asap-2-4424",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-4-9832",
+      "weak": "asap-5-12634",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-6-15722",
+      "weak": "asap-5-12858",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-8-21438",
+      "weak": "asap-7-18539",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-1-1068",
+      "weak": "asap-3-6973",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-2-3144",
+      "weak": "asap-2-3413",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-6-16568",
+      "weak": "asap-1-727",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-8-20829",
+      "weak": "asap-2-3583",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-3-6027",
+      "weak": "asap-7-18712",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-5-12910",
+      "weak": "asap-3-6556",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-6-15427",
+      "weak": "asap-4-9755",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-2-4290",
+      "weak": "asap-4-9293",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-2-3651",
+      "weak": "asap-4-10125",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-6-16253",
+      "weak": "asap-2-4774",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-1-304",
+      "weak": "asap-6-14919",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-3-6862",
+      "weak": "asap-6-15440",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-3-6340",
+      "weak": "asap-2-4322",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-5-12020",
+      "weak": "asap-5-12948",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-7-19123",
+      "weak": "asap-1-1271",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-2-3231",
+      "weak": "asap-2-3561",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-7-19096",
+      "weak": "asap-6-15962",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-6-15287",
+      "weak": "asap-7-18018",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-2-3888",
+      "weak": "asap-3-7306",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-1-1214",
+      "weak": "asap-4-10506",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-6-15323",
+      "weak": "asap-1-960",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-8-21540",
+      "weak": "asap-7-19310",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-4-9402",
+      "weak": "asap-1-1678",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-3-6185",
+      "weak": "asap-4-10584",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-6-15388",
+      "weak": "asap-8-20754",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-4-9584",
+      "weak": "asap-3-5985",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-5-12805",
+      "weak": "asap-1-1463",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-2-3545",
+      "weak": "asap-6-15317",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-8-21505",
+      "weak": "asap-8-21393",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-1-1551",
+      "weak": "asap-1-1333",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-4-9830",
+      "weak": "asap-7-18717",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-2-4589",
+      "weak": "asap-5-12994",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-5-13598",
+      "weak": "asap-1-175",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-6-16249",
+      "weak": "asap-3-6066",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-6-15329",
+      "weak": "asap-4-9632",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-4-10417",
+      "weak": "asap-2-4135",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-3-7409",
+      "weak": "asap-1-1323",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-6-15518",
+      "weak": "asap-3-7083",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-1-1658",
+      "weak": "asap-3-6813",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-5-12987",
+      "weak": "asap-2-3053",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-2-3788",
+      "weak": "asap-8-20776",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-5-11986",
+      "weak": "asap-4-10059",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-2-3697",
+      "weak": "asap-1-1533",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-4-9968",
+      "weak": "asap-4-10398",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-8-21147",
+      "weak": "asap-2-3667",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-6-15230",
+      "weak": "asap-5-12600",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-1-361",
+      "weak": "asap-5-12979",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-3-6699",
+      "weak": "asap-5-12655",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-5-13578",
+      "weak": "asap-3-7230",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-3-6355",
+      "weak": "asap-6-16401",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-1-439",
+      "weak": "asap-7-19089",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-1-1076",
+      "weak": "asap-8-21546",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-3-6399",
+      "weak": "asap-5-13305",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-1-1193",
+      "weak": "asap-2-4591",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-5-12867",
+      "weak": "asap-3-7368",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-1-386",
+      "weak": "asap-1-1309",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-4-10037",
+      "weak": "asap-2-4676",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-5-12403",
+      "weak": "asap-4-9797",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-6-15606",
+      "weak": "asap-5-12389",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-6-16417",
+      "weak": "asap-6-16270",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-5-12133",
+      "weak": "asap-8-21177",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-8-21070",
+      "weak": "asap-1-1433",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-1-957",
+      "weak": "asap-1-1179",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-5-12033",
+      "weak": "asap-5-13068",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-6-15686",
+      "weak": "asap-5-11959",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-5-12848",
+      "weak": "asap-5-13244",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-2-4620",
+      "weak": "asap-1-634",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-1-145",
+      "weak": "asap-4-10274",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-6-16419",
+      "weak": "asap-1-765",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-2-3362",
+      "weak": "asap-6-15872",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-5-12244",
+      "weak": "asap-1-357",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-6-15332",
+      "weak": "asap-2-4274",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-4-10065",
+      "weak": "asap-4-9973",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-7-18237",
+      "weak": "asap-1-728",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-3-7623",
+      "weak": "asap-8-21000",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-7-18983",
+      "weak": "asap-1-428",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-5-12395",
+      "weak": "asap-2-3563",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-3-6171",
+      "weak": "asap-4-9273",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-1-539",
+      "weak": "asap-6-15280",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-5-13402",
+      "weak": "asap-7-18037",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-5-12755",
+      "weak": "asap-5-12541",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-5-13518",
+      "weak": "asap-1-1569",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-3-6177",
+      "weak": "asap-6-16600",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-1-1167",
+      "weak": "asap-5-13289",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-2-4218",
+      "weak": "asap-5-13311",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-8-21432",
+      "weak": "asap-1-216",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-2-4559",
+      "weak": "asap-2-3690",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-6-16083",
+      "weak": "asap-7-19155",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-5-12408",
+      "weak": "asap-2-4237",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-3-6645",
+      "weak": "asap-6-16135",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-3-7444",
+      "weak": "asap-2-3759",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-5-13243",
+      "weak": "asap-2-3305",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-4-10187",
+      "weak": "asap-5-13125",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-2-3411",
+      "weak": "asap-1-1672",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-5-12252",
+      "weak": "asap-8-21615",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-3-7381",
+      "weak": "asap-8-21291",
+      "template_id": "edu_v2"
+    },
+    {
+      "strong": "asap-3-7015",
+      "weak": "asap-3-6380",
+      "template_id": "edu_v1"
+    },
+    {
+      "strong": "asap-4-9798",
+      "weak": "asap-6-16374",
+      "template_id": "edu_v2"
+    }
+  ],
+  "results": [
+    {
+      "axis": "sex",
+      "encoding": "explicit",
+      "n_pairs": 200,
+      "baseline": {
+        "n": 200,
+        "acc_baseline": 0.72,
+        "acc_weak_protected": 0.84,
+        "cross_influence": -0.12,
+        "baseline_tracks_quality": true,
+        "acc_weak_reference": 0.875,
+        "cross_influence_reference": -0.15500000000000003,
+        "acc_strong_protected": 0.59,
+        "marker_on_strong_effect": -0.13
+      },
+      "nulled": {
+        "n": 200,
+        "acc_baseline": 0.73,
+        "acc_weak_protected": 0.845,
+        "cross_influence": -0.11499999999999999,
+        "baseline_tracks_quality": true,
+        "acc_weak_reference": 0.845,
+        "cross_influence_reference": -0.11499999999999999,
+        "acc_strong_protected": 0.6,
+        "marker_on_strong_effect": -0.13
+      }
+    },
+    {
+      "axis": "ethnicity",
+      "encoding": "explicit",
+      "n_pairs": 200,
+      "baseline": {
+        "n": 200,
+        "acc_baseline": 0.72,
+        "acc_weak_protected": 0.89,
+        "cross_influence": -0.17000000000000004,
+        "baseline_tracks_quality": true,
+        "acc_weak_reference": 0.9,
+        "cross_influence_reference": -0.18000000000000005,
+        "acc_strong_protected": 0.485,
+        "marker_on_strong_effect": -0.235
+      },
+      "nulled": {
+        "n": 200,
+        "acc_baseline": 0.72,
+        "acc_weak_protected": 0.89,
+        "cross_influence": -0.17000000000000004,
+        "baseline_tracks_quality": true,
+        "acc_weak_reference": 0.9,
+        "cross_influence_reference": -0.18000000000000005,
+        "acc_strong_protected": 0.485,
+        "marker_on_strong_effect": -0.235
+      }
+    },
+    {
+      "axis": "grade_level",
+      "encoding": "explicit",
+      "n_pairs": 200,
+      "baseline": {
+        "n": 200,
+        "acc_baseline": 0.72,
+        "acc_weak_protected": 0.805,
+        "cross_influence": -0.08500000000000008,
+        "baseline_tracks_quality": true,
+        "acc_weak_reference": 0.835,
+        "cross_influence_reference": -0.11499999999999999,
+        "acc_strong_protected": 0.605,
+        "marker_on_strong_effect": -0.11499999999999999
+      },
+      "nulled": {
+        "n": 200,
+        "acc_baseline": 0.715,
+        "acc_weak_protected": 0.815,
+        "cross_influence": -0.09999999999999998,
+        "baseline_tracks_quality": true,
+        "acc_weak_reference": 0.84,
+        "cross_influence_reference": -0.125,
+        "acc_strong_protected": 0.57,
+        "marker_on_strong_effect": -0.14500000000000002
+      }
+    }
+  ]
+}

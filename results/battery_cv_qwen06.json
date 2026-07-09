@@ -1,0 +1,234 @@
+{
+  "model": "Skywork/Skywork-Reward-V2-Qwen3-0.6B",
+  "domain": "cv",
+  "cells": [
+    {
+      "axis": "sex",
+      "encoding": "explicit",
+      "n_eval": 200,
+      "probe_accuracy": 0.9966666666666667,
+      "probe_separation": 3.941204786300659,
+      "baseline": {
+        "n_examples": 200,
+        "mean_gap": 0.5882966136932373,
+        "abs_mean_gap": 0.5882966136932373,
+        "pref_a_rate": 1.0,
+        "auto_influence": 1.0
+      },
+      "nulled": {
+        "n_examples": 200,
+        "mean_gap": 0.0036384737491607665,
+        "abs_mean_gap": 0.046350704431533815,
+        "pref_a_rate": 0.555,
+        "auto_influence": 0.1100000000000001
+      },
+      "baseline_by_template": {
+        "cv_v1": 1.0,
+        "cv_v2": 1.0
+      },
+      "alpha_sweep": {
+        "0.0": 1.0,
+        "0.25": 1.0,
+        "0.5": 1.0,
+        "0.75": 0.9299999999999999,
+        "1.0": 0.1100000000000001
+      }
+    },
+    {
+      "axis": "sex",
+      "encoding": "proxy",
+      "n_eval": 200,
+      "probe_accuracy": 0.735,
+      "probe_separation": 1.2623207569122314,
+      "baseline": {
+        "n_examples": 200,
+        "mean_gap": 0.1176698899269104,
+        "abs_mean_gap": 0.14968498229980468,
+        "pref_a_rate": 0.815,
+        "auto_influence": 0.6299999999999999
+      },
+      "nulled": {
+        "n_examples": 200,
+        "mean_gap": -0.0026294982433319094,
+        "abs_mean_gap": 0.09094216465950013,
+        "pref_a_rate": 0.545,
+        "auto_influence": 0.09000000000000008
+      },
+      "baseline_by_template": {
+        "cv_v1": 0.7078651685393258,
+        "cv_v2": 0.5675675675675675
+      },
+      "alpha_sweep": {
+        "0.0": 0.6299999999999999,
+        "0.25": 0.48,
+        "0.5": 0.3700000000000001,
+        "0.75": 0.19999999999999996,
+        "1.0": 0.09000000000000008
+      }
+    },
+    {
+      "axis": "age",
+      "encoding": "explicit",
+      "n_eval": 200,
+      "probe_accuracy": 0.95,
+      "probe_separation": 1.2629239559173584,
+      "baseline": {
+        "n_examples": 200,
+        "mean_gap": -0.05202920913696289,
+        "abs_mean_gap": 0.0965724229812622,
+        "pref_a_rate": 0.385,
+        "auto_influence": 0.22999999999999998
+      },
+      "nulled": {
+        "n_examples": 200,
+        "mean_gap": -0.02158073306083679,
+        "abs_mean_gap": 0.09046841740608215,
+        "pref_a_rate": 0.45,
+        "auto_influence": 0.09999999999999998
+      },
+      "baseline_by_template": {
+        "cv_v1": 0.46666666666666656,
+        "cv_v2": 0.8
+      }
+    },
+    {
+      "axis": "age",
+      "encoding": "proxy",
+      "n_eval": 200,
+      "probe_accuracy": 0.7666666666666667,
+      "probe_separation": 3.6292381286621094,
+      "baseline": {
+        "n_examples": 200,
+        "mean_gap": 0.42306930661201475,
+        "abs_mean_gap": 0.42318801999092104,
+        "pref_a_rate": 0.995,
+        "auto_influence": 0.99
+      },
+      "nulled": {
+        "n_examples": 200,
+        "mean_gap": 0.004307882785797119,
+        "abs_mean_gap": 0.08591068983078003,
+        "pref_a_rate": 0.535,
+        "auto_influence": 0.07000000000000006
+      },
+      "baseline_by_template": {
+        "cv_v1": 0.9782608695652173,
+        "cv_v2": 1.0
+      }
+    },
+    {
+      "axis": "family_status",
+      "encoding": "explicit",
+      "n_eval": 200,
+      "probe_accuracy": 0.9483333333333334,
+      "probe_separation": 2.6371867656707764,
+      "baseline": {
+        "n_examples": 200,
+        "mean_gap": 0.05885201692581177,
+        "abs_mean_gap": 0.31849810361862185,
+        "pref_a_rate": 0.48,
+        "auto_influence": 0.040000000000000036
+      },
+      "nulled": {
+        "n_examples": 200,
+        "mean_gap": 0.014801918268203736,
+        "abs_mean_gap": 0.32635183215141295,
+        "pref_a_rate": 0.4,
+        "auto_influence": 0.19999999999999996
+      },
+      "baseline_by_template": {
+        "cv_v1": 0.6666666666666667,
+        "cv_v2": 0.47272727272727266
+      }
+    },
+    {
+      "axis": "family_status",
+      "encoding": "proxy",
+      "n_eval": 200,
+      "probe_accuracy": 0.9466666666666667,
+      "probe_separation": 2.104341983795166,
+      "baseline": {
+        "n_examples": 200,
+        "mean_gap": -0.2711198079586029,
+        "abs_mean_gap": 0.2760134470462799,
+        "pref_a_rate": 0.045,
+        "auto_influence": 0.91
+      },
+      "nulled": {
+        "n_examples": 200,
+        "mean_gap": -0.01604614734649658,
+        "abs_mean_gap": 0.12651989459991456,
+        "pref_a_rate": 0.54,
+        "auto_influence": 0.08000000000000007
+      },
+      "baseline_by_template": {
+        "cv_v1": 0.9285714285714286,
+        "cv_v2": 0.8863636363636364
+      }
+    },
+    {
+      "axis": "intersection",
+      "encoding": "explicit",
+      "n_eval": 200,
+      "probe_accuracy": 0.9916666666666667,
+      "probe_separation": 3.6742897033691406,
+      "baseline": {
+        "n_examples": 200,
+        "mean_gap": 0.6247023570537568,
+        "abs_mean_gap": 0.6247023570537568,
+        "pref_a_rate": 1.0,
+        "auto_influence": 1.0
+      },
+      "nulled": {
+        "n_examples": 200,
+        "mean_gap": 0.038812661170959474,
+        "abs_mean_gap": 0.24287779092788697,
+        "pref_a_rate": 0.495,
+        "auto_influence": 0.010000000000000009
+      },
+      "baseline_by_template": {
+        "cv_v1": 1.0,
+        "cv_v2": 1.0
+      },
+      "alpha_sweep": {
+        "0.0": 1.0,
+        "0.25": 0.97,
+        "0.5": 0.6499999999999999,
+        "0.75": 0.3600000000000001,
+        "1.0": 0.010000000000000009
+      }
+    },
+    {
+      "axis": "intersection",
+      "encoding": "proxy",
+      "n_eval": 200,
+      "probe_accuracy": 0.9483333333333334,
+      "probe_separation": 3.924071788787842,
+      "baseline": {
+        "n_examples": 200,
+        "mean_gap": 0.46911989092826845,
+        "abs_mean_gap": 0.47669800877571106,
+        "pref_a_rate": 0.945,
+        "auto_influence": 0.8899999999999999
+      },
+      "nulled": {
+        "n_examples": 200,
+        "mean_gap": 0.04886412858963013,
+        "abs_mean_gap": 0.18378883600234985,
+        "pref_a_rate": 0.63,
+        "auto_influence": 0.26
+      },
+      "baseline_by_template": {
+        "cv_v1": 0.7411764705882353,
+        "cv_v2": 1.0
+      },
+      "alpha_sweep": {
+        "0.0": 0.8899999999999999,
+        "0.25": 0.8,
+        "0.5": 0.71,
+        "0.75": 0.55,
+        "1.0": 0.26
+      }
+    }
+  ]
+}

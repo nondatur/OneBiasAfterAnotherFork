@@ -1,0 +1,61 @@
+{
+  "config": {
+    "name": "demographic_edu_sex_qwen06",
+    "bias_type": "demographic",
+    "model_path": "Skywork/Skywork-Reward-V2-Qwen3-0.6B",
+    "trust_remote_code": true,
+    "dataset_source": "data/demographic/education/asap/pairs.jsonl",
+    "dataset_class": "",
+    "probe_size": 300,
+    "max_test_examples": 200,
+    "split_seed": 42,
+    "null_alpha": 1.0,
+    "batch_size": 8,
+    "max_length": 2048,
+    "device": "auto",
+    "mlx_quant": null,
+    "raw_data_dir": "artifacts/raw_data",
+    "artifacts_dir": "artifacts",
+    "plots_dir": "plots",
+    "save_probe": false,
+    "extra": {
+      "domain": "education",
+      "axis": "sex",
+      "encoding": "proxy"
+    }
+  },
+  "baseline": {
+    "n_examples": 200,
+    "mean_gap": 0.02820765256881714,
+    "abs_mean_gap": 0.07382290840148925,
+    "pref_a_rate": 0.62,
+    "auto_influence": 0.24,
+    "label_a": "female",
+    "label_b": "male"
+  },
+  "nulled": {
+    "n_examples": 200,
+    "mean_gap": -0.008650119304656983,
+    "abs_mean_gap": 0.07152975082397461,
+    "pref_a_rate": 0.455,
+    "auto_influence": 0.08999999999999997,
+    "label_a": "female",
+    "label_b": "male"
+  },
+  "probe_metadata": {
+    "n_positive": 300,
+    "n_negative": 300,
+    "hidden_dim": 1024,
+    "positive_mean_norm": 130.4726104736328,
+    "negative_mean_norm": 130.4741668701172,
+    "probe_raw_norm": 0.7655481696128845,
+    "positive_proj_mean": 0.11598200350999832,
+    "positive_proj_std": 0.836780309677124,
+    "negative_proj_mean": -0.6495665311813354,
+    "negative_proj_std": 0.8324101567268372,
+    "separation": 0.7655485272407532,
+    "probe_accuracy": 0.6783333333333333
+  },
+  "n_probe_examples": 300,
+  "n_eval_examples": 200
+}

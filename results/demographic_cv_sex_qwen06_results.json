@@ -1,0 +1,61 @@
+{
+  "config": {
+    "name": "demographic_cv_sex_qwen06",
+    "bias_type": "demographic",
+    "model_path": "Skywork/Skywork-Reward-V2-Qwen3-0.6B",
+    "trust_remote_code": true,
+    "dataset_source": "data/demographic/cv/pairs.jsonl",
+    "dataset_class": "",
+    "probe_size": 300,
+    "max_test_examples": 200,
+    "split_seed": 42,
+    "null_alpha": 1.0,
+    "batch_size": 8,
+    "max_length": 2048,
+    "device": "auto",
+    "mlx_quant": null,
+    "raw_data_dir": "artifacts/raw_data",
+    "artifacts_dir": "artifacts",
+    "plots_dir": "plots",
+    "save_probe": true,
+    "extra": {
+      "domain": "cv",
+      "axis": "sex",
+      "encoding": "explicit"
+    }
+  },
+  "baseline": {
+    "n_examples": 200,
+    "mean_gap": 0.5882966136932373,
+    "abs_mean_gap": 0.5882966136932373,
+    "pref_a_rate": 1.0,
+    "auto_influence": 1.0,
+    "label_a": "female",
+    "label_b": "male"
+  },
+  "nulled": {
+    "n_examples": 200,
+    "mean_gap": 0.0036384737491607665,
+    "abs_mean_gap": 0.046350704431533815,
+    "pref_a_rate": 0.555,
+    "auto_influence": 0.1100000000000001,
+    "label_a": "female",
+    "label_b": "male"
+  },
+  "probe_metadata": {
+    "n_positive": 300,
+    "n_negative": 300,
+    "hidden_dim": 1024,
+    "positive_mean_norm": 129.9962615966797,
+    "negative_mean_norm": 130.14659118652344,
+    "probe_raw_norm": 3.94120454788208,
+    "positive_proj_mean": -2.9910805225372314,
+    "positive_proj_std": 0.7331515550613403,
+    "negative_proj_mean": -6.932285308837891,
+    "negative_proj_std": 0.7133502960205078,
+    "separation": 3.941204786300659,
+    "probe_accuracy": 0.9966666666666667
+  },
+  "n_probe_examples": 300,
+  "n_eval_examples": 200
+}

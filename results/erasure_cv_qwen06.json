@@ -1,0 +1,117 @@
+{
+  "model": "Skywork/Skywork-Reward-V2-Qwen3-0.6B",
+  "domain": "cv",
+  "seed": 42,
+  "probe_items": 200,
+  "eval_items": 200,
+  "results": [
+    {
+      "premise": "parental_leave",
+      "concept": "correctness",
+      "rows": {
+        "none": {
+          "linear_acc": 1.0,
+          "mlp_acc": 0.99875,
+          "chance": 0.5,
+          "n_train": 800,
+          "n_eval": 800
+        },
+        "diffmean": {
+          "linear_acc": 0.5,
+          "mlp_acc": 1.0,
+          "chance": 0.5,
+          "n_train": 800,
+          "n_eval": 800
+        },
+        "leace": {
+          "linear_acc": 0.5225,
+          "mlp_acc": 1.0,
+          "chance": 0.5,
+          "n_train": 800,
+          "n_eval": 800
+        }
+      }
+    },
+    {
+      "premise": "parental_leave",
+      "concept": "conclusion",
+      "rows": {
+        "none": {
+          "linear_acc": 1.0,
+          "mlp_acc": 0.9975,
+          "chance": 0.5,
+          "n_train": 800,
+          "n_eval": 800
+        },
+        "diffmean": {
+          "linear_acc": 0.5,
+          "mlp_acc": 0.995,
+          "chance": 0.5,
+          "n_train": 800,
+          "n_eval": 800
+        },
+        "leace": {
+          "linear_acc": 0.5125,
+          "mlp_acc": 0.99,
+          "chance": 0.5,
+          "n_train": 800,
+          "n_eval": 800
+        }
+      }
+    },
+    {
+      "premise": "commute",
+      "concept": "correctness",
+      "rows": {
+        "none": {
+          "linear_acc": 1.0,
+          "mlp_acc": 1.0,
+          "chance": 0.5,
+          "n_train": 800,
+          "n_eval": 800
+        },
+        "diffmean": {
+          "linear_acc": 0.5,
+          "mlp_acc": 0.99625,
+          "chance": 0.5,
+          "n_train": 800,
+          "n_eval": 800
+        },
+        "leace": {
+          "linear_acc": 0.56,
+          "mlp_acc": 0.99,
+          "chance": 0.5,
+          "n_train": 800,
+          "n_eval": 800
+        }
+      }
+    },
+    {
+      "premise": "commute",
+      "concept": "conclusion",
+      "rows": {
+        "none": {
+          "linear_acc": 1.0,
+          "mlp_acc": 0.99875,
+          "chance": 0.5,
+          "n_train": 800,
+          "n_eval": 800
+        },
+        "diffmean": {
+          "linear_acc": 0.5,
+          "mlp_acc": 1.0,
+          "chance": 0.5,
+          "n_train": 800,
+          "n_eval": 800
+        },
+        "leace": {
+          "linear_acc": 0.5125,
+          "mlp_acc": 0.99625,
+          "chance": 0.5,
+          "n_train": 800,
+          "n_eval": 800
+        }
+      }
+    }
+  ]
+}
