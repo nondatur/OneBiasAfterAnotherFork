@@ -1,0 +1,14 @@
+{
+  "n_positive": 300,
+  "n_negative": 300,
+  "hidden_dim": 1024,
+  "positive_mean_norm": 130.5401611328125,
+  "negative_mean_norm": 130.653564453125,
+  "probe_raw_norm": 2.696769952774048,
+  "positive_proj_mean": -4.142571449279785,
+  "positive_proj_std": 0.9530420899391174,
+  "negative_proj_mean": -6.839340686798096,
+  "negative_proj_std": 0.9883971810340881,
+  "separation": 2.6967692375183105,
+  "probe_accuracy": 0.915
+}

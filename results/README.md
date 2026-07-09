@@ -25,3 +25,11 @@ configs, and record IDs only. **No raw datasets, essay text, or scored inputs ar
 
 Regenerate any of these end to end with the corresponding `experiments/run_*.py` after downloading the
 source corpora (see `data/demographic/education/README.md`).
+
+## Probe directions (`probes/`)
+The difference-of-means bias directions used for null-space projection: one `probe.pt` (a single
+`[hidden_dim]` float tensor) plus `metadata.json` (norms, separation, probe accuracy) per axis. Safe to
+share (a single direction vector, no text, derived from open-weights activations) and enough to apply or
+verify the null-space projection without re-extracting activations. Partial set: only runs with `save_probe`
+enabled (credit and CV, sex and intersection) are saved; all other probes are rebuilt in-memory by the
+runners and are regenerable.
