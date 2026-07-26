@@ -72,12 +72,53 @@ def collect(results_dir: Path) -> Tuple[Dict[str, str], List[str]]:
         for macro, key in want.items():
             if key in cells:
                 m[macro] = _fmt(cells[key]["baseline"]["auto_influence"])
+        if d["cells"]:
+            m["nEvalBattery"] = str(d["cells"][0]["n_eval"])
 
-    # --- cross-influence: acc_baseline (interpretability) -------------------------------------------
-    for tag, fname in (("CV", "crossinf_cv_qwen06.json"), ("Credit", "crossinf_credit_qwen06.json")):
+    # --- education (A1 header-proxy) battery on the real-essay corpora -------------------------------
+    edu_want = {"eduSexExplicit": ("sex", "explicit"), "eduSexProxy": ("sex", "proxy"),
+                "eduEthnicityExplicit": ("ethnicity", "explicit"), "eduEthnicityProxy": ("ethnicity", "proxy"),
+                "eduGradeExplicit": ("grade_level", "explicit"), "eduGradeProxy": ("grade_level", "proxy")}
+    edu_headline = {"eduSexExplicit", "eduGradeProxy"}  # also emit the nulled value for these two
+    for tag, fname in (("Asap", "battery_education_asap_qwen06.json"),
+                       ("Persuade", "battery_education_persuade_qwen06.json")):
         d = need(fname)
         if d:
-            m[f"crossAccBaseline{tag}"] = _fmt(d["results"][0]["baseline"]["acc_baseline"])
+            cells = {(c["axis"], c["encoding"]): c for c in d["cells"]}
+            for macro, key in edu_want.items():
+                if key in cells:
+                    m[f"{macro}{tag}"] = _fmt(cells[key]["baseline"]["auto_influence"])
+                    if macro in edu_headline:
+                        m[f"{macro}{tag}null"] = _fmt(cells[key]["nulled"]["auto_influence"])
+
+    # --- cross-influence: acc_baseline (interpretability) + the n it actually rests on ---------------
+    # NOTE: Credit reads crossinf_qwen06.json (n=300), NOT crossinf_credit_qwen06.json (n=50) — the same
+    # experiment was run at two sample sizes and the better-powered one is what the prose quotes.
+    for tag, fname in (("CV", "crossinf_cv_qwen06.json"),
+                       ("Credit", "crossinf_qwen06.json"),
+                       ("EduAsap", "crossinf_education_asap_explicit_qwen06.json"),
+                       ("EduPersuade", "crossinf_education_persuade_explicit_qwen06.json")):
+        d = need(fname)
+        if d:
+            r0 = d["results"][0]
+            m[f"crossAccBaseline{tag}"] = _fmt(r0["baseline"]["acc_baseline"])
+            m[f"crossN{tag}"] = str(r0["n_pairs"])
+
+    # --- standpoint credibility (A2): identity gap vs a no-standpoint neutral baseline --------------
+    sp_axes = {"Sex": "pos_sex", "Race": "pos_race", "Class": "pos_class", "Origin": "pos_origin",
+               "Intersection": "pos_intersection", "Control": "pos_control",
+               "Hobby": "pos_ctrl_hobby", "Pet": "pos_ctrl_pet", "Region": "pos_ctrl_region"}
+    for tag, fname in (("Persuade", "maineffect_edupos_persuade_qwen06.json"),
+                       ("Asap", "maineffect_edupos_asap_qwen06.json")):
+        d = need(fname)
+        if d:
+            by = {r["axis"]: r for r in d["results"]}
+            for name, axis in sp_axes.items():
+                if axis in by:
+                    m[f"standpointGap{name}{tag}"] = _fmt(by[axis]["identity_gap"], sign=True)
+            if "pos_intersection" in by:
+                m[f"standpointMainEffect{tag}"] = _fmt(by["pos_intersection"]["main_effect"], sign=True)
+                m[f"nEvalStandpoint{tag}"] = str(by["pos_intersection"]["n"])
 
     # --- decision-response (CV): discriminatory win-rate + fair-minus-disc gap -----------------------
     d = need("decision_cv_qwen06.json")

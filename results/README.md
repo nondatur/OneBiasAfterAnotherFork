@@ -1,8 +1,16 @@
-# Results snapshot (Direction 1: demographic reward-model bias)
+# Results snapshot: demographic reward-model bias
 
-Metric result files (JSON) from the Direction-1 experiments, all on
+Metric result files (JSON) from the demographic protected-attribute bias experiments, all on
 **Skywork-Reward-V2-Qwen3-0.6B**. These are the numbers behind the write-ups; they contain metrics,
 configs, and record IDs only. **No raw datasets, essay text, or scored inputs are included here.**
+
+## Scope of this snapshot
+Everything here is **one reward model (0.6B), one seed (`42`), and n between 50 and 300 per cell.** No
+confidence intervals or significance tests are computed, so small differences between cells should not be
+read as real. The `auto_influence` statistic is a preference *rate* and saturates at 1.0, which makes the
+cells at ceiling uninformative about effect *size*; where magnitude matters, prefer the standpoint arm's
+`identity_gap` / `main_effect`, which are in raw reward units against a no-standpoint baseline. The
+scaling study across the larger reward models is not represented here.
 
 ## Why the data and scored inputs are not in the repo
 - **Size:** the raw corpora are ~660 MB.
