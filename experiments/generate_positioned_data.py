@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate the positioned-argument (A2) matched-pair dataset (Direction 1, education / standpoint-credibility).
+Generate the positioned-argument (A2) matched-pair dataset (education / standpoint-credibility).
 
 Pipeline: load real argumentative essays (PERSUADE 2.0 / ASAP-AES) -> inject a first-person positionality
 sentence whose claimed identity is the only thing that varies A<->B (essay body held byte-identical) at a

@@ -1,4 +1,4 @@
-# Demographic bias (Direction 1) — REASONING-FLIP 2×2, CV-screening, Skywork-Reward-V2-Qwen3-0.6B.
+# Demographic bias — REASONING-FLIP 2×2, CV-screening, Skywork-Reward-V2-Qwen3-0.6B.
 #
 # Does the RM reward factually-correct causal reasoning, or the conclusion? {claim correctness} ×
 # {conclusion} over a parental-leave / intersection premise + a non-demographic commute control.

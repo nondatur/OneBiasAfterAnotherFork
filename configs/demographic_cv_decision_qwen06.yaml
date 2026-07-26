@@ -1,4 +1,4 @@
-# Demographic bias (Direction 1) — DECISION-RESPONSE arm, CV-screening, Skywork-Reward-V2-Qwen3-0.6B.
+# Demographic bias — DECISION-RESPONSE arm, CV-screening, Skywork-Reward-V2-Qwen3-0.6B.
 #
 # Models the model RESPONSE: USER presents the applicant (with the protected marker), ASSISTANT gives a
 # verdict; the RM scores fair vs discriminatory vs neutral vs evasive verdicts.

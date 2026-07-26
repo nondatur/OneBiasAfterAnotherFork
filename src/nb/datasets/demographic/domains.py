@@ -1,5 +1,5 @@
 """
-Domain registry for the demographic-bias arms (Direction 1).
+Domain registry for the demographic-bias arms.
 
 A single source of truth for everything that differs between the **credit** and **CV-screening**
 domains: the matched-pair dataset class + default manifest, the neutral renderer + framing prompt +

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-LEACE + non-linear-probe test (Direction 1): is the **reasoning-correctness** concept (and **conclusion
+LEACE + non-linear-probe test: is the **reasoning-correctness** concept (and **conclusion
 polarity**) genuinely *low-complexity* in the RM's activations, or only *linearly* erasable while still
 **non-linearly recoverable** (high-complexity / entangled — the TaCo signature)?
 

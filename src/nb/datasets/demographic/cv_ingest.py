@@ -1,5 +1,5 @@
 """
-Synthetic CV substrate for the CV-screening arm (Direction 1, recruitment domain).
+Synthetic CV substrate for the CV-screening arm (recruitment domain).
 
 The CV analog of `ingest.py`'s German Credit loader: instead of decoding an external dataset, we
 **generate** structured `CandidateRecord`s deterministically from a seed. Each record carries the

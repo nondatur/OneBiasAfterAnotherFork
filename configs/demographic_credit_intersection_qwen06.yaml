@@ -1,4 +1,4 @@
-# Demographic bias (Direction 1) — INTERSECTION (sex×age×family), credit arm, Qwen3-0.6B.
+# Demographic bias — INTERSECTION (sex×age×family), credit arm, Qwen3-0.6B.
 #
 # Combined-marker contrast: female∧age-30∧parental-leave  vs  male∧age-50∧continuous-employment.
 # Generate the data first: python experiments/generate_credit_data.py --axes sex,age,family_status,intersection

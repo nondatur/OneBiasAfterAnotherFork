@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate the demographic credit-bias matched-pair dataset (Direction 1, credit arm).
+Generate the demographic credit-bias matched-pair dataset (credit arm).
 
 Pipeline: load German Credit → render neutral profiles → inject single-axis demographic markers
 (sex/age/family-status; explicit + proxy) → Tier-1 structural validation gate → write manifest.

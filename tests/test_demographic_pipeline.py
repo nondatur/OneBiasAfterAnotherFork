@@ -1,5 +1,5 @@
 """
-Unit tests for the demographic credit data-creation pipeline (Direction 1).
+Unit tests for the demographic credit data-creation pipeline.
 
 Cover the offline stages (ingest → render → inject → validate → loader → metric) without any model:
 - renderer determinism + demographic-neutrality of the baseline,

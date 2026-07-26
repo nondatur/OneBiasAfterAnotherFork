@@ -1,5 +1,5 @@
 """
-Real-essay substrate for the education (grading) arm (Direction 1, education domain).
+Real-essay substrate for the education (grading) arm (education domain).
 
 Unlike the CV arm (which *generates* synthetic records) this arm *loads* essays from an established
 corpus and holds the essay body fixed — the demographic marker is injected only as a header clause

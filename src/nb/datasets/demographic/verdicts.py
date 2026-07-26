@@ -1,5 +1,5 @@
 """
-Decision-response (downstream-harm) arm — authored verdicts (Direction 1).
+Decision-response (downstream-harm) arm — authored verdicts.
 
 Instead of scoring the candidate profile directly, we model a real model **response**: a USER turn that
 presents the applicant (carrying the protected marker) and asks for a hiring recommendation, and an

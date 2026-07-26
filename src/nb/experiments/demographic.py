@@ -1,5 +1,5 @@
 """
-Demographic protected-attribute bias experiment (Direction 1), credit arm — direct-scoring path.
+Demographic protected-attribute bias experiment, credit arm — direct-scoring path.
 
 Reuses the base pipeline end-to-end: `load_model` (auto→MLX on Apple Silicon), `build_probe`
 (difference-of-means → the demographic direction), and `get_rewards_both` (baseline + null-space

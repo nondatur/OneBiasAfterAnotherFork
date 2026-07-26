@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Reasoning-flip 2×2 (Direction 1): does the RM reward factually-CORRECT reasoning, or the conclusion?
+Reasoning-flip 2×2: does the RM reward factually-CORRECT reasoning, or the conclusion?
 
 For a strong applicant carrying a premise (parental-leave / intersection / a non-demographic commute
 control), score four matched verdicts crossing {causal-claim correctness} × {conclusion}:

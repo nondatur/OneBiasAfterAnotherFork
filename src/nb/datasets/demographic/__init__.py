@@ -1,5 +1,5 @@
 """
-Demographic / intersectional protected-attribute bias — data-creation pipeline (Direction 1).
+Demographic / intersectional protected-attribute bias — data-creation pipeline.
 
 Builds matched, single-axis **contrastive pairs** (for the difference-of-means probe) and matched
 **applicant-pair eval items** (for cross-/auto-influence) on a credit-scoring substrate (UCI German

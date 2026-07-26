@@ -1,5 +1,5 @@
 """
-Concept erasure + probe-recoverability helpers (Direction 1 reasoning low/high-complexity test).
+Concept erasure + probe-recoverability helpers (reasoning low/high-complexity test).
 
 Implements the TaCo discriminator: erase a binary concept from activations, then ask whether a
 **non-linear** probe can still recover it.

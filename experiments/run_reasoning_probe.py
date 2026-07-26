@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Mechanistic probe of the reasoning-flip drivers (Direction 1), **held-out probe/eval split**: are
+Mechanistic probe of the reasoning-flip drivers, **held-out probe/eval split**: are
 **reasoning correctness** and the **advance/reject conclusion** each represented as a *linear direction*
 in the RM's activations that can be nulled — measured on items NOT used to build the direction?
 

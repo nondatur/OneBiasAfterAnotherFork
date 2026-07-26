@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate the demographic education (grading) matched-pair dataset (Direction 1, education arm).
+Generate the demographic education (grading) matched-pair dataset (education arm).
 
 Pipeline: load real essays (PERSUADE 2.0 or ASAP-AES) -> derive a strong/weak `high_quality` label
 from the holistic score -> render as a gradable submission with a neutral header -> inject a single

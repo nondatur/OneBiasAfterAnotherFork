@@ -1,5 +1,5 @@
 """
-Unit tests for the education (grading) demographic pipeline (Direction 1, education arm).
+Unit tests for the education (grading) demographic pipeline (education arm).
 
 Cover the offline stages (render -> inject -> validate -> loader) on a tiny inline essay fixture
 (no corpus download, no model), plus the new education markers (ethnicity name-grid, grade_level) and

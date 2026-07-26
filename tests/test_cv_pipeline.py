@@ -1,5 +1,5 @@
 """
-Unit tests for the CV-screening demographic pipeline (Direction 1, recruitment arm).
+Unit tests for the CV-screening demographic pipeline (recruitment arm).
 
 Cover the offline stages (generate → render → inject → validate → loader) without any model, plus a
 regression that the shared `make_pair` default (credit) is unchanged by the CV `content_label` hook.

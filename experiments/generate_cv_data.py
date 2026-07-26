@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate the demographic CV-screening matched-pair dataset (Direction 1, recruitment arm).
+Generate the demographic CV-screening matched-pair dataset (recruitment arm).
 
 Pipeline: generate synthetic CV records → render neutral CV summaries → inject single-axis
 demographic markers (sex/age/family-status [+intersection]; explicit + proxy) → Tier-1 structural

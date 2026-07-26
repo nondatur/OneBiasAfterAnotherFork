@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-First look at intersectional **additivity** (Direction 1, RQ1-b / H1-b).
+First look at intersectional **additivity** (RQ1-b / H1-b).
 
 Builds difference-of-means probe directions for the three marginal axes (sex, age, family_status)
 and for the combined **intersection** axis on one RM, all oriented A-pole − B-pole and built from the

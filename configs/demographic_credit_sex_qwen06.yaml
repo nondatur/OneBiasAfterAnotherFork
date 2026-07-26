@@ -1,4 +1,4 @@
-# Demographic bias (Direction 1) — sex axis, credit arm, Skywork-Reward-V2-Qwen3-0.6B.
+# Demographic bias — sex axis, credit arm, Skywork-Reward-V2-Qwen3-0.6B.
 #
 # Direct-scoring path: difference-of-means "sex" probe over matched credit profiles, then
 # auto-influence (score gap when only sex is swapped) baseline vs null-space-projected.

@@ -1,4 +1,4 @@
-# Demographic bias (Direction 1) — EDUCATION positioned-argument (A2), Skywork-Reward-V2-Qwen3-0.6B.
+# Demographic bias — EDUCATION positioned-argument (A2), Skywork-Reward-V2-Qwen3-0.6B.
 #
 # Standpoint-credibility bias: same argument + conclusion, swap only the author's claimed identity in a
 # first-person positionality sentence. Runs through the education DomainSpec (pre-rendered pairs). The
