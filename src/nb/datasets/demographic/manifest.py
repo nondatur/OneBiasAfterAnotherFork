@@ -25,10 +25,15 @@ from typing import Any, Dict, List, Optional
 from src.nb.datasets.demographic.markers import GeneratedPair
 from src.nb.datasets.demographic.render import TEMPLATES
 
-try:  # CV templates live in a sibling module; absent on a credit-only checkout is fine.
+try:  # Legacy synthetic-CV templates (retained so pre-2026-08 CV manifests still hash).
     from src.nb.datasets.demographic.cv_render import CV_TEMPLATES
 except Exception:  # pragma: no cover - defensive
     CV_TEMPLATES = {}
+
+try:  # Bias-in-Bios (real biography) templates — the current hiring substrate.
+    from src.nb.datasets.demographic.bios_render import BIOS_TEMPLATES
+except Exception:  # pragma: no cover - defensive
+    BIOS_TEMPLATES = {}
 
 try:  # Education (essay) templates; absent on a minimal checkout is fine.
     from src.nb.datasets.demographic.edu_render import EDU_TEMPLATES
@@ -41,7 +46,9 @@ except Exception:  # pragma: no cover - defensive
     POSITION_TEMPLATES = {}
 
 # Combined registry so provenance hashing works for every domain's template ids.
-_ALL_TEMPLATES: Dict[str, str] = {**TEMPLATES, **CV_TEMPLATES, **EDU_TEMPLATES, **POSITION_TEMPLATES}
+_ALL_TEMPLATES: Dict[str, str] = {
+    **TEMPLATES, **CV_TEMPLATES, **BIOS_TEMPLATES, **EDU_TEMPLATES, **POSITION_TEMPLATES,
+}
 
 GENERATOR_VERSION = "0.1.0"
 
@@ -52,7 +59,17 @@ GERMAN_CREDIT_ATTRIBUTION = (
 
 CV_ATTRIBUTION = (
     "Substrate: synthetic CV records, generated deterministically from seed (no external dataset). "
-    "Demographic markers (sex/age/family-status) are synthetic. Self-licensed."
+    "Demographic markers (sex/age/family-status) are synthetic. Self-licensed. "
+    "LEGACY: retained to reproduce pre-2026-08 hiring results; the hiring domain now uses BIOS_ATTRIBUTION."
+)
+
+BIOS_ATTRIBUTION = (
+    "Substrate: real biographies — Bias in Bios (De-Arteaga et al., 2019), HF mirror "
+    "'LabHC/bias_in_bios', MIT licence; sourced from Common Crawl. Bodies are scrubbed (leading name "
+    "stripped, gendered pronouns/titles neutralised) and NOT redistributed — these are biographies of "
+    "identifiable real people, so only aggregate metrics are shared. The dataset's own gender label is "
+    "retained for validity checks and is never rendered into the text. Quality label is role-match "
+    "(profession == target role). Demographic markers are synthetic, injected, self-licensed."
 )
 
 EDU_ATTRIBUTION = (

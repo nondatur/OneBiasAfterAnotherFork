@@ -1,5 +1,10 @@
 """
-Unit tests for the CV-screening demographic pipeline (recruitment arm).
+Unit tests for the **legacy synthetic** CV-screening pipeline.
+
+As of 2026-08 the `cv` domain loads real biographies (Bias-in-Bios) — see `test_bios_pipeline.py`.
+The synthetic generator exercised here is retained solely to reproduce pre-2026-08 hiring results
+(the erasure, reasoning and decision-response arms were all run on it), so these tests target
+`cv_ingest` / `cv_render` directly and assert nothing about the `cv` domain registry entry.
 
 Cover the offline stages (generate → render → inject → validate → loader) without any model, plus a
 regression that the shared `make_pair` default (credit) is unchanged by the CV `content_label` hook.

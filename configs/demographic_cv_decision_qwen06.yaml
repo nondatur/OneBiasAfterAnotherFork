@@ -2,7 +2,9 @@
 #
 # Models the model RESPONSE: USER presents the applicant (with the protected marker), ASSISTANT gives a
 # verdict; the RM scores fair vs discriminatory vs neutral vs evasive verdicts.
-# Generate the CV data first: python experiments/generate_cv_data.py
+# NOTE: this arm still uses the LEGACY synthetic CV substrate (generate_cv_data.py); it has not yet
+# been ported to the real Bias-in-Bios substrate that domain=cv now loads.
+# Generate it with: python experiments/generate_cv_data.py
 #
 #   python experiments/run_decision_response.py --config configs/demographic_cv_decision_qwen06.yaml
 

@@ -11,7 +11,7 @@ import pytest
 
 from src.nb.datasets.demographic.domains import DOMAINS, get_domain
 from src.nb.datasets.demographic.render import TEMPLATES
-from src.nb.datasets.demographic.cv_render import CV_TEMPLATES
+from src.nb.datasets.demographic.bios_render import BIOS_TEMPLATES
 from src.nb.datasets.demographic.edu_render import EDU_TEMPLATES
 
 
@@ -23,7 +23,7 @@ class TestRegistry:
 
     def test_template_ids_match_renderers(self):
         assert get_domain("credit").template_ids == tuple(sorted(TEMPLATES))
-        assert get_domain("cv").template_ids == tuple(sorted(CV_TEMPLATES))
+        assert get_domain("cv").template_ids == tuple(sorted(BIOS_TEMPLATES))
         assert get_domain("education").template_ids == tuple(sorted(EDU_TEMPLATES))
 
     def test_is_strong_reads_right_field(self):
@@ -38,10 +38,20 @@ class TestRegistry:
         assert edu.is_strong(SimpleNamespace(high_quality=False)) is False
 
     def test_load_records_nonempty(self):
-        cv_recs = get_domain("cv").load_records()
-        assert len(cv_recs) == 1000 and hasattr(cv_recs[0], "qualified")
         credit_recs = get_domain("credit").load_records()  # uses the downloaded raw file
         assert len(credit_recs) == 1000 and hasattr(credit_recs[0], "credit_good")
+
+    def test_cv_load_records_needs_corpus(self):
+        # The hiring arm now loads real biographies (Bias-in-Bios), user-downloaded like the
+        # education corpus — skip gracefully if it isn't present locally rather than failing.
+        try:
+            recs = get_domain("cv").load_records()
+        except FileNotFoundError:
+            pytest.skip("Bias-in-Bios corpus not downloaded (data/demographic/cv/raw/)")
+        assert len(recs) > 0
+        # These attribute names are load-bearing: run_reasoning_*.py filter on
+        # getattr(r, "qualified", True) and verdicts.py reads .role — both fail silently if renamed.
+        assert hasattr(recs[0], "qualified") and hasattr(recs[0], "role")
 
     def test_education_load_records_needs_corpus(self):
         # Education loads a user-downloaded corpus; skip gracefully if it isn't present locally.

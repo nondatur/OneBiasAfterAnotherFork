@@ -2,7 +2,9 @@
 #
 # Does the RM reward factually-correct causal reasoning, or the conclusion? {claim correctness} ×
 # {conclusion} over a parental-leave / intersection premise + a non-demographic commute control.
-# Generate the CV data first: python experiments/generate_cv_data.py
+# NOTE: this arm still uses the LEGACY synthetic CV substrate (generate_cv_data.py); it has not yet
+# been ported to the real Bias-in-Bios substrate that domain=cv now loads.
+# Generate it with: python experiments/generate_cv_data.py
 #
 #   python experiments/run_reasoning_flip.py --config configs/demographic_cv_reasoning_qwen06.yaml
 

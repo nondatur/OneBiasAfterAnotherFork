@@ -1,8 +1,8 @@
 # Demographic bias — sex axis, CV-screening arm, Skywork-Reward-V2-Qwen3-0.6B.
 #
-# Direct-scoring path: difference-of-means "sex" probe over matched CV summaries, then
+# Direct-scoring path: difference-of-means "sex" probe over matched real-biography profiles, then
 # auto-influence (score gap when only sex is swapped) baseline vs null-space-projected.
-# Generate the data first: python experiments/generate_cv_data.py
+# Generate the data first: python experiments/generate_bios_data.py --from-hub
 #
 #   python experiments/run_experiment.py --config configs/demographic_cv_sex_qwen06.yaml
 

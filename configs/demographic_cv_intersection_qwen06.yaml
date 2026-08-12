@@ -1,7 +1,7 @@
 # Demographic bias — INTERSECTION (sex×age×family), CV-screening arm, Qwen3-0.6B.
 #
 # Combined-marker contrast: female∧age-30∧parental-leave  vs  male∧age-50∧continuous-employment.
-# Generate the data first: python experiments/generate_cv_data.py --axes sex,age,family_status,intersection
+# Generate the data first: python experiments/generate_bios_data.py --axes sex,age,family_status,intersection
 #
 #   python experiments/run_experiment.py --config configs/demographic_cv_intersection_qwen06.yaml
 

@@ -12,10 +12,21 @@ cells at ceiling uninformative about effect *size*; where magnitude matters, pre
 `identity_gap` / `main_effect`, which are in raw reward units against a no-standpoint baseline. The
 scaling study across the larger reward models is not represented here.
 
+## Substrate change (2026-08): the hiring domain moved to real data
+Every `*_cv_*` result file here was produced on the **synthetic** CV substrate
+(`cv_ingest.generate_candidates`, deterministic at seed 42). As of 2026-08 the `cv` domain loads
+**real biographies** (Bias-in-Bios) instead, so these files are *not* reproducible from the current
+`domain=cv` — regenerate them via `experiments/generate_cv_data.py`, which is retained for exactly
+that purpose. The erasure, reasoning and decision-response arms have not yet been re-run on the real
+substrate.
+
 ## Why the data and scored inputs are not in the repo
 - **Size:** the raw corpora are ~660 MB.
 - **Licensing / redistribution:** PERSUADE 2.0 is **CC BY-NC-SA 4.0** (no redistribution of derived
   essays), ASAP-AES is under the **Kaggle 2012 competition terms**, and German Credit is CC-BY-4.0.
+- **Privacy:** Bias-in-Bios (MIT) is ~400k biographies of **identifiable real people** scraped from
+  Common Crawl. Neither the corpus nor the derived pairs are committed; only aggregate metrics leave
+  the machine, and the dataset's real gender label is never rendered into any scored text.
   The matched-pair datasets embed derived essay/profile text, so they are **regenerated locally** from
   user-downloaded corpora via the generators in `experiments/` (e.g. `generate_edu_data.py`,
   `generate_positioned_data.py`), and the per-example scored inputs (`artifacts/raw_data/`) are excluded

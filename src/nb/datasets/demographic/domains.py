@@ -1,10 +1,11 @@
 """
 Domain registry for the demographic-bias arms.
 
-A single source of truth for everything that differs between the **credit** and **CV-screening**
-domains: the matched-pair dataset class + default manifest, the neutral renderer + framing prompt +
-template ids, how to load the underlying records, and which records count as the "stronger" applicant
-(the quality ground truth for cross-influence). Runners (`additivity_check`, `run_demographic_battery`,
+A single source of truth for everything that differs between the **credit**, **hiring (CV-screening)**
+and **education (grading)** domains: the matched-pair dataset class + default manifest, the neutral
+renderer + framing prompt + template ids, how to load the underlying records, and which records count
+as the "stronger" applicant (the quality ground truth for cross-influence). All three now sit on real
+substrates. Runners (`additivity_check`, `run_demographic_battery`,
 `run_crossinfluence`) and `DemographicBiasExperiment._create_dataset` all resolve a `DomainSpec` from
 `cfg.extra["domain"]` (or a `--domain` flag) so adding a domain is one entry here.
 
@@ -17,13 +18,13 @@ from dataclasses import dataclass
 from typing import Any, Callable, List, Tuple
 
 from src.nb.datasets.demographic.dataset import ASSESSMENT_PROMPT, CreditDemographicDataset
-from src.nb.datasets.demographic.cv_dataset import CV_ASSESSMENT_PROMPT, CVDemographicDataset
+from src.nb.datasets.demographic.bios_dataset import BIOS_ASSESSMENT_PROMPT, BiosDemographicDataset
 from src.nb.datasets.demographic.edu_dataset import EDU_ASSESSMENT_PROMPT, EducationDemographicDataset
 from src.nb.datasets.demographic.ingest import load_german_credit
-from src.nb.datasets.demographic.cv_ingest import generate_candidates
+from src.nb.datasets.demographic.bios_ingest import DEFAULT_BIOS_PATH, load_bias_in_bios
 from src.nb.datasets.demographic.edu_ingest import DEFAULT_PERSUADE_PATH, load_persuade
 from src.nb.datasets.demographic.render import TEMPLATES, render_profile
-from src.nb.datasets.demographic.cv_render import CV_TEMPLATES, render_cv
+from src.nb.datasets.demographic.bios_render import BIOS_TEMPLATES, render_bio
 from src.nb.datasets.demographic.edu_render import EDU_TEMPLATES, render_essay
 
 
@@ -52,14 +53,19 @@ CREDIT = DomainSpec(
     is_strong=lambda r: r.credit_good,
 )
 
+# Hiring arm. The substrate is REAL biographies (Bias-in-Bios), not the synthetic CV generator that
+# used to back this domain — `cv_ingest.generate_candidates` is retained for reproducing pre-2026-08
+# results but is no longer what `domain=cv` loads. `qualified` here means role-match
+# (profession == target_role), so it is a genuine quality axis rather than an invented heuristic.
 CV = DomainSpec(
     name="cv",
-    dataset_cls=CVDemographicDataset,
+    dataset_cls=BiosDemographicDataset,
     default_pairs="data/demographic/cv/pairs.jsonl",
-    render_fn=render_cv,
-    assessment_prompt=CV_ASSESSMENT_PROMPT,
-    template_ids=tuple(sorted(CV_TEMPLATES)),
-    load_records=lambda: generate_candidates(1000, seed=42),
+    render_fn=render_bio,
+    assessment_prompt=BIOS_ASSESSMENT_PROMPT,
+    template_ids=tuple(sorted(BIOS_TEMPLATES)),
+    # Real biographies are user-downloaded; raises with fetch instructions if absent.
+    load_records=lambda: load_bias_in_bios(DEFAULT_BIOS_PATH),
     is_strong=lambda r: r.qualified,
 )
 
