@@ -1,0 +1,7 @@
+{
+  "_comment": "giscus config for the review site's comment boxes. Until repoId and categoryId are filled in, every page renders a labelled placeholder instead of the embed -- the site is fully reviewable without them. To wire comments up: enable Discussions on Frankfurt-AI-Safety/rm-bias-experiment-review, add a category, install the giscus GitHub App (https://giscus.app), paste the two ids it issues below, and rebuild. No code change is needed.",
+  "repo": "Frankfurt-AI-Safety/rm-bias-experiment-review",
+  "repoId": "",
+  "category": "Experiment review",
+  "categoryId": ""
+}
