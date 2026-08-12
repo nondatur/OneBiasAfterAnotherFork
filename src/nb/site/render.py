@@ -61,10 +61,18 @@ class GiscusConfig:
     repo_id: str = ""
     category: str = ""
     category_id: str = ""
+    enabled: bool = False
 
     @property
     def configured(self) -> bool:
-        return bool(self.repo and self.repo_id and self.category_id)
+        """Both the ids *and* the explicit switch.
+
+        The switch is separate on purpose. Installing the giscus GitHub App is a web-only
+        step, and embedding the widget before it is installed renders a giscus error box —
+        strictly worse for a reviewer than our own labelled placeholder. So the ids can be
+        filled in ahead of time and the embed turned on in one edit once the app is there.
+        """
+        return bool(self.enabled and self.repo and self.repo_id and self.category_id)
 
     @classmethod
     def load(cls, path: Path) -> "GiscusConfig":
@@ -74,6 +82,7 @@ class GiscusConfig:
         return cls(
             repo=raw.get("repo", ""), repo_id=raw.get("repoId", ""),
             category=raw.get("category", ""), category_id=raw.get("categoryId", ""),
+            enabled=bool(raw.get("enabled", False)),
         )
 
 
