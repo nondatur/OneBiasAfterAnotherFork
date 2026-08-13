@@ -210,18 +210,21 @@ def delta_histogram(
     for v in values:
         counts[int(v)] = counts.get(int(v), 0) + 1
 
-    # Always plot out to the threshold, so "well inside the gate" is visible rather than implied.
-    hi = max(max(counts), int(threshold) if threshold else 0)
-    buckets = list(range(0, hi + 1))
+    # Plot only the observed range. Extending to the gate wasted most of the canvas (a gate of 40
+    # against data at 2-5 left ~85% empty and squashed the variation into a corner) and duplicated
+    # a question `gate_headroom` already answers for every cell at once. The threshold is stated in
+    # the caption instead of drawn.
+    buckets = list(range(0, max(counts) + 1))
     cmax = max(counts.values())
 
+    top_pad = 18                                # room for the max-count label
     height = 190
-    plot_h = height - _PAD_TOP - 40
+    plot_h = height - top_pad - 40
     left = 44
     plot_w = _W - left - 16
     step = plot_w / max(len(buckets), 1)
-    bar_w = max(min(step - 2, 26), 2)          # 2px surface gap between adjacent bars
-    y_base = _PAD_TOP + plot_h
+    bar_w = max(min(step * 0.7, 48), 2)         # scales with available width, leaves a real gap
+    y_base = top_pad + plot_h
 
     parts = [
         f'<svg class="chart" viewBox="0 0 {_W} {height}" width="100%" height="{height}" '
@@ -229,7 +232,7 @@ def delta_histogram(
     ]
     parts.append(f'<line class="axis" x1="{left}" y1="{y_base}" x2="{_W - 16}" y2="{y_base}"/>')
     parts.append(
-        f'<text class="cat" x="{left - 8}" y="{_PAD_TOP + 10}" text-anchor="end">{cmax}</text>'
+        f'<text class="cat" x="{left - 8}" y="{top_pad + 4}" text-anchor="end">{cmax}</text>'
     )
     parts.append(f'<text class="cat" x="{left - 8}" y="{y_base + 4}" text-anchor="end">0</text>')
 
@@ -243,18 +246,13 @@ def delta_histogram(
                 f'<path class="mark" d="{_bar_v(x, y_base - h, bar_w, y_base)}">'
                 f"<title>Δ = {b} {_esc(unit)}: {c} pairs ({c / total * 100:.1f}%)</title></path>"
             )
-        if len(buckets) <= 24 or b % 5 == 0:
             parts.append(
-                f'<text class="cat" x="{x + bar_w / 2:.1f}" y="{y_base + 16}" '
-                f'text-anchor="middle">{b}</text>'
+                f'<text class="val" x="{x + bar_w / 2:.1f}" y="{y_base - h - 5:.1f}" '
+                f'text-anchor="middle">{c}</text>'
             )
-
-    if threshold is not None:
-        tx = left + (buckets.index(int(threshold)) if int(threshold) in buckets else 0) * step + step / 2
-        parts.append(f'<line class="ref-crit" x1="{tx:.1f}" y1="{_PAD_TOP - 2}" x2="{tx:.1f}" y2="{y_base}"/>')
         parts.append(
-            f'<text class="ref-crit-label" x="{tx:.1f}" y="{_PAD_TOP - 6}" text-anchor="middle">'
-            f"gate: {int(threshold)}</text>"
+            f'<text class="cat" x="{x + bar_w / 2:.1f}" y="{y_base + 16}" '
+            f'text-anchor="middle">{b}</text>'
         )
 
     parts.append(
@@ -263,9 +261,13 @@ def delta_histogram(
     )
     parts.append("</svg>")
     svg = "".join(parts)
+    full = caption
+    if threshold is not None:
+        full = (f"{caption} Range shown is the observed one; every pair is inside the "
+                f"{int(threshold)}-char gate (see the chart above).")
     table = _table(
         [f"|Δ{unit}|", "pairs", "share"],
         [(b, counts.get(b, 0), f"{counts.get(b, 0) / total * 100:.1f}%") for b in buckets],
         caption,
     )
-    return f'<figure class="chart-figure">{svg}<figcaption>{_esc(caption)}</figcaption>{table}</figure>'
+    return f'<figure class="chart-figure">{svg}<figcaption>{_esc(full)}</figcaption>{table}</figure>'
