@@ -170,26 +170,20 @@ def examples_section(d: stats.DatasetStats, *, per_axis: int = 1) -> tuple:
     out, texts = [], []
     for axis in axes:
         cells = [c for c in d.cells if c.axis == axis]
-        primary = next((c for c in cells if c.encoding == "explicit"), cells[0])
-        recs = stats.examples(DATA_ROOT, d.key, axis, primary.encoding, n=per_axis)
-        if not recs:
-            continue
-        out.append(f"<h3>{esc(axis)} <span class='muted'>({esc(primary.encoding)})</span></h3>")
-        for r in recs:
-            out.append(pair_block(r, d.key))
-            texts += [r["text_a"], r["text_b"]]
-
-        others = [c for c in cells if c.encoding != primary.encoding]
-        if others:
-            inner = []
-            for c in others:
-                for r in stats.examples(DATA_ROOT, d.key, axis, c.encoding, n=1):
-                    inner.append(f"<h4>{esc(axis)} ({esc(c.encoding)})</h4>" + pair_block(r, d.key))
-                    texts += [r["text_a"], r["text_b"]]
-            out.append(
-                f"<details><summary>Other encodings for <code>{esc(axis)}</code></summary>"
-                f"{''.join(inner)}</details>"
-            )
+        # Explicit first where both exist, then the proxy. Both are rendered inline rather than
+        # behind a disclosure: the explicit-vs-proxy contrast is one of the main things being
+        # reviewed, so it should not cost a click.
+        cells.sort(key=lambda c: (c.encoding != "explicit", c.encoding))
+        out.append(f"<h3>{esc(axis)}</h3>")
+        for c in cells:
+            recs = stats.examples(DATA_ROOT, d.key, axis, c.encoding, n=per_axis)
+            if not recs:
+                continue
+            if len(cells) > 1:
+                out.append(f"<h4>{esc(axis)} <span class='muted'>({esc(c.encoding)})</span></h4>")
+            for r in recs:
+                out.append(pair_block(r, d.key))
+                texts += [r["text_a"], r["text_b"]]
     return "".join(out), texts
 
 
@@ -212,17 +206,39 @@ def stats_section(d: stats.DatasetStats) -> str:
 
     out = [table]
 
-    # Realized length deltas against the gate, for the widest cell.
-    widest = max(d.cells, key=lambda c: c.max_char_delta, default=None)
-    if widest and widest.char_deltas:
-        out.append(
-            charts.delta_histogram(
-                widest.char_deltas,
-                threshold=d.threshold_for(widest.axis),
-                caption=(f"Realized |Δchars| for {widest.axis}/{widest.encoding} "
-                         f"({widest.n} pairs) against the Tier-1 gate."),
-            )
+    # Does the gate bind anywhere? One row per cell, since the bound differs by axis.
+    out.append(
+        "<h3>Length parity against the gate</h3>"
+        "<p class='muted'>The largest realized character difference in each cell, against the "
+        "bound that cell has to pass. Bars are drawn as a share of the gate because the bound is "
+        "not the same for every axis. If everything sits well short of the line, the 0% discard "
+        "rate reflects genuinely length-matched markers rather than a permissive gate.</p>"
+    )
+    out.append(
+        charts.gate_headroom(
+            [(f"{c.axis} / {c.encoding}", c.max_char_delta, d.threshold_for(c.axis))
+             for c in d.cells],
+            caption="Worst-case |Δchars| per cell, as a share of that cell's gate.",
         )
+    )
+
+    # A histogram only where the difference actually varies. Marker clauses are fixed strings, so
+    # in most cells it is a single constant and a histogram would be a one-bar chart.
+    varying = [c for c in d.cells if len(set(c.char_deltas)) > 2]
+    if varying:
+        out.append(
+            "<p class='muted'>Only the name-proxy cells vary at all — names differ in length, "
+            "whereas every other clause is a fixed string, so its length difference is constant "
+            "across the cell. Those distributions:</p>"
+        )
+        for c in varying:
+            out.append(
+                charts.delta_histogram(
+                    c.char_deltas,
+                    threshold=d.threshold_for(c.axis),
+                    caption=f"{c.axis}/{c.encoding} — realized |Δchars| across {c.n} pairs.",
+                )
+            )
 
     # Marker draw distributions, only where a pool is actually sampled.
     pooled = [c for c in d.cells if c.samples_a_pool]

@@ -136,6 +136,66 @@ def draw_distribution(
     return f'<figure class="chart-figure">{svg}<figcaption>{_esc(caption)}</figcaption>{table}</figure>'
 
 
+def gate_headroom(rows: Sequence[tuple], *, caption: str) -> str:
+    """How close each cell's realized length difference comes to the gate it must pass.
+
+    `rows` are `(label, realized, gate)`. Bar length is realized/gate, because the gate is not
+    the same for every axis (the composed intersection clause gets a relaxed bound), so raw
+    lengths would not be comparable across rows. The reference line is the gate itself; the
+    direct label keeps the raw numbers visible.
+
+    This replaced a per-cell histogram, which was the wrong form: the marker clauses are fixed
+    strings, so within a cell the difference is usually a single constant and the "distribution"
+    was one bar.
+    """
+    items = [(str(l), float(r), float(g)) for l, r, g in rows if g]
+    if not items:
+        return ""
+    n = len(items)
+    plot_w = _W - _LABEL_W - _VALUE_W
+    height = _PAD_TOP + n * _ROW_H + _PAD_BOTTOM
+    # Scale so the gate sits at 80% of the plot, leaving the reference line visible on-chart.
+    vmax = max(max(r / g for _, r, g in items), 1.0) * 1.25
+
+    parts = [
+        f'<svg class="chart" viewBox="0 0 {_W} {height}" width="100%" height="{height}" '
+        f'role="img" aria-label="{_esc(caption)}" preserveAspectRatio="xMinYMin meet">'
+    ]
+    for i, (label, realized, gate) in enumerate(items):
+        y = _PAD_TOP + i * _ROW_H
+        bar_y = y + (_ROW_H - _BAR_H) / 2
+        frac = realized / gate
+        w = (frac / vmax) * plot_w
+        parts.append(
+            f'<text class="cat" x="{_LABEL_W - 10}" y="{bar_y + _BAR_H / 2 + 4}" '
+            f'text-anchor="end">{_esc(label)}</text>'
+        )
+        parts.append(
+            f'<path class="mark" d="{_bar_h(_LABEL_W, bar_y, w, _BAR_H)}">'
+            f"<title>{_esc(label)}: |Δ| {realized:.0f} of a {gate:.0f}-char bound "
+            f"({frac * 100:.0f}% of the gate)</title></path>"
+        )
+        parts.append(
+            f'<text class="val" x="{_LABEL_W + max(w, 2) + 8}" y="{bar_y + _BAR_H / 2 + 4}">'
+            f"{realized:.0f} / {gate:.0f}</text>"
+        )
+
+    gx = _LABEL_W + (1.0 / vmax) * plot_w
+    y_end = _PAD_TOP + n * _ROW_H
+    parts.append(f'<line class="ref-crit" x1="{gx:.1f}" y1="{_PAD_TOP - 2}" x2="{gx:.1f}" y2="{y_end}"/>')
+    parts.append(
+        f'<text class="ref-crit-label" x="{gx:.1f}" y="{y_end + 16}" text-anchor="middle">'
+        f"gate</text>"
+    )
+    parts.append("</svg>")
+    table = _table(
+        ["cell", "max |Δchars|", "gate", "share of gate"],
+        [(l, f"{r:.0f}", f"{g:.0f}", f"{r / g * 100:.0f}%") for l, r, g in items],
+        caption,
+    )
+    return f'<figure class="chart-figure">{"".join(parts)}<figcaption>{_esc(caption)}</figcaption>{table}</figure>'
+
+
 def delta_histogram(
     values: Sequence[int],
     *,
