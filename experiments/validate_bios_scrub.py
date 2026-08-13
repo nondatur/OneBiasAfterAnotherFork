@@ -51,6 +51,35 @@ from src.nb.nullbias.erasure import probe_recoverability
 from src.nb.nullbias.probe import get_embeddings
 
 
+def occupation_baseline(train, evalr) -> Dict[str, float]:
+    """How much of the real gender label is predictable from occupation alone, with no model.
+
+    This is the control that decides how to *read* a leak. Bias-in-Bios exists because
+    occupation correlates with gender (surgeon vs nurse), so a scrubbed body still carries a
+    gender prior no name/pronoun scrub can remove. If the probe's margin over chance is roughly
+    this baseline, the residual is the dataset's own phenomenon rather than a scrub defect.
+
+    `target_role` is included as a design check: it is randomised for the mismatched half of the
+    records, so it should sit at chance. If it does not, the role-match header is leaking.
+    """
+    from collections import Counter, defaultdict
+
+    def majority(rows, key):
+        agg = defaultdict(Counter)
+        for r in rows:
+            agg[getattr(r, key)][r.gender] += 1
+        return {k: c.most_common(1)[0][0] for k, c in agg.items()}
+
+    chance = max(Counter(r.gender for r in evalr).values()) / len(evalr)
+    out = {"chance": round(chance, 4)}
+    for key in ("profession", "target_role"):
+        m = majority(train, key)
+        acc = sum(m.get(getattr(r, key), 0) == r.gender for r in evalr) / len(evalr)
+        out[f"{key}_acc"] = round(acc, 4)
+        out[f"{key}_margin"] = round(acc - chance, 4)
+    return out
+
+
 def _embed(exp, cfg, records, *, scrubbed: bool) -> torch.Tensor:
     """Activations for the rendered profiles. `scrubbed=False` restores the raw body as a control."""
     texts = []
@@ -104,6 +133,8 @@ def main() -> None:
         Xev = _embed(exp, cfg, eval_recs, scrubbed=scrubbed)
         results[arm] = probe_recoverability(Xtr, y_tr, Xev, y_ev, seed=args.seed)
 
+    occ = occupation_baseline(probe_recs, eval_recs)
+
     print("\n" + "=" * 84)
     print(f"BIAS-IN-BIOS SCRUB CHECK — real gender recoverability — {cfg.model_path}")
     print("=" * 84)
@@ -111,19 +142,39 @@ def main() -> None:
     for arm, r in results.items():
         margin = max(r["linear_acc"], r["mlp_acc"]) - r["chance"]
         if arm == "scrubbed":
-            verdict = "clean (<=0.05 over chance)" if margin <= 0.05 else "LEAKS - sex axis confounded"
+            verdict = "clean (<=0.05 over chance)" if margin <= 0.05 else "residual signal present"
         else:
             verdict = "decodable (expected)" if margin > 0.05 else "PROBE SETUP SUSPECT"
         r["margin_over_chance"] = round(margin, 4)
         print(f"{arm:12} {r['linear_acc']:>9.3f} {r['mlp_acc']:>9.3f} {r['chance']:>9.3f}  {verdict}")
     print("-" * 84)
-    print("Scrubbed arm near chance => the injected marker is the only sex cue, as the design requires.")
+    print("No-model baselines — how much of gender is predictable from a single field:")
+    print(f"  occupation   {occ['profession_acc']:.3f}  ({occ['profession_margin']:+.3f} over chance)"
+          "   <- irreducible: this is what Bias-in-Bios is *about*")
+    print(f"  target role  {occ['target_role_acc']:.3f}  ({occ['target_role_margin']:+.3f})"
+          "   <- design check: should sit at chance")
+
+    scrub_margin = results.get("scrubbed", {}).get("margin_over_chance", 0.0)
+    unexplained = scrub_margin - occ["profession_margin"]
+    print("-" * 84)
+    if scrub_margin <= 0.05:
+        print("VERDICT: scrub clean — the injected marker is the only sex cue.")
+    elif unexplained <= 0.05:
+        print(f"VERDICT: residual {scrub_margin:+.3f} is essentially the occupational prior "
+              f"({occ['profession_margin']:+.3f}); unexplained {unexplained:+.3f}.")
+        print("  Not a scrub defect: occupation cannot be removed without destroying the substrate.")
+        print("  The matched-pair contrast is still clean (the body is identical across A/B), but")
+        print("  the item is NOT sex-neutral — report congruent vs incongruent pairs separately.")
+    else:
+        print(f"VERDICT: residual {scrub_margin:+.3f} exceeds the occupational prior "
+              f"({occ['profession_margin']:+.3f}) by {unexplained:+.3f} — investigate the scrub.")
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps({
         "model": cfg.model_path, "seed": args.seed,
         "probe_items": args.probe_items, "eval_items": args.eval_items,
-        "results": results,
+        "results": results, "occupation_baseline": occ,
+        "unexplained_margin": round(unexplained, 4),
     }, indent=2))
     print(f"saved -> {args.out}")
 

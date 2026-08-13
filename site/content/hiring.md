@@ -50,14 +50,51 @@ own renderer rather than reusing the synthetic CV one.
 
 ## controls
 - **The single-axis strip check**, as everywhere: the two sides differ by exactly the clause.
-- **The scrub, which the gate cannot check.** This is the important one. The gate compares the
-  two poles *to each other*, so any residual gendered text appears identically on both sides,
-  cancels in the difference, and passes silently. The scrub is therefore validated separately by
-  probing the corpus's **real** gender label out of scrubbed activations: near chance means the
-  injected marker really is the only sex cue. Until that check has been run, no sex-axis number
-  from this substrate should be trusted.
+- **The scrub, which the gate cannot check.** The gate compares the two poles *to each other*,
+  so residual gendered text appears identically on both sides, cancels in the difference, and
+  passes silently. The scrub is therefore validated separately by probing the corpus's **real**
+  gender label out of scrubbed activations. **This check has now been run — see the result
+  below.**
 - **Discarding unresolvable names** rather than keeping them: with ~257k biographies available,
   precision is cheaper than recall.
 - **Two templates**, and **held-fixed axes** recorded per pair, as in the other substrates.
 - **A known residual risk:** a first name appearing mid-text in a biography that opens without a
   recognisable name span is not removed. The probe check is what would catch this at scale.
+
+## scrub check result
+Run on the 0.6B pilot model, 500 probe / 500 eval items, predicting the corpus's **real** gender
+label from activations:
+
+| arm | linear probe | MLP probe | chance |
+|---|---|---|---|
+| scrubbed | 0.666 | 0.608 | 0.566 |
+| unscrubbed (control) | 0.994 | 0.974 | 0.566 |
+
+The control arm is strongly decodable, so the probe setup works. The scrub cuts decodability
+hard — 0.994 down to 0.666 — but **does not reach chance**. There is residual signal of about
+**+0.10** over chance.
+
+**Where it comes from, and why it is not a scrub defect.** Two no-model baselines locate it:
+
+- Predicting gender from **occupation alone** gives 0.622, i.e. **+0.056** — over half the
+  residual. The occupations in this corpus are heavily gender-skewed by construction (surgeon
+  14% female, nurse 83% female); that skew *is what Bias-in-Bios was built to study*, and no
+  name-or-pronoun scrub can remove it without destroying the substrate.
+- Predicting from the **stated target role** gives 0.500, *below* chance. The role-match header
+  is randomised for the mismatched half of the records, so the design element we added
+  introduces no leak. That was the thing most at risk of being our own fault, and it is clean.
+
+That leaves roughly **+0.044** unexplained — plausibly finer lexical correlates (specialisms,
+institutions, activities) that also track gender.
+
+**What this does and does not invalidate.**
+
+- It does **not** break the matched-pair contrast. The body is byte-identical across A and B, so
+  occupational content sits on both sides and largely cancels in the difference. Auto-influence
+  still measures the effect of the injected clause, and a difference-of-means probe built from
+  these pairs is dominated by the clause rather than the body.
+- It **does** falsify the stronger claim that the item is sex-neutral apart from the marker. It
+  is not. Each biography carries an occupational gender prior.
+- The consequence is a **congruency interaction** we should measure rather than assume away:
+  "the applicant is a man" lands differently on a nurse biography than on a surgeon one. The
+  right response is to report congruent and incongruent pairs separately, not to scrub harder.

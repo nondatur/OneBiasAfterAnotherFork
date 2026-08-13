@@ -60,7 +60,30 @@ probe setup is broken and the scrubbed result means nothing.
 - **Cosine reported per axis**, not pooled, so a single misbehaving axis is visible.
 
 ## statistics
-Check 1 has been run once: n = 142 per group, probe accuracy 0.92, cosines −0.216 and −0.297.
-Check 2 has **not been run yet**. Until it has, no sex-axis number from the hiring substrate
-should be treated as trustworthy — that caveat is repeated on the hiring page for the same
-reason.
+**Check 1** has been run once: n = 142 per group, probe accuracy 0.92, cosines −0.216 and
+−0.297. Still a single arm on a single small model.
+
+**Check 2 has now been run** (0.6B pilot, 500 probe / 500 eval):
+
+| arm | linear | MLP | chance |
+|---|---|---|---|
+| scrubbed | 0.666 | 0.608 | 0.566 |
+| unscrubbed (control) | 0.994 | 0.974 | 0.566 |
+
+The control is strongly decodable, so the setup works; the scrub takes decodability from 0.994
+to 0.666 but not to chance, leaving about **+0.10** of residual signal.
+
+Two no-model baselines locate that residual. Occupation alone predicts gender at 0.622
+(**+0.056**), which is most of it — the corpus is gender-skewed by occupation on purpose, and no
+scrub removes that. The stated target role predicts at 0.500, *below* chance, so the role-match
+header we introduced leaks nothing. About **+0.044** remains unexplained.
+
+**The conclusion is narrower than "the scrub failed".** The matched-pair contrast survives,
+because the body is byte-identical across the two poles and largely cancels. What does not
+survive is the claim that the item is sex-neutral apart from the injected marker — each
+biography carries an occupational gender prior. So the corrective is not a harder scrub but an
+analysis change: report **congruent** and **incongruent** pairs separately, since a masculine
+marker on a nurse biography is a different item from the same marker on a surgeon's.
+
+This is why the check was worth running before the scaling runs rather than after: it changes
+how the hiring sex-axis results have to be reported, not whether they can be produced.
