@@ -7,9 +7,8 @@
 #   det shell start -w IL_rm_bias --config-file cluster/config.yaml
 #   det shell start -w IL_rm_bias --config-file cluster/config.yaml --config resources.slots=2
 #
-# TWO PLACEHOLDERS TO FILL BEFORE FIRST USE:
-#   <TU_ID>      your TU-Darmstadt id (the user bind mount)
-#   <REGISTRY>   where you pushed the image built from cluster/Dockerfile
+# Ready to use as-is. The only thing to change is `image`, and only if you switch from the
+# stock NGC image plus PFSS-installed extras to a custom image (see cluster/README.md §1).
 
 bind_mounts:
   # Shared external area — present in the cluster's own config_blueprint.yaml.
@@ -22,8 +21,8 @@ bind_mounts:
     host_path: /pfss/mlde/workspaces/mlde_wsp_IL_rm_bias
     propagation: rprivate
     read_only: false
-  - container_path: /pfss/mlde/users/<TU_ID>
-    host_path: /pfss/mlde/users/<TU_ID>
+  - container_path: /pfss/mlde/users/ck21zoly
+    host_path: /pfss/mlde/users/ck21zoly
     propagation: rprivate
     read_only: false
 

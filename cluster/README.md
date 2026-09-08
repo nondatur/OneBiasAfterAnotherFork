@@ -13,12 +13,12 @@ Determined's trial machinery is needed. A task with a plain `entrypoint` just ru
 ```bash
 source .venv-mlx/bin/activate                 # `det` 0.35.0 lives here
 export DET_MASTER=https://login01.ai.tu-darmstadt.de:8080
-det user login <TU_ID>                        # TU VPN must be up first
+det user login ck21zoly                        # TU VPN must be up first
 det workspace ls
 ```
 
-Fill the two placeholders in `cluster/config.yaml` (`<TU_ID>`, `<REGISTRY>`) before launching
-anything.
+The configs are filled in for this workspace and TU-ID; nothing needs editing before a first
+launch. `<REGISTRY>` appears only in the optional custom-image route below.
 
 ## 1. Get our packages into the environment
 

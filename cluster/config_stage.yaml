@@ -7,7 +7,7 @@
 #
 #   det shell start -w IL_rm_bias --config-file cluster/config_stage.yaml
 #
-# Fill <TU_ID> before first use.
+# Ready to use as-is.
 
 bind_mounts:
   - container_path: /pfss/mlde/mlde_ext
@@ -18,8 +18,8 @@ bind_mounts:
     host_path: /pfss/mlde/workspaces/mlde_wsp_IL_rm_bias
     propagation: rprivate
     read_only: false
-  - container_path: /pfss/mlde/users/<TU_ID>
-    host_path: /pfss/mlde/users/<TU_ID>
+  - container_path: /pfss/mlde/users/ck21zoly
+    host_path: /pfss/mlde/users/ck21zoly
     propagation: rprivate
     read_only: false
 
