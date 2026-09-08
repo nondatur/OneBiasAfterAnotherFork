@@ -111,6 +111,15 @@ def _load_transformers(config: Any) -> Tuple[Any, Any]:
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
+    # Pin RIGHT padding. Every activation read in probe.py gathers the last real token via
+    # `attention_mask.sum(dim=1) - 1`, which is only the last token under right padding; with
+    # left padding that index lands mid-sequence on a pad and the scores are silently wrong.
+    # The MLX backend (mlx_backend.py:79) and parity_check.py:83 already pin it; this path did
+    # not, so it inherited each checkpoint's tokenizer default -- fine for Qwen3 ('right'), but
+    # several Llama tokenizers default to 'left'. It also keeps the baseline branch, which uses
+    # HF's own pad_token_id-based pooling, consistent with the nulled branch's manual gather.
+    tokenizer.padding_side = "right"
+
     # "cuda" / "auto" → let HF shard the model across all visible GPUs.
     # An explicit single-device string (e.g. "cuda:0", "cpu") is passed
     # through unchanged so the caller retains control.

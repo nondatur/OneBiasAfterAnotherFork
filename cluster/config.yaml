@@ -1,0 +1,55 @@
+# Base MLDE task config for the RM-bias experiments on the hessian.AI 42 cluster.
+# Derived from the onboarding config_blueprint, with our workspace and image filled in.
+#
+# Workspace: IL_rm_bias (id 142)   PFSS root: /pfss/mlde/workspaces/mlde_wsp_IL_rm_bias
+#
+# One base file; vary GPU count on the command line rather than keeping several near-copies:
+#   det shell start -w IL_rm_bias --config-file cluster/config.yaml
+#   det shell start -w IL_rm_bias --config-file cluster/config.yaml --config resources.slots=2
+#
+# TWO PLACEHOLDERS TO FILL BEFORE FIRST USE:
+#   <TU_ID>      your TU-Darmstadt id (the user bind mount)
+#   <REGISTRY>   where you pushed the image built from cluster/Dockerfile
+
+bind_mounts:
+  # Workspace storage: code, data, HF cache and results all live here and survive the task.
+  - container_path: /pfss/mlde/workspaces/mlde_wsp_IL_rm_bias
+    host_path: /pfss/mlde/workspaces/mlde_wsp_IL_rm_bias
+    propagation: rprivate
+    read_only: false
+  - container_path: /pfss/mlde/users/<TU_ID>
+    host_path: /pfss/mlde/users/<TU_ID>
+    propagation: rprivate
+    read_only: false
+
+description: RM demographic-bias evaluation (inference only)
+
+environment:
+  add_capabilities:
+    - IPC_LOCK          # required for the InfiniBand device below
+  force_pull_image: false
+  image:
+    cuda: <REGISTRY>/rm-bias:latest
+  environment_variables:
+    # Keep every large cache on PFSS. The node-local disk is small, and slide 35 is explicit:
+    # overrunning instance storage crashes the compute node and takes other jobs with it.
+    - HF_HOME=/pfss/mlde/workspaces/mlde_wsp_IL_rm_bias/hf_cache
+    - HF_HUB_ENABLE_HF_TRANSFER=1
+    - TOKENIZERS_PARALLELISM=false
+    - PYTHONPATH=/pfss/mlde/workspaces/mlde_wsp_IL_rm_bias/OneBiasAfterAnotherFork
+
+resources:
+  devices:
+    - container_path: /dev/infiniband/
+      host_path: /dev/infiniband/
+      mode: mrw
+  # The workspace has NO default compute pool set, so this must be stated explicitly on every
+  # launch or the task is rejected (42_Priority does not exist for us).
+  resource_pool: 42_Compute
+  slots: 1
+  weight: 1
+
+# Everything up to 32B fits on one A100-80GB in bf16; the two 70B models need slots: 2.
+# Override per run instead of editing this file.
+
+work_dir: /pfss/mlde/workspaces/mlde_wsp_IL_rm_bias/OneBiasAfterAnotherFork
