@@ -25,7 +25,7 @@ bind_mounts:
 
 description: staging shell (0 GPU, stock image)
 
-idle_timeout: 3600
+idle_timeout: 1h
 
 environment:
   add_capabilities:

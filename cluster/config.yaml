@@ -30,9 +30,11 @@ bind_mounts:
 description: RM demographic-bias evaluation (inference only)
 
 # Safety net against the failure mode the onboarding deck warns about twice: an idle task
-# holding GPUs. Determined reaps the task after this many seconds idle, so a forgotten shell
-# stops costing allocation. Harmless for batch experiments, which exit on their own.
-idle_timeout: 3600
+# holding GPUs. Determined reaps the task after this long idle, so a forgotten shell stops
+# costing allocation. Harmless for batch experiments, which exit on their own.
+# Must be a DURATION STRING ("1h", "30m", "600s") -- a bare integer is rejected at launch
+# with `invalid duration`.
+idle_timeout: 1h
 
 environment:
   add_capabilities:
