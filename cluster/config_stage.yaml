@@ -10,6 +10,10 @@
 # Fill <TU_ID> before first use.
 
 bind_mounts:
+  - container_path: /pfss/mlde/mlde_ext
+    host_path: /pfss/mlde/mlde_ext
+    propagation: rprivate
+    read_only: false
   - container_path: /pfss/mlde/workspaces/mlde_wsp_IL_rm_bias
     host_path: /pfss/mlde/workspaces/mlde_wsp_IL_rm_bias
     propagation: rprivate
@@ -21,10 +25,17 @@ bind_mounts:
 
 description: staging shell (0 GPU, stock image)
 
+idle_timeout: 3600
+
 environment:
   add_capabilities:
     - IPC_LOCK
   force_pull_image: false
+  image:
+    # A slots=0 task uses the `cpu` entry. State it so staging runs the same NGC image the
+    # GPU jobs do, rather than whatever default the platform would otherwise pick.
+    cpu: determinedai/pytorch-ngc:0.35.0
+    cuda: determinedai/pytorch-ngc:0.35.0
 
 resources:
   # Stated explicitly: this workspace has no default compute pool, and the launch that

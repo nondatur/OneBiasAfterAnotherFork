@@ -1,42 +1,41 @@
 # Image for the hessian.AI 42 cluster (MLDE / Determined 0.35.0).
 #
-# WHY A CUSTOM IMAGE AT ALL: the stock Determined images are py-3.8-pytorch-1.12, and the
-# compute nodes forbid installing anything at run time ("apt install, pdsh, apt-get won't
-# work"). Qwen3 / Llama-3.1 / Gemma-2 reward models need torch 2.x and a modern transformers,
-# so the environment has to be baked in here.
+# Layered on the image the cluster's own config_blueprint.yaml ships, NOT built from a bare
+# CUDA base. That base already carries a matching CUDA/PyTorch stack and the Determined 0.35.0
+# harness, so this only has to add the packages our experiments need on top. It also removes
+# any risk of a harness/master version mismatch.
 #
-# Build on an amd64 machine or CI runner. Cross-building this on Apple Silicon works via
-# `docker buildx --platform linux/amd64` but is slow; see cluster/README.md.
+# (The onboarding slides show py-3.8-pytorch-1.12; that is stale — the live blueprint uses the
+# NGC image below.)
+#
+# This is the reproducible route. The faster route to a first result is to skip Docker
+# entirely and `pip install --target` the extras onto PFSS — see cluster/README.md.
+#
+# Build on amd64 (the cluster) — cross-building from Apple Silicon works but is slow:
+#   docker buildx build --platform linux/amd64 \
+#     -f cluster/Dockerfile -t <REGISTRY>/rm-bias:latest --push .
 
-FROM nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04
+FROM determinedai/pytorch-ngc:0.35.0
 
-ENV DEBIAN_FRONTEND=noninteractive \
-    PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1
-
-# Ubuntu 22.04 ships Python 3.10, which is new enough for our code and avoids the
-# externally-managed-environment friction that 24.04 introduces.
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        python3 python3-dev python3-pip \
-        git ca-certificates curl \
-    && rm -rf /var/lib/apt/lists/* \
-    && ln -sf /usr/bin/python3 /usr/bin/python
+ENV PIP_NO_CACHE_DIR=1
 
 WORKDIR /opt/app
 
-# requirements-analysis.txt pulls in requirements.txt via `-r`, so this installs the base
-# stack (torch, transformers, accelerate, datasets, textstat) plus scikit-learn,
-# concept-erasure (LEACE) and markdown-it-py in one layer.
+# requirements-analysis.txt pulls in requirements.txt via `-r`, so this covers the base stack
+# (transformers, accelerate, datasets, textstat) plus scikit-learn, concept-erasure (LEACE)
+# and markdown-it-py.
+#
+# torch is deliberately left to the base image: the NGC build is tuned for this hardware and
+# reinstalling it from PyPI would replace a matched CUDA build with a generic one.
 COPY requirements.txt requirements-analysis.txt ./
-RUN python -m pip install --upgrade pip \
+RUN sed -i '/^torch/d' requirements.txt \
+    && python -m pip install --upgrade pip \
     && python -m pip install -r requirements-analysis.txt
-
-# Determined's harness runs inside the container; it must match the cluster master (0.35.0).
-RUN python -m pip install determined==0.35.0
 
 # Fail the build rather than the job if the stack is not actually importable.
 RUN python -c "import torch, transformers, sklearn, concept_erasure, textstat; \
-print('torch', torch.__version__, '| transformers', transformers.__version__)"
+print('torch', torch.__version__, '| transformers', transformers.__version__); \
+assert torch.__version__ >= '2.1', 'base image torch too old for these reward models'"
 
-# NOTE: the code and data are NOT copied in. They live on PFSS and are bind-mounted at run
-# time (see cluster/config.yaml), so a code change does not require an image rebuild.
+# Code and data are NOT copied in: they live on PFSS and are bind-mounted at run time
+# (cluster/config.yaml), so a code change never requires an image rebuild.

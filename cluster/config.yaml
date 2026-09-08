@@ -12,6 +12,11 @@
 #   <REGISTRY>   where you pushed the image built from cluster/Dockerfile
 
 bind_mounts:
+  # Shared external area — present in the cluster's own config_blueprint.yaml.
+  - container_path: /pfss/mlde/mlde_ext
+    host_path: /pfss/mlde/mlde_ext
+    propagation: rprivate
+    read_only: false
   # Workspace storage: code, data, HF cache and results all live here and survive the task.
   - container_path: /pfss/mlde/workspaces/mlde_wsp_IL_rm_bias
     host_path: /pfss/mlde/workspaces/mlde_wsp_IL_rm_bias
@@ -24,19 +29,35 @@ bind_mounts:
 
 description: RM demographic-bias evaluation (inference only)
 
+# Safety net against the failure mode the onboarding deck warns about twice: an idle task
+# holding GPUs. Determined reaps the task after this many seconds idle, so a forgotten shell
+# stops costing allocation. Harmless for batch experiments, which exit on their own.
+idle_timeout: 3600
+
 environment:
   add_capabilities:
     - IPC_LOCK          # required for the InfiniBand device below
   force_pull_image: false
   image:
-    cuda: <REGISTRY>/rm-bias:latest
+    # The cluster's blueprint ships determinedai/pytorch-ngc:0.35.0 — an NGC PyTorch build,
+    # NOT the py-3.8-pytorch-1.12 shown on the onboarding slides, which were out of date.
+    # Set BOTH keys: a slots=0 task uses the `cpu` entry, so leaving it unset would silently
+    # fall back to a different (older) image than the GPU runs use.
+    #
+    # Two ways to get our extras (transformers, scikit-learn, concept-erasure, textstat) in:
+    #   a) point both keys at a custom image layered on this one (cluster/Dockerfile), or
+    #   b) pip install --target onto PFSS once and set PYTHONPATH below — no Docker needed.
+    # (b) is the faster route to a first result; (a) is the reproducible one. See README.
+    cpu: determinedai/pytorch-ngc:0.35.0
+    cuda: determinedai/pytorch-ngc:0.35.0
   environment_variables:
     # Keep every large cache on PFSS. The node-local disk is small, and slide 35 is explicit:
     # overrunning instance storage crashes the compute node and takes other jobs with it.
     - HF_HOME=/pfss/mlde/workspaces/mlde_wsp_IL_rm_bias/hf_cache
     - HF_HUB_ENABLE_HF_TRANSFER=1
     - TOKENIZERS_PARALLELISM=false
-    - PYTHONPATH=/pfss/mlde/workspaces/mlde_wsp_IL_rm_bias/OneBiasAfterAnotherFork
+    # Repo first, then the PFSS-installed extras (option (b) above). Harmless if unused.
+    - PYTHONPATH=/pfss/mlde/workspaces/mlde_wsp_IL_rm_bias/OneBiasAfterAnotherFork:/pfss/mlde/workspaces/mlde_wsp_IL_rm_bias/pylibs
 
 resources:
   devices:
@@ -48,6 +69,11 @@ resources:
   resource_pool: 42_Compute
   slots: 1
   weight: 1
+  # REQUIRED for the 70B runs, and harmless below them. `device_map="auto"` shards one model
+  # across the GPUs visible to a single process; it cannot span nodes. Without this, a
+  # slots=2 request could be placed as 1 GPU on each of two nodes and the load would fail or,
+  # worse, silently see only half the hardware.
+  is_single_node: true
 
 # Everything up to 32B fits on one A100-80GB in bf16; the two 70B models need slots: 2.
 # Override per run instead of editing this file.

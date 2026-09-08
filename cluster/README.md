@@ -20,21 +20,38 @@ det workspace ls
 Fill the two placeholders in `cluster/config.yaml` (`<TU_ID>`, `<REGISTRY>`) before launching
 anything.
 
-## 1. Build and push the image
+## 1. Get our packages into the environment
 
-A custom image is **mandatory**. The stock Determined images are `py-3.8-pytorch-1.12`; our
-reward models need torch 2.x and a modern transformers, and the compute nodes forbid
-installing anything at run time.
+The onboarding slides show `py-3.8-pytorch-1.12`, which would have forced a custom image. That
+is **stale**: the cluster's own `config_blueprint.yaml` ships
+**`determinedai/pytorch-ngc:0.35.0`**, an NGC PyTorch build with a modern torch and the
+matching Determined harness. So the base is fine and only our extras (transformers,
+scikit-learn, concept-erasure, textstat) need adding. Two routes:
 
-The cluster is amd64 and this Mac is arm64, so build on an amd64 machine or a CI runner.
-Cross-building locally works but is slow:
+**(b) PFSS install — no Docker, fastest to a first result.** From a staging shell:
+
+```bash
+PFSS=/pfss/mlde/workspaces/mlde_wsp_IL_rm_bias
+python -m pip install --target "$PFSS/pylibs" -r requirements-analysis.txt
+```
+
+`config.yaml` already puts `$PFSS/pylibs` on `PYTHONPATH`. Nothing is installed on the
+compute node itself — the packages sit on shared storage and are simply importable — so this
+does not run into the "no installing on compute nodes" rule, which is about `apt`.
+Check what the base image already provides before installing, and **never** install `torch`
+this way: the NGC build is tuned for this hardware and a PyPI wheel would displace it.
+
+**(a) Custom image — reproducible, do it once things work.** `cluster/Dockerfile` layers our
+extras onto the same NGC base and drops `torch` from the requirements for the reason above.
+The cluster is amd64 and this Mac is arm64, so build on an amd64 machine or CI:
 
 ```bash
 docker buildx build --platform linux/amd64 \
   -f cluster/Dockerfile -t <REGISTRY>/rm-bias:latest --push .
 ```
 
-The registry must be **public**, or the cluster cannot pull without credentials.
+The registry must be **public**, or the cluster cannot pull without credentials. Then point
+both `image.cpu` and `image.cuda` in `config.yaml` at it.
 
 ## 2. Stage code, data and checkpoints
 
@@ -83,7 +100,10 @@ side, dtype, and chat-template differences at once.
 | 2× 27B, 2× 32B (54–64 GB bf16) | 1 |
 | 2× 70B (~140 GB bf16) | **2** |
 
-`device_map="auto"` is already in the loader, so multi-GPU sharding needs no code change.
+`device_map="auto"` is already in the loader, so multi-GPU sharding needs no code change —
+but it shards across the GPUs visible to **one process** and cannot span nodes. That is why
+`config.yaml` sets `is_single_node: true`: without it a `slots: 2` request could be placed as
+one GPU on each of two nodes, and the 70B load would fail or silently see half the memory.
 
 Interactive:
 ```bash
