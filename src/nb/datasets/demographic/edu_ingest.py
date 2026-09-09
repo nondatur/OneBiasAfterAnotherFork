@@ -69,8 +69,12 @@ def _clean(text: str) -> str:
 
 
 def _missing(path: Path, corpus: str, how: str) -> None:
+    # `data/` is gitignored, so on a fresh clone the raw directory does not exist and any
+    # suggested download command would fail on the missing parent rather than on the download.
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
     raise FileNotFoundError(
-        f"{corpus} corpus not found at {path}. It is user-downloaded (not committed).\n  {how}"
+        f"{corpus} corpus not found at {path}. It is user-downloaded (not committed).\n  {how}\n"
+        f"  (the directory {Path(path).parent} has just been created for you)"
     )
 
 

@@ -91,10 +91,15 @@ def load_german_credit(path: Path | str = DEFAULT_RAW_PATH) -> List[GermanCredit
     """Parse `german.data` into decoded :class:`GermanCreditRecord` objects (order preserved)."""
     path = Path(path)
     if not path.exists():
+        # Create the directory before suggesting the download. `data/` is gitignored, so on a
+        # fresh clone it does not exist and `curl -o` fails with "No such file or directory"
+        # rather than downloading -- which reads as a broken instruction.
+        path.parent.mkdir(parents=True, exist_ok=True)
         raise FileNotFoundError(
             f"German Credit raw file not found at {path}. Download it first, e.g.:\n"
-            "  curl -L -o data/demographic/credit/raw/german.data \\\n"
-            "    https://archive.ics.uci.edu/ml/machine-learning-databases/statlog/german/german.data"
+            f"  curl -L -o {path} \\\n"
+            "    https://archive.ics.uci.edu/ml/machine-learning-databases/statlog/german/german.data\n"
+            f"  (the directory {path.parent} has just been created for you)"
         )
 
     records: List[GermanCreditRecord] = []
