@@ -55,6 +55,8 @@ environment:
     # Keep every large cache on PFSS. The node-local disk is small, and slide 35 is explicit:
     # overrunning instance storage crashes the compute node and takes other jobs with it.
     - HF_HOME=/pfss/mlde/workspaces/mlde_wsp_IL_rm_bias/hf_cache
+    # Requires the `hf_transfer` package in pylibs -- the Hub RAISES rather than
+    # falling back if this is 1 and the package is absent.
     - HF_HUB_ENABLE_HF_TRANSFER=1
     - TOKENIZERS_PARALLELISM=false
     # Repo first, then the PFSS-installed extras (option (b) above). Harmless if unused.

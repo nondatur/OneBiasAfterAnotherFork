@@ -37,7 +37,8 @@ PFSS=/pfss/mlde/workspaces/mlde_wsp_IL_rm_bias
 # cannot resolve, so every package otherwise burns 5 retries before falling back to PyPI.
 # A CLI flag cannot unset an extra-index-url, so make the failure fast instead.
 python -m pip install --target "$PFSS/pylibs" --retries 1 --timeout 10 \
-  "transformers>=4.51,<5" accelerate datasets textstat scikit-learn concept-erasure markdown-it-py
+  "transformers>=4.51,<5" accelerate datasets textstat scikit-learn concept-erasure markdown-it-py \
+  hf_transfer
 
 # MANDATORY cleanup -- see below.
 cd "$PFSS/pylibs" && rm -rf \
@@ -61,6 +62,10 @@ restores the image's builds; `--target` never touched `site-packages`, so nothin
 
 Verify afterwards that `numpy.__file__` and `torch.__file__` both resolve under
 `/usr/local/lib/python3.10/dist-packages/`, not `pylibs`.
+
+`hf_transfer` is required, not optional: both configs set `HF_HUB_ENABLE_HF_TRANSFER=1`, and
+the Hub raises rather than falling back if the package is missing. It is worth having anyway —
+it is substantially faster over the 566 GB of checkpoints.
 
 Pins worth knowing: `transformers>=4.51` because Qwen3 support (which the Skywork RMs need)
 landed there; `<5` to stay compatible with the image's torch 2.3. Note the reference numbers
