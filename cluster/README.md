@@ -127,9 +127,13 @@ side, dtype, and chat-template differences at once.
 | 2× 70B (~140 GB bf16) | **2** |
 
 `device_map="auto"` is already in the loader, so multi-GPU sharding needs no code change —
-but it shards across the GPUs visible to **one process** and cannot span nodes. That is why
-`config.yaml` sets `is_single_node: true`: without it a `slots: 2` request could be placed as
-one GPU on each of two nodes, and the 70B load would fail or silently see half the memory.
+but it shards across the GPUs visible to **one process** and cannot span nodes.
+
+For **experiments**, therefore, set `resources.is_single_node: true`, or a `slots: 2` request
+could be placed one GPU per node and the 70B load would fail or silently see half the memory.
+Do **not** set it in `config.yaml`: NTSCs (notebooks, shells, commands) reject it with
+`cannot be set for NTSCs`, because an NTSC is one container on one node anyway — the
+guarantee is implicit there and only needs stating for multi-node-capable experiments.
 
 Interactive:
 ```bash

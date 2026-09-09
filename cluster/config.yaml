@@ -70,11 +70,15 @@ resources:
   resource_pool: 42_Compute
   slots: 1
   weight: 1
-  # REQUIRED for the 70B runs, and harmless below them. `device_map="auto"` shards one model
-  # across the GPUs visible to a single process; it cannot span nodes. Without this, a
-  # slots=2 request could be placed as 1 GPU on each of two nodes and the load would fail or,
-  # worse, silently see only half the hardware.
-  is_single_node: true
+  # NOTE: `is_single_node` is deliberately NOT set here. It is rejected for NTSCs (notebooks,
+  # shells, tensorboards, commands) with "cannot be set for NTSCs" -- an NTSC is one container
+  # on one node by construction, so the guarantee is implicit and the field is meaningless.
+  #
+  # It IS required for multi-slot *experiments*: `device_map="auto"` shards one model across
+  # the GPUs visible to a single process and cannot span nodes, so an unconstrained slots=2
+  # experiment could be placed one GPU per node and either fail or silently see half the
+  # memory. Set `resources.is_single_node: true` in the experiment config used for the 70B
+  # runs, not here.
 
 # Everything up to 32B fits on one A100-80GB in bf16; the two 70B models need slots: 2.
 # Override per run instead of editing this file.
