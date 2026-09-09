@@ -32,14 +32,40 @@ scikit-learn, concept-erasure, textstat) need adding. Two routes:
 
 ```bash
 PFSS=/pfss/mlde/workspaces/mlde_wsp_IL_rm_bias
-python -m pip install --target "$PFSS/pylibs" -r requirements-analysis.txt
+
+# --retries 1: the image's pip.conf lists pypi.ngc.nvidia.com, which the compute nodes
+# cannot resolve, so every package otherwise burns 5 retries before falling back to PyPI.
+# A CLI flag cannot unset an extra-index-url, so make the failure fast instead.
+python -m pip install --target "$PFSS/pylibs" --retries 1 --timeout 10 \
+  "transformers>=4.51,<5" accelerate datasets textstat scikit-learn concept-erasure markdown-it-py
+
+# MANDATORY cleanup -- see below.
+cd "$PFSS/pylibs" && rm -rf \
+  torch torchgen functorch torch-*.dist-info torch.libs \
+  numpy numpy.libs numpy-*.dist-info \
+  nvidia nvidia_*.dist-info triton triton-*.dist-info \
+  cuda_bindings cuda_pathfinder cuda_toolkit cuda_*.dist-info
 ```
 
 `config.yaml` already puts `$PFSS/pylibs` on `PYTHONPATH`. Nothing is installed on the
 compute node itself — the packages sit on shared storage and are simply importable — so this
 does not run into the "no installing on compute nodes" rule, which is about `apt`.
-Check what the base image already provides before installing, and **never** install `torch`
-this way: the NGC build is tuned for this hardware and a PyPI wheel would displace it.
+
+**Why the cleanup is not optional.** `pip --target` treats the target directory as isolated:
+it cannot see the image's `site-packages`, so when `accelerate` declares a torch dependency
+pip installs the *newest* torch (2.14) plus its entire CUDA 13 runtime — several GB of
+`nvidia-*` wheels — into `pylibs`. Because `PYTHONPATH` precedes `site-packages`, that would
+shadow the NGC-tuned torch `2.3.0a0+…nv24.03` and numpy `1.24.4` the container is built
+around, and CUDA breaks in ways that look like a code bug. Deleting them from `pylibs`
+restores the image's builds; `--target` never touched `site-packages`, so nothing is lost.
+
+Verify afterwards that `numpy.__file__` and `torch.__file__` both resolve under
+`/usr/local/lib/python3.10/dist-packages/`, not `pylibs`.
+
+Pins worth knowing: `transformers>=4.51` because Qwen3 support (which the Skywork RMs need)
+landed there; `<5` to stay compatible with the image's torch 2.3. Note the reference numbers
+in `results/` were produced under transformers 5.10 — the first thing to suspect if a cluster
+run comes out close but not equal.
 
 **(a) Custom image — reproducible, do it once things work.** `cluster/Dockerfile` layers our
 extras onto the same NGC base and drops `torch` from the requirements for the reason above.
