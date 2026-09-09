@@ -123,6 +123,33 @@ python experiments/run_experiment.py --config configs/demographic_credit_sex_qwe
 diverges, and every scaled number would inherit the fault. This single run catches padding
 side, dtype, and chat-template differences at once.
 
+Note the config wants 500 pairs per cell (probe 300 / eval 200). Generating with a smaller
+`--n-per` silently under-fills the split and the headline metric becomes noise.
+
+### Result — PASSED, 2026-09-09 (A100-80GB, torch 2.3.0a0+nv24.03, transformers 4.57.6)
+
+| metric | reference (MLX, Mac) | cluster (CUDA) |
+|---|---|---|
+| probe accuracy | 91.5% | 93.00% |
+| baseline `mean_gap` | +0.391 | +0.3794 |
+| baseline `auto_influence` | 1.00 | **1.0000** |
+| nulled `abs_mean_gap` | 0.069 | **0.0689** |
+| nulled `auto_influence` | 0.06 | 0.1100 |
+
+The decisive line is `abs_mean_gap`: the nulled effect in raw reward units agrees to three
+decimals across two frameworks, dtypes and backends. The rewards are right.
+
+The `auto_influence` difference is the effect `CLAUDE.md` already documents from the MLX
+parity work: "nulled/debiased headline metrics can differ by ~0.03 (3 comparison-flips/100),
+a stable bf16-vs-fp32 precision effect near decision ties, not a framework bug." After nulling,
+`mean_gap` is 0.0083 -- effectively zero -- so each A/B comparison is decided by numerical
+noise. `pref_a_rate` 0.555 vs the reference 0.53 is **0.7 SE** at n=200. Indistinguishable.
+
+**Implication for the scaling runs.** `auto_influence` is a preference *rate*: it saturates at
+1.00 whenever an effect is consistent, and is pure noise once an effect is nulled -- both ends
+of its range are where we actually read it. Report `mean_gap` / `abs_mean_gap` as the primary
+magnitude alongside it, as the A2 arm already does with `identity_gap`.
+
 ## 4. Scale the ladder
 
 | models | `resources.slots` |
