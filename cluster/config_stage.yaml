@@ -36,6 +36,13 @@ environment:
     # GPU jobs do, rather than whatever default the platform would otherwise pick.
     cpu: determinedai/pytorch-ngc:0.35.0
     cuda: determinedai/pytorch-ngc:0.35.0
+  environment_variables:
+    # Same as config.yaml, so a staging shell and a GPU run resolve imports and the model
+    # cache identically. Without these you have to export them by hand every session.
+    - HF_HOME=/pfss/mlde/workspaces/mlde_wsp_IL_rm_bias/hf_cache
+    - HF_HUB_ENABLE_HF_TRANSFER=1
+    - TOKENIZERS_PARALLELISM=false
+    - PYTHONPATH=/pfss/mlde/workspaces/mlde_wsp_IL_rm_bias/OneBiasAfterAnotherFork:/pfss/mlde/workspaces/mlde_wsp_IL_rm_bias/pylibs
 
 resources:
   # Stated explicitly: this workspace has no default compute pool, and the launch that
