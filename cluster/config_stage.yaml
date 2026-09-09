@@ -39,6 +39,10 @@ environment:
   environment_variables:
     # Same as config.yaml, so a staging shell and a GPU run resolve imports and the model
     # cache identically. Without these you have to export them by hand every session.
+    # Exported so $PFSS is available in every task shell. Without it, the pip --target
+    # and staging commands in the README silently expand to /pylibs and fail on the
+    # filesystem root -- a shell variable set in one task does not survive into the next.
+    - PFSS=/pfss/mlde/workspaces/mlde_wsp_IL_rm_bias
     - HF_HOME=/pfss/mlde/workspaces/mlde_wsp_IL_rm_bias/hf_cache
     # Requires the `hf_transfer` package in pylibs -- the Hub RAISES rather than
     # falling back if this is 1 and the package is absent.
